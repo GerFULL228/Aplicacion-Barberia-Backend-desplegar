@@ -14,5 +14,5 @@ public class ProductoRequest {
     private boolean estado;
     private boolean publicado;
     private Long idCategoria;
-    private List<String> urlsMultimedia;
+
 }

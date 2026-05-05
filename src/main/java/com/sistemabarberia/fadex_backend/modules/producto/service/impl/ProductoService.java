@@ -100,14 +100,18 @@ public class ProductoService implements IProductoService {
 
     @Override
     public void eliminarProducto(Long id) {
-        Producto producto = productoRepository.findById(id).orElseThrow(() -> new BusinessException("Producto no encontrado", HttpStatus.NOT_FOUND));
+        Producto producto = productoRepository.findById(id)
+                .orElseThrow(() -> new BusinessException("Producto no encontrado", HttpStatus.NOT_FOUND));
+
         for (String url : producto.getUrlsMultimedia()) {
             try {
-                fileStorageService.eliminarArchivo(url);
+                String rutaRelativa = fileStorageService.urlAPathRelativo(url);
+                fileStorageService.eliminarArchivo(rutaRelativa);
             } catch (Exception e) {
-                throw new BusinessException("Archivo no eliminado", HttpStatus.BAD_REQUEST);
+                System.err.println("No se pudo eliminar archivo: " + url + " -> " + e.getMessage());
             }
         }
+
         productoRepository.delete(producto);
     }
 
@@ -117,7 +121,6 @@ public class ProductoService implements IProductoService {
                 .orElseThrow(() -> new BusinessException("Producto no existe", HttpStatus.NOT_FOUND));
 
         for (MultipartFile file : archivos) {
-
             if (file.isEmpty()) continue;
 
             validarArchivoImagen(file);
@@ -131,6 +134,7 @@ public class ProductoService implements IProductoService {
             productoImagenRepository.save(imagen);
         }
     }
+
 
     private void validarArchivoImagen(MultipartFile file) {
         if (file == null || file.isEmpty()) {

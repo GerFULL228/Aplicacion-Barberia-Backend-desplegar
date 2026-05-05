@@ -28,7 +28,7 @@ public abstract class ProductoMapper {
         if (imagenes == null) return List.of();
 
         return imagenes.stream()
-                .map(img -> baseUrl + "/" + uploadDir + "/" + img.getUrl())
+                .map(ProductoImagen::getUrl)
                 .toList();
     }
 
