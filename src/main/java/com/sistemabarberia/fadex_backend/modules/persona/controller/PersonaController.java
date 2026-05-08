@@ -2,7 +2,7 @@ package com.sistemabarberia.fadex_backend.modules.persona.controller;
 
 
 import com.sistemabarberia.fadex_backend.commons.response.ApiResponse;
-import com.sistemabarberia.fadex_backend.modules.barbero.dto.response.BarberoResponseDTO;
+import com.sistemabarberia.fadex_backend.commons.response.PageResponse;
 import com.sistemabarberia.fadex_backend.modules.persona.dto.request.PersonaRequestDTO;
 import com.sistemabarberia.fadex_backend.modules.persona.dto.request.PersonaUpdateRequestDTO;
 import com.sistemabarberia.fadex_backend.modules.persona.dto.response.PersonaResponseDTO;
@@ -17,7 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/personas")
+@RequestMapping("/api/v1/personas")
 public class PersonaController {
     @Autowired
     private IPersonaService personaService;
@@ -26,13 +26,13 @@ public class PersonaController {
 
     //Listar
     @GetMapping
-    public ResponseEntity<ApiResponse<PersonaResponseDTO>> listarPersonas(
+    public ResponseEntity<ApiResponse<PageResponse<PersonaResponseDTO>>> listarPersonas(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
         Pageable pageable = PageRequest.of(page, size);
         Page<PersonaResponseDTO> result = personaService.listarPersonas(pageable);
-        return ResponseEntity.ok(ApiResponse.ok("Clientes obtenidos correctamente", result));
+        return ResponseEntity.ok(ApiResponse.ok("Personas obtenidos correctamente", result));
     }
 
     //Buscar

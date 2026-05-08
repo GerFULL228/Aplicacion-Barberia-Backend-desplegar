@@ -1,9 +1,6 @@
 package com.sistemabarberia.fadex_backend.modules.persona.dto.request;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 
 @Data
@@ -12,6 +9,10 @@ public class PersonaRequestDTO {
     @NotBlank(message = "El nombre es obligatorio")
     @Size(max = 100, message = "El nombre no debe superar 100 caracteres")
     private String nombre;
+
+    @NotNull(message = "El usuarioId es obligatorio")
+    @Positive(message = "El usuarioId debe ser un número positivo")
+    private Integer usuarioId;
 
     @NotBlank(message = "El apellido es obligatorio")
     @Size(max = 100, message = "El apellido no debe superar 100 caracteres")

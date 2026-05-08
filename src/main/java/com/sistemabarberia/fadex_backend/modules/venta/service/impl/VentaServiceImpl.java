@@ -1,0 +1,109 @@
+package com.sistemabarberia.fadex_backend.modules.venta.service.impl;
+
+import com.sistemabarberia.fadex_backend.modules.barbero.entity.Barbero;
+import com.sistemabarberia.fadex_backend.modules.barbero.repository.BarberoRepository;
+import com.sistemabarberia.fadex_backend.modules.cliente.entity.Cliente;
+import com.sistemabarberia.fadex_backend.modules.cliente.repository.ClienteRepository;
+import com.sistemabarberia.fadex_backend.modules.venta.dto.request.VentaRequestDTO;
+import com.sistemabarberia.fadex_backend.modules.venta.dto.request.DetalleVentaRequestDTO;
+import com.sistemabarberia.fadex_backend.modules.venta.dto.response.*;
+import com.sistemabarberia.fadex_backend.modules.venta.entity.*;
+import com.sistemabarberia.fadex_backend.modules.venta.mapper.VentaMapper;
+import com.sistemabarberia.fadex_backend.modules.venta.mapper.DetalleVentaMapper;
+import com.sistemabarberia.fadex_backend.modules.venta.mapper.HistorialVentaMapper;
+import com.sistemabarberia.fadex_backend.modules.venta.repository.*;
+import com.sistemabarberia.fadex_backend.modules.venta.service.IVentaService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class VentaServiceImpl implements IVentaService {
+
+    private final VentaRepository ventaRepository;
+    private final DetalleVentaRepository detalleVentaRepository;
+    private final HistorialVentaRepository historialVentaRepository;
+
+    private final ClienteRepository clienteRepository;
+    private final BarberoRepository barberoRepository;
+
+    private final VentaMapper ventaMapper;
+    private final DetalleVentaMapper detalleVentaMapper;
+    private final HistorialVentaMapper historialVentaMapper;
+
+    @Override
+    @Transactional
+    public VentaResponseDTO crear(VentaRequestDTO dto) {
+
+        Cliente cliente = clienteRepository.findById(dto.getClienteId())
+                .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
+
+        Barbero barbero = barberoRepository.findById(dto.getBarberoId())
+                .orElseThrow(() -> new RuntimeException("Barbero no encontrado"));
+
+        // CREAR VENTA
+        Venta venta = ventaMapper.toEntity(dto);
+        venta.setCliente(cliente);
+        venta.setBarbero(barbero);
+
+        Venta ventaGuardada = ventaRepository.save(venta);
+
+        // DETALLES
+        if (dto.getDetalles() != null && !dto.getDetalles().isEmpty()) {
+            for (DetalleVentaRequestDTO detDto : dto.getDetalles()) {
+                DetalleVenta detalle = detalleVentaMapper.toEntity(detDto);
+                detalle.setVenta(ventaGuardada);
+                detalleVentaRepository.save(detalle);
+            }
+        }
+
+        // HISTORIAL AUTOMÁTICO
+        HistorialVenta historial = new HistorialVenta();
+        historial.setVenta(ventaGuardada);
+        historial.setFecha(LocalDateTime.now());
+        historialVentaRepository.save(historial);
+
+        return ventaMapper.toResponse(ventaGuardada);
+    }
+
+    @Override
+    public List<VentaResponseDTO> listar() {
+        return ventaMapper.toResponseList(ventaRepository.findAll());
+    }
+
+    @Override
+    public VentaResponseDTO obtenerPorId(Integer id) {
+        Venta venta = ventaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Venta no encontrada"));
+
+        return ventaMapper.toResponse(venta);
+    }
+
+    @Override
+    public void eliminar(Integer id) {
+
+        if (!ventaRepository.existsById(id)) {
+            throw new RuntimeException("Venta no encontrada");
+        }
+
+        ventaRepository.deleteById(id);
+    }
+
+    @Override
+    public List<DetalleVentaResponseDTO> listarDetalles(Integer ventaId) {
+        return detalleVentaMapper.toResponseList(
+                detalleVentaRepository.findByVenta_VentaId(ventaId)
+        );
+    }
+
+    @Override
+    public List<HistorialVentaResponseDTO> listarHistorial(Integer ventaId) {
+        return historialVentaMapper.toResponseList(
+                historialVentaRepository.findByVenta_VentaId(ventaId)
+        );
+    }
+}

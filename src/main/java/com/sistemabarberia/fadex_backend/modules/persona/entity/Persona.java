@@ -17,6 +17,12 @@ public class Persona {
     @Column(name = "id_persona")
     private Integer personaId;
 
+    //@ManyToOne(fetch = FetchType.EAGER)
+    //@JoinColumn(name = "id_usuario")
+
+    @Column(name = "id_usuario")
+    private Integer usuarioId;
+
     @Column(name = "nombre")
     private String nombre;
 

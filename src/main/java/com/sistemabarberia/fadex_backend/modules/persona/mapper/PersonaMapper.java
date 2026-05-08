@@ -14,10 +14,12 @@ public interface PersonaMapper {
 
     //Listar
     @Mapping(source = "personaId", target = "personaId")
+    @Mapping(source = "usuarioId", target = "usuarioId")
     PersonaResponseDTO toResponseDTO(Persona persona);
 
     //Registrar
     @Mapping(target = "personaId", ignore = true)
+    @Mapping(source = "usuarioId", target = "usuarioId")
     Persona toEntity(PersonaRequestDTO dto);
 
 }
