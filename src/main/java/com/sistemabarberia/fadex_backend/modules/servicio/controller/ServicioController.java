@@ -1,8 +1,12 @@
 package com.sistemabarberia.fadex_backend.modules.servicio.controller;
 
-import com.sistemabarberia.fadex_backend.modules.servicio.dto.request.CorteRequestDTO;
-import com.sistemabarberia.fadex_backend.modules.servicio.dto.response.CorteResponseDTO;
-import com.sistemabarberia.fadex_backend.modules.servicio.service.ICorteService;
+
+import com.sistemabarberia.fadex_backend.modules.servicio.dto.request.ServicioRequestDTO;
+
+import com.sistemabarberia.fadex_backend.modules.servicio.dto.response.ServicioResponseDTO;
+
+
+import com.sistemabarberia.fadex_backend.modules.servicio.service.IServicioService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -12,37 +16,37 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/cortes")
+@RequestMapping("/api/v1/servicio")
 @RequiredArgsConstructor
-public class CorteController {
+public class ServicioController {
 
-    private final ICorteService corteService;
+    private final IServicioService corteService;
 
     @GetMapping
-    public ResponseEntity<List<CorteResponseDTO>> listar() {
+    public ResponseEntity<List<ServicioResponseDTO>> listar() {
         return ResponseEntity.ok(corteService.listar());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CorteResponseDTO> obtenerPorId(@PathVariable Long id) {
+    public ResponseEntity<ServicioResponseDTO> obtenerPorId(@PathVariable Long id) {
         return ResponseEntity.ok(corteService.obtenerPorId(id));
     }
 
     @GetMapping("/categoria/{categoriaId}")
-    public ResponseEntity<List<CorteResponseDTO>> listarPorCategoria(@PathVariable Long categoriaId) {
+    public ResponseEntity<List<ServicioResponseDTO>> listarPorCategoria(@PathVariable Long categoriaId) {
         return ResponseEntity.ok(corteService.listarPorCategoria(categoriaId));
     }
 
     @PostMapping
-    public ResponseEntity<CorteResponseDTO> crear(@Valid @RequestBody CorteRequestDTO dto) {
+    public ResponseEntity<ServicioResponseDTO> crear(@Valid @RequestBody ServicioRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(corteService.crear(dto));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CorteResponseDTO> actualizar(
+    public ResponseEntity<ServicioResponseDTO> actualizar(
             @PathVariable Long id,
-            @Valid @RequestBody CorteRequestDTO dto) {
+            @Valid @RequestBody ServicioRequestDTO dto) {
         return ResponseEntity.ok(corteService.actualizar(id, dto));
     }
 

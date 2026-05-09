@@ -13,12 +13,12 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Corte {
+public class Servicio {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_corte")
-    private Long corteId;
+    private Long servicioId;
 
     @Column(name = "nombre", length = 100)
     private String nombre;
@@ -29,5 +29,11 @@ public class Corte {
     @ManyToOne
     @JoinColumn(name = "id_categoria")
     private Categoria categoria;
+
+    @ManyToOne
+    @JoinColumn(name = "categoria_id")
+    private Categoria categoriaId;
+
+    private Integer duracion;
 
 }

@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CorteResponseDTO {
+public class ServicioResponseDTO {
 
     private Long corteId;
     private String nombre;

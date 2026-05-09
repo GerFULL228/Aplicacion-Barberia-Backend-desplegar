@@ -2,6 +2,7 @@ package com.sistemabarberia.fadex_backend.modules.reserva.entity;
 
 import com.sistemabarberia.fadex_backend.modules.barbero.entity.Barbero;
 import com.sistemabarberia.fadex_backend.modules.cliente.entity.Cliente;
+import com.sistemabarberia.fadex_backend.modules.servicio.entity.Servicio;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,6 +18,7 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @Getter
 @Setter
+@Table(name = "reservas")
 public class Reserva {
 
     @Id
@@ -29,11 +31,15 @@ public class Reserva {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Barbero barbero;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_servicio")
+    private Servicio servicio;
 
-
+    @Enumerated(EnumType.STRING)
+    private TipoReserva tipoReserva;
     private LocalDate fecha;
-    private LocalTime HoraInicio;
-    private LocalTime HoraFin;
+    private LocalTime horaInicio;
+    private LocalTime horaFin;
 
     private BigDecimal total;
 
