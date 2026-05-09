@@ -26,6 +26,9 @@ public class Corte {
     @Column(name = "precio")
     private BigDecimal precio;
 
+    @Column(name = "duracion_minutos")
+    private Integer duracionMinutos;
+
     @ManyToOne
     @JoinColumn(name = "id_categoria")
     private Categoria categoria;
