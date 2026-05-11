@@ -1,5 +1,6 @@
 package com.sistemabarberia.fadex_backend.modules.cliente.repository;
 
+import com.sistemabarberia.fadex_backend.auth.usuario.Entity.Usuario;
 import com.sistemabarberia.fadex_backend.modules.cliente.entity.Cliente;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -14,4 +15,6 @@ public interface ClienteRepository extends JpaRepository<Cliente,Integer> {
 
 
     Optional<Cliente> findByPersona_Usuario_IdUsuario(Integer usuarioId);
+
+    Optional<Cliente> findByPersonaUsuario(Usuario usuario);
 }

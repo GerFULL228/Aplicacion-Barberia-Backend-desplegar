@@ -107,8 +107,10 @@ public class ReservaService {
       }
   }
 
-  public List<ReservaDTO> ListarReservasPorCliente(Integer clienteId){
-      List<Reserva> reservas = reservaRepository.findByCliente_ClienteId(clienteId);
+  public List<ReservaDTO> ListarReservasPorCliente(Usuario usuario){
+     Cliente cliente = clienteRepository.findByPersonaUsuario(usuario).orElseThrow(()-> new ResourceNotFoundException("Cliente no encontrado"));
+
+     List<Reserva> reservas = reservaRepository.findByCliente_ClienteId(cliente.getClienteId());
 
       return reservaMapper.toDtoLista(reservas);
   }
@@ -117,8 +119,10 @@ public class ReservaService {
       return reservaRepository.findAll().stream().map(reservaMapper::toDto).toList();
   }
 
-    public List<ReservaDTO> ListarReservasBarbero(Integer barberoId){
-        return reservaRepository.findAll().stream().map(reservaMapper::toDto).toList();
+    public List<ReservaDTO> ListarReservasBarbero(Usuario usuario){
+       Barbero barbero = barberoRepository.findByPersonaUsuario(usuario).orElseThrow(()-> new ResourceNotFoundException("Barbero no encontrado"));
+
+        return reservaRepository.findByBarbero_BarberoId(barbero.getBarberoId()).stream().map(reservaMapper::toDto).toList();
     }
 
 }
