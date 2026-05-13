@@ -7,8 +7,7 @@ import com.sistemabarberia.fadex_backend.modules.servicio.dto.request.ServicioRe
 import com.sistemabarberia.fadex_backend.modules.servicio.dto.response.ServicioResponseDTO;
 
 import com.sistemabarberia.fadex_backend.modules.servicio.entity.Servicio;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.*;
 
 import java.util.List;
 
@@ -17,6 +16,7 @@ public interface ServicioMapper {
 
     @Mapping(target = "servicioId", ignore = true)
     @Mapping(target = "categoria", expression = "java(mapCategoria(dto.getCategoriaId()))")
+    @Mapping(target = "urlsMultimedia", ignore = true)
     Servicio toEntity(ServicioRequestDTO dto);
 
     @Mapping(source = "categoria.id", target = "categoriaId")
@@ -31,4 +31,9 @@ public interface ServicioMapper {
         categoria.setId(id);
         return categoria;
     }
+
+    @BeanMapping(nullValuePropertyMappingStrategy= NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "servicioId", ignore = true)
+    @Mapping(target = "urlsMultimedia", ignore = true)
+    void updateEntityFromDto(ServicioRequestDTO dto, @MappingTarget Servicio servicio);
 }
