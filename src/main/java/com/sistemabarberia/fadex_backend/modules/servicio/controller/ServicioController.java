@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,12 +38,14 @@ public class ServicioController {
         return ResponseEntity.ok(corteService.listarPorCategoria(categoriaId));
     }
 
+    @PreAuthorize("hasAuthority('SERVICIO_CREATE')")
     @PostMapping
     public ResponseEntity<ServicioResponseDTO> crear(@Valid @RequestBody ServicioRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(corteService.crear(dto));
     }
 
+    @PreAuthorize("hasAuthority('SERVICIO_UPDATE_ALL')")
     @PutMapping("/{id}")
     public ResponseEntity<ServicioResponseDTO> actualizar(
             @PathVariable Long id,
@@ -50,6 +53,7 @@ public class ServicioController {
         return ResponseEntity.ok(corteService.actualizar(id, dto));
     }
 
+    @PreAuthorize("hasAuthority('SERVICIO_DELETE_ALL')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         corteService.eliminar(id);
