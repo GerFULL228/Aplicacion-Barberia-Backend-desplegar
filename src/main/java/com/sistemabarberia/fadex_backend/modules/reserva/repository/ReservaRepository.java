@@ -29,4 +29,30 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
 
     List<Reserva> findByCliente_ClienteId (Integer clienteId);
     List<Reserva> findByBarbero_BarberoId (Integer barberoId);
+
+
+    @Query("""
+        SELECT r FROM Reserva r
+        LEFT JOIN FETCH r.cliente c
+        LEFT JOIN FETCH c.persona
+        WHERE r.barbero.barberoId = :barberoId
+          AND r.fecha BETWEEN :desde AND :hasta
+        ORDER BY r.fecha ASC
+    """)
+    List<Reserva> findReservasDiarias(
+            @Param("barberoId") Integer barberoId,
+            @Param("desde") LocalDate desde,
+            @Param("hasta") LocalDate hasta
+    );
+
+    @Query("""
+        SELECT r FROM Reserva r
+        WHERE r.barbero.barberoId = :barberoId
+          AND r.fecha BETWEEN :desde AND :hasta
+    """)
+    List<Reserva> findByBarberoIdAndFechaBetween(
+            @Param("barberoId") Integer barberoId,
+            @Param("desde") LocalDate desde,
+            @Param("hasta") LocalDate hasta
+    );
 }

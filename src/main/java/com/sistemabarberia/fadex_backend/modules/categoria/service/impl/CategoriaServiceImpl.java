@@ -1,6 +1,7 @@
 package com.sistemabarberia.fadex_backend.modules.categoria.service.impl;
 
 import com.sistemabarberia.fadex_backend.commons.exception.BusinessException;
+import com.sistemabarberia.fadex_backend.commons.response.PageResponse;
 import com.sistemabarberia.fadex_backend.modules.categoria.dto.CategoriaFiltro;
 import com.sistemabarberia.fadex_backend.modules.categoria.dto.request.CategoriaRequestDTO;
 import com.sistemabarberia.fadex_backend.modules.categoria.dto.response.CategoriaResponseDTO;
@@ -9,10 +10,14 @@ import com.sistemabarberia.fadex_backend.modules.categoria.entity.CategoriaEnum;
 import com.sistemabarberia.fadex_backend.modules.categoria.mapper.CategoriaMapper;
 import com.sistemabarberia.fadex_backend.modules.categoria.repository.CategoriaRepository;
 import com.sistemabarberia.fadex_backend.modules.categoria.service.ICategoriaService;
+import com.sistemabarberia.fadex_backend.modules.categoria.specs.CategoriaSpecification;
 import com.sistemabarberia.fadex_backend.modules.producto.repository.ProductoRepository;
 
 import com.sistemabarberia.fadex_backend.modules.servicio.repository.ServicioRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -31,14 +36,19 @@ public class CategoriaServiceImpl implements ICategoriaService {
     private final CategoriaMapper categoriaMapper;
 
     @Override
-    public List<CategoriaResponseDTO> listarConFiltro(CategoriaFiltro filtro) {
-        boolean incluirInactivas = filtro != null && Boolean.FALSE.equals(filtro.getEstado());
-        Map<Long, CategoriaResponseDTO> mapa = construirArbol(incluirInactivas);
-        List<CategoriaResponseDTO> raiz = mapa.values().stream().filter(cat -> cat.getPadreId() == null).toList();
-        if (filtro == null) {
-            return raiz;
-        }
-        return filtrarArbol(raiz, filtro);
+    @Transactional(readOnly = true)
+    public PageResponse<CategoriaResponseDTO> listarConFiltro(CategoriaFiltro filtro, Pageable pageable) {
+        Page<Categoria> page = categoriaRepository.findAll(CategoriaSpecification.conFiltros(filtro), pageable);
+        List<CategoriaResponseDTO> data = page.getContent().stream().map(this::mapearConHijos).toList();
+        data = filtrarArbol(data, filtro);
+        return PageResponse.<CategoriaResponseDTO>builder()
+                .content(data)
+                .pageNumber(page.getNumber())
+                .pageSize(page.getSize())
+                .totalElements(page.getTotalElements())
+                .totalPages(page.getTotalPages())
+                .last(page.isLast())
+                .build();
     }
 
     @Override
@@ -115,12 +125,19 @@ public class CategoriaServiceImpl implements ICategoriaService {
         }
         if (cambioTipo) {
             boolean tieneHijos = categoriaRepository.existsByPadreId(categoria.getId());
-            boolean tieneElementos = categoria.getTipo() == CategoriaEnum.PRODUCTO ? productoRepository.existsByCategoriaId(id) : corteRepository.existsByCategoriaId(id);
             if (tieneHijos) {
-                throw new BusinessException("No se puede cambiar el tipo porque tiene subcategorías", HttpStatus.BAD_REQUEST);
+                throw new BusinessException("No se puede cambiar el tipo porque tiene subcategorías asociadas", HttpStatus.BAD_REQUEST);
             }
-            if (tieneElementos) {
-                throw new BusinessException("No se puede cambiar el tipo porque tiene elementos asociados", HttpStatus.BAD_REQUEST);
+            if (categoria.getTipo() == CategoriaEnum.PRODUCTO) {
+                boolean tieneProductos = productoRepository.existsByCategoriaId(id);
+                if (tieneProductos) {
+                    throw new BusinessException("No se puede cambiar el tipo porque tiene productos asociados", HttpStatus.BAD_REQUEST);
+                }
+            } else {
+                boolean tieneServicios = corteRepository.existsByCategoriaId(id);
+                if (tieneServicios) {
+                    throw new BusinessException("No se puede cambiar el tipo porque tiene servicios asociados", HttpStatus.BAD_REQUEST);
+                }
             }
         }
         categoria.setNombre(dto.getNombre().trim());
@@ -133,14 +150,27 @@ public class CategoriaServiceImpl implements ICategoriaService {
     @Override
     public CategoriaResponseDTO cambiarEstado(Long id, Boolean estado) {
         Categoria categoria = categoriaRepository.findById(id).orElseThrow(() -> new BusinessException("Categoría no encontrada", HttpStatus.NOT_FOUND));
+        if (Boolean.TRUE.equals(estado) && categoria.getPadre() != null) {
+            if (!categoria.getPadre().isEstado()) {
+                throw new BusinessException("No se puede activar una categoría cuyo padre está inactivo", HttpStatus.BAD_REQUEST);
+            }
+        }
         if (Boolean.FALSE.equals(estado)) {
             boolean tieneSubcategorias = categoriaRepository.existsByPadreId(id);
-            boolean tieneElementos = categoria.getTipo() == CategoriaEnum.PRODUCTO ? productoRepository.existsByCategoriaId(id) : corteRepository.existsByCategoriaId(id);
             if (tieneSubcategorias) {
                 throw new BusinessException("No se puede desactivar la categoría porque tiene subcategorías asociadas", HttpStatus.BAD_REQUEST);
             }
-            if (tieneElementos) {
-                throw new BusinessException("No se puede desactivar la categoría porque tiene elementos asociados", HttpStatus.BAD_REQUEST);
+            if (categoria.getTipo() == CategoriaEnum.PRODUCTO) {
+                boolean tieneProductos = productoRepository.existsByCategoriaId(id);
+                if (tieneProductos) {
+                    throw new BusinessException("No se puede desactivar la categoría porque tiene productos asociados", HttpStatus.BAD_REQUEST);
+                }
+
+            } else {
+                boolean tieneServicios = corteRepository.existsByCategoriaId(id);
+                if (tieneServicios) {
+                    throw new BusinessException("No se puede desactivar la categoría porque tiene servicios asociados", HttpStatus.BAD_REQUEST);
+                }
             }
         }
         categoria.setEstado(estado);
@@ -151,15 +181,21 @@ public class CategoriaServiceImpl implements ICategoriaService {
     public void eliminar(Long id) {
         Categoria categoria = categoriaRepository.findById(id).orElseThrow(() -> new BusinessException("Categoría no encontrada", HttpStatus.NOT_FOUND));
         boolean tieneSubcategorias = categoriaRepository.existsByPadreId(id);
-        boolean tieneElementos = categoria.getTipo() == CategoriaEnum.PRODUCTO ? productoRepository.existsByCategoriaId(id) : corteRepository.existsByCategoriaId(id);
         if (tieneSubcategorias) {
             throw new BusinessException("No se puede eliminar la categoría porque tiene subcategorías asociadas", HttpStatus.BAD_REQUEST);
         }
-        if (tieneElementos) {
-            throw new BusinessException("No se puede eliminar la categoría porque tiene elementos asociados", HttpStatus.BAD_REQUEST);
+        if (categoria.getTipo() == CategoriaEnum.PRODUCTO) {
+            boolean tieneProductos = productoRepository.existsByCategoriaId(id);
+            if (tieneProductos) {
+                throw new BusinessException("No se puede eliminar la categoría porque tiene productos asociados", HttpStatus.BAD_REQUEST);
+            }
+        } else {
+            boolean tieneServicios = corteRepository.existsByCategoriaId(id);
+            if (tieneServicios) {
+                throw new BusinessException("No se puede eliminar la categoría porque tiene servicios asociados", HttpStatus.BAD_REQUEST);
+            }
         }
-        categoria.setEstado(false);
-        categoriaRepository.save(categoria);
+        categoriaRepository.delete(categoria);
     }
 
     private Map<Long, CategoriaResponseDTO> construirArbol(boolean incluirInactivas) {
@@ -185,24 +221,23 @@ public class CategoriaServiceImpl implements ICategoriaService {
         List<CategoriaResponseDTO> resultado = new ArrayList<>();
         for (CategoriaResponseDTO cat : lista) {
             boolean cumple = true;
-            if (filtro.getPadreId() != null && (cat.getPadreId() == null || !cat.getPadreId().equals(filtro.getPadreId()))) {
-                cumple = false;
-            }
-            if (filtro.getNombre() != null && !cat.getNombre().toLowerCase().contains(filtro.getNombre().toLowerCase().trim())) {
-                cumple = false;
-            }
-            if (filtro.getEstado() != null && cat.isEstado() != filtro.getEstado()) {
-                cumple = false;
-            }
-            if (filtro.getTipo() != null && !cat.getTipo().equals(filtro.getTipo())) {
-                cumple = false;
-            }
+            if (filtro.getNombre() != null && !cat.getNombre().toLowerCase().contains(filtro.getNombre().toLowerCase().trim())) {cumple = false;}
+            if (filtro.getEstado() != null && cat.isEstado() != filtro.getEstado()) {cumple = false;}
+            if (filtro.getTipo() != null &&  !cat.getTipo().equals(filtro.getTipo())) {cumple = false;}
             List<CategoriaResponseDTO> hijosFiltrados = filtrarArbol(cat.getSubcategorias(), filtro);
-            if (cumple || !hijosFiltrados.isEmpty()) {
-                cat.setSubcategorias(hijosFiltrados);
-                resultado.add(cat);
-            }
+            if (cumple || !hijosFiltrados.isEmpty()) {cat.setSubcategorias(hijosFiltrados);resultado.add(cat);}
         }
+
         return resultado;
+    }
+
+    private CategoriaResponseDTO mapearConHijos(Categoria categoria) {
+        CategoriaResponseDTO dto = categoriaMapper.toResponse(categoria);
+        List<CategoriaResponseDTO> hijos = new ArrayList<>();
+        if (categoria.getHijos() != null && !categoria.getHijos().isEmpty()) {
+            hijos = categoria.getHijos().stream().sorted((a, b) -> b.getId().compareTo(a.getId())).map(this::mapearConHijos).toList();
+        }
+        dto.setSubcategorias(hijos);
+        return dto;
     }
 }
