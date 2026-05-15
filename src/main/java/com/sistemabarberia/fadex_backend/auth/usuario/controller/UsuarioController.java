@@ -33,5 +33,4 @@ public class UsuarioController {
     public ResponseEntity<ApiResponse<UsuarioResponse>> update( @PathVariable Integer id, @RequestBody RegisterRequest request) {
         return ResponseEntity.ok( ApiResponse.ok( "Usuario actualizado correctamente", usuarioService.update(id, request)));
     }
-
 }
