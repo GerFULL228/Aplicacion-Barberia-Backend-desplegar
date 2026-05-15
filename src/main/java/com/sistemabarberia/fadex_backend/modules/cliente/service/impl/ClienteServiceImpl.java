@@ -3,18 +3,27 @@ package com.sistemabarberia.fadex_backend.modules.cliente.service.impl;
 import com.sistemabarberia.fadex_backend.commons.exception.BusinessException;
 import com.sistemabarberia.fadex_backend.modules.barbero.repository.BarberoRepository;
 import com.sistemabarberia.fadex_backend.modules.cliente.dto.request.ClienteRequestDTO;
+import com.sistemabarberia.fadex_backend.modules.cliente.dto.response.ActividadRecienteResponse;
+import com.sistemabarberia.fadex_backend.modules.cliente.dto.response.ClienteDetalleResumenDTO;
 import com.sistemabarberia.fadex_backend.modules.cliente.dto.response.ClienteResponseDTO;
+import com.sistemabarberia.fadex_backend.modules.cliente.dto.response.ClienteResumenResponseDTO;
 import com.sistemabarberia.fadex_backend.modules.cliente.entity.Cliente;
 import com.sistemabarberia.fadex_backend.modules.cliente.mapper.ClienteMapper;
 import com.sistemabarberia.fadex_backend.modules.cliente.repository.ClienteRepository;
 import com.sistemabarberia.fadex_backend.modules.cliente.service.IClienteService;
 import com.sistemabarberia.fadex_backend.modules.persona.entity.Persona;
 import com.sistemabarberia.fadex_backend.modules.persona.repository.PersonaRepository;
+import com.sistemabarberia.fadex_backend.modules.reserva.repository.ReservaRepository;
+import com.sistemabarberia.fadex_backend.modules.venta.repository.VentaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class ClienteServiceImpl implements IClienteService {
@@ -26,6 +35,13 @@ public class ClienteServiceImpl implements IClienteService {
 
     @Autowired
     private PersonaRepository personaRepository;
+
+    @Autowired
+    private ReservaRepository reservaRepository;
+
+    @Autowired
+    private VentaRepository ventaRepository;
+
     @Autowired
     private ClienteMapper mapper;
 
@@ -94,6 +110,149 @@ public class ClienteServiceImpl implements IClienteService {
         return mapper.toResponseDTO(cliente);
     }
 
+    @Override
+    public ClienteResumenResponseDTO obtenerResumen() {
+
+        Long totalClientes =
+                clienteRepository.contarClientes();
+
+        Long nuevosClientes =
+                clienteRepository.contarClientesNuevosMes();
+
+        Long clientesActivos =
+                reservaRepository.clientesActivosMes();
+
+        Double retencion =
+                reservaRepository.calcularRetencion();
+        Double retencionAnterior =
+                reservaRepository.calcularRetencionMesAnterior();
+
+        if (retencionAnterior == null) {
+            retencionAnterior = 0.0;
+        }
+
+        Double diferenciaRetencion =
+                retencion - retencionAnterior;
+
+        String deltaRetencion =
+                (diferenciaRetencion >= 0 ? "+" : "") +
+                        String.format("%.1f", diferenciaRetencion) +
+                        "% vs anterior";
+
+        // NUEVOS CLIENTES
+        Long nuevosActual =
+                clienteRepository.contarClientesNuevosMes();
+
+        Long nuevosAnterior =
+                clienteRepository.contarClientesNuevosMesAnterior();
+
+        Long diferenciaNuevos =
+                nuevosActual - nuevosAnterior;
+
+        String deltaNuevos =
+                (diferenciaNuevos >= 0 ? "+" : "") +
+                        diferenciaNuevos +
+                        " vs anterior";
+
+        // TOTAL CLIENTES
+        Long totalAnterior =
+                clienteRepository.contarClientesHastaMesAnterior();
+
+        Long diferenciaTotal =
+                totalClientes - totalAnterior;
+
+        String deltaTotal =
+                (diferenciaTotal >= 0 ? "+" : "") +
+                        diferenciaTotal +
+                        " este mes";
+
+        Long activosAnterior =
+                reservaRepository.clientesActivosMesAnterior();
+
+        Long diferenciaActivos =
+                clientesActivos - activosAnterior;
+
+        String deltaActivos =
+                (diferenciaActivos >= 0 ? "+" : "") +
+                        diferenciaActivos +
+                        " vs anterior";
+
+        return ClienteResumenResponseDTO.builder()
+                .totalClientes(totalClientes)
+                .deltaTotalClientes(deltaTotal)
+
+                .clientesActivosMes(clientesActivos)
+
+                .nuevosClientes(nuevosClientes)
+                .deltaNuevosClientes(deltaNuevos)
+
+                .retencion(retencion)
+                .deltaRetencion(deltaRetencion)
+
+                .deltaClientesActivos(deltaActivos)
+
+                .build();
+    }
+
+    @Override
+    public ClienteDetalleResumenDTO obtenerResumenCliente(
+            Integer clienteId
+    ) {
+
+        Long totalReservas =
+                reservaRepository.contarReservasCliente(clienteId);
+
+        Long totalCortes =
+                reservaRepository.contarCortesCliente(clienteId);
+
+        Long totalCompras =
+                ventaRepository.contarComprasCliente(clienteId);
+
+        Double totalGastado =
+                ventaRepository.totalGastadoCliente(clienteId);
+
+        java.sql.Date ultimaVisita =
+                reservaRepository.ultimaVisitaCliente(clienteId);
+
+        return ClienteDetalleResumenDTO.builder()
+
+                .totalReservas(totalReservas)
+
+                .totalCortes(totalCortes)
+
+                .totalCompras(totalCompras)
+
+                .totalGastado(totalGastado)
+
+                .ultimaVisita(
+                        ultimaVisita != null
+                                ? ultimaVisita.toLocalDate().toString()
+                                : "Sin visitas"
+                )
+
+                .build();
+    }
+
+    @Override
+    public List<ActividadRecienteResponse> obtenerActividadReciente(
+            Integer idCliente
+    ) {
+
+        List<Object[]> rows =
+                clienteRepository.obtenerActividadReciente(idCliente);
+
+        return rows.stream().map(row ->
+
+                ActividadRecienteResponse.builder()
+                        .tipo((String) row[0])
+                        .titulo((String) row[1])
+                        .descripcion((String) row[2])
+                        .fecha(((Timestamp) row[3]).toLocalDateTime())
+                        .color((String) row[4])
+                        .build()
+
+        ).toList();
+    }
 
 }
 

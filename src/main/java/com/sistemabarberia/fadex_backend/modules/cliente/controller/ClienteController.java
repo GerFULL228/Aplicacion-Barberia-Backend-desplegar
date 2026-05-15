@@ -3,7 +3,10 @@ package com.sistemabarberia.fadex_backend.modules.cliente.controller;
 import com.sistemabarberia.fadex_backend.commons.response.ApiResponse;
 import com.sistemabarberia.fadex_backend.commons.response.PageResponse;
 import com.sistemabarberia.fadex_backend.modules.cliente.dto.request.ClienteRequestDTO;
+import com.sistemabarberia.fadex_backend.modules.cliente.dto.response.ActividadRecienteResponse;
+import com.sistemabarberia.fadex_backend.modules.cliente.dto.response.ClienteDetalleResumenDTO;
 import com.sistemabarberia.fadex_backend.modules.cliente.dto.response.ClienteResponseDTO;
+import com.sistemabarberia.fadex_backend.modules.cliente.dto.response.ClienteResumenResponseDTO;
 import com.sistemabarberia.fadex_backend.modules.cliente.service.IClienteService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +16,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/clientes")
@@ -62,5 +67,49 @@ public class ClienteController {
         return ResponseEntity.ok(ApiResponse.ok("Cliente eliminado correctamente", eliminado));
     }
     /*AVANZADOS*/
+
+    @GetMapping("/resumen")
+    public ResponseEntity<ApiResponse<ClienteResumenResponseDTO>> obtenerResumen() {
+
+        ClienteResumenResponseDTO resumen =
+                clienteService.obtenerResumen();
+
+        return ResponseEntity.ok(
+                ApiResponse.ok(
+                        "Resumen obtenido correctamente",
+                        resumen
+                )
+        );
+    }
+
+    @GetMapping("/{id}/resumen")
+    public ResponseEntity<ApiResponse<ClienteDetalleResumenDTO>>
+    obtenerResumenCliente(@PathVariable Integer id) {
+
+        ClienteDetalleResumenDTO resumen =
+                clienteService.obtenerResumenCliente(id);
+
+        return ResponseEntity.ok(
+                ApiResponse.ok(
+                        "Resumen del cliente obtenido correctamente",
+                        resumen
+                )
+        );
+    }
+
+    @GetMapping("/{id}/actividad")
+    public ResponseEntity<ApiResponse<List<ActividadRecienteResponse>>>
+    obtenerActividad(@PathVariable Integer id) {
+
+        List<ActividadRecienteResponse> actividad =
+                clienteService.obtenerActividadReciente(id);
+
+        return ResponseEntity.ok(
+                ApiResponse.ok(
+                        "Actividad reciente obtenida correctamente",
+                        actividad
+                )
+        );
+    }
 
 }

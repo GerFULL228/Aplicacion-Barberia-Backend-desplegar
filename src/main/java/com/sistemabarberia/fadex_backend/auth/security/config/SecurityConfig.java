@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -51,21 +52,21 @@ public class SecurityConfig {
                 .sessionManagement(sessionManagement ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/uploads/**").permitAll()
+                        .requestMatchers(
+                                "/api/v1/auth/**",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/uploads/**"
+                        ).permitAll()
 
-                        .requestMatchers("/api/v1/auth/**").permitAll()
-                        .requestMatchers("/api/v1/usuarios/**").permitAll()
-                        .requestMatchers("/api/v1/barberos/**").permitAll()
-                        .requestMatchers("/api/v1/clientes/**").permitAll()
-                        .requestMatchers("/api/v1/personas/**").permitAll()
-                        .requestMatchers("/api/v1/categorias/**").permitAll()
-                        .requestMatchers("/api/v1/usuarios/**").permitAll()
-                        .requestMatchers("/api/v1/productos/**").permitAll()
-                        .requestMatchers("/api/v1/cortes/**").permitAll()
-                        .requestMatchers("/api/v1/ventas/**").permitAll()
 
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                        .requestMatchers("/api/test/**").permitAll()
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/v1/servicios/**",
+                                "/api/v1/categorias/**",
+                                "/api/v1/barberos/**",
+                                "/api/v1/productos/**"
+                        ).permitAll()
+
 
                         .anyRequest().authenticated()
 
@@ -89,7 +90,7 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowedOrigins(List.of("http://localhost:4200"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT","PATCH", "DELETE", "OPTIONS"));
 
         config.setAllowedHeaders(List.of(
                 "Authorization",

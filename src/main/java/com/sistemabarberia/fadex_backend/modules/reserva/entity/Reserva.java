@@ -1,26 +1,29 @@
 package com.sistemabarberia.fadex_backend.modules.reserva.entity;
+
 import com.sistemabarberia.fadex_backend.modules.barbero.entity.Barbero;
 import com.sistemabarberia.fadex_backend.modules.cliente.entity.Cliente;
+import com.sistemabarberia.fadex_backend.modules.servicio.entity.Servicio;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.List;
 
 @Entity
-@Table(name = "reservas")
+@AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Table(name = "reservas")
 public class Reserva {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_reservas")
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_cliente")
@@ -29,23 +32,21 @@ public class Reserva {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_barbero")
     private Barbero barbero;
-
-    @Column(name = "fecha")
-    private LocalDate fecha;
-
-    @Column(name = "hora_inicio")
-    private LocalTime horaInicio;
-
-    @Column(name = "hora_fin")
-    private LocalTime horaFin;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_servicio")
+    private Servicio servicio;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "estado")
-    private EstadoReserva estado;
+    private TipoReserva tipoReserva;
 
-    @Column(name = "tipo_reservas")
-    private String tipoReserva;
+    @Enumerated(EnumType.STRING)
+    private EstadoReserva estadoReserva;
+    private LocalDate fecha;
+    private LocalTime horaInicio;
+    private LocalTime horaFin;
 
-    @OneToMany(mappedBy = "reserva", fetch = FetchType.LAZY)
-    private List<DetalleReserva> detalles;
+    private BigDecimal total;
+
+
+
 }

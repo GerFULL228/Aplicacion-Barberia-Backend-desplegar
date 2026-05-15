@@ -1,8 +1,12 @@
 package com.sistemabarberia.fadex_backend.modules.reserva.entity;
 
 public enum EstadoReserva {
-    PENDIENTE,
+    PENDIENTE_PAGO,
+    CONFIRMADA,
     EN_PROCESO,
-    COMPLETADO,
-    CANCELADO
+    FINALIZADA,
+    CANCELADA,
+    CANCELADA_AUTOMATICA,
+    NO_ASISTIO
+
 }

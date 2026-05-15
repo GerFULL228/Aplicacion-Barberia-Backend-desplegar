@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CorteRequestDTO {
+public class ServicioRequestDTO {
 
     @NotBlank(message = "Nombre obligatorio")
     @Size(max = 100, message = "Máx 100 caracteres")
@@ -23,4 +23,6 @@ public class CorteRequestDTO {
 
     @NotNull(message = "Categoría obligatoria")
     private Long categoriaId;
+    @NotNull(message = "la duracion del servicio es obligatorio")
+    private Integer duracion;
 }
