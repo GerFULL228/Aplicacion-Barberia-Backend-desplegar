@@ -1,6 +1,10 @@
 package com.sistemabarberia.fadex_backend.modules.servicio.controller;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sistemabarberia.fadex_backend.commons.response.ApiResponse;
+import com.sistemabarberia.fadex_backend.modules.producto.dto.request.ProductoRequest;
+import com.sistemabarberia.fadex_backend.modules.producto.dto.response.ProductoResponse;
 import com.sistemabarberia.fadex_backend.modules.servicio.dto.request.ServicioRequestDTO;
 
 import com.sistemabarberia.fadex_backend.modules.servicio.dto.response.ServicioResponseDTO;
@@ -10,8 +14,11 @@ import com.sistemabarberia.fadex_backend.modules.servicio.service.IServicioServi
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -37,12 +44,27 @@ public class ServicioController {
         return ResponseEntity.ok(corteService.listarPorCategoria(categoriaId));
     }
 
-    @PostMapping
-    public ResponseEntity<ServicioResponseDTO> crear(@Valid @RequestBody ServicioRequestDTO dto) {
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(corteService.crear(dto));
+    @PreAuthorize("hasAuthority('SERVICIO_CREATE')")
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponse<ServicioResponseDTO>> crear(
+            @RequestPart("servicio") String servicio,
+            @RequestPart(value = "archivos", required = false) List<MultipartFile> archivos
+    ) throws Exception {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        ServicioRequestDTO request =
+                objectMapper.readValue(servicio, ServicioRequestDTO.class);
+
+        ServicioResponseDTO responseDTO =
+                corteService.crear(request, archivos);
+
+        return ResponseEntity.ok(
+                ApiResponse.ok("Servicio creado correctamente", responseDTO)
+        );
     }
 
+    @PreAuthorize("hasAuthority('SERVICIO_UPDATE_ALL')")
     @PutMapping("/{id}")
     public ResponseEntity<ServicioResponseDTO> actualizar(
             @PathVariable Long id,
@@ -50,6 +72,7 @@ public class ServicioController {
         return ResponseEntity.ok(corteService.actualizar(id, dto));
     }
 
+    @PreAuthorize("hasAuthority('SERVICIO_DELETE_ALL')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         corteService.eliminar(id);

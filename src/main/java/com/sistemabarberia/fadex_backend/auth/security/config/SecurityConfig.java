@@ -59,6 +59,19 @@ public class SecurityConfig {
                                 "/uploads/**"
                         ).permitAll()
 
+                        .requestMatchers(HttpMethod.POST,
+                                "/api/v1/usuarios/barbero",
+                                "/api/v1/usuarios/cliente",
+                                "/api/v1/usuarios/admin"
+                        ).hasRole("admin")
+
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/v1/usuarios/**"
+                        ).hasAnyRole("admin")
+
+                        .requestMatchers(HttpMethod.PUT,
+                                "/api/v1/usuarios/**"
+                        ).hasRole("admin")
 
                         .requestMatchers(HttpMethod.GET,
                                 "/api/v1/servicios/**",
@@ -90,7 +103,7 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowedOrigins(List.of("http://localhost:4200"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT","PATCH", "DELETE", "OPTIONS"));
 
         config.setAllowedHeaders(List.of(
                 "Authorization",

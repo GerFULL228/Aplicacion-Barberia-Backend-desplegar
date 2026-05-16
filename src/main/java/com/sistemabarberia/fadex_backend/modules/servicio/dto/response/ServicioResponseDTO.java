@@ -3,6 +3,7 @@ package com.sistemabarberia.fadex_backend.modules.servicio.dto.response;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Getter
 @Setter
@@ -17,4 +18,6 @@ public class ServicioResponseDTO {
     private Long categoriaId;
     private String categoriaNombre;
     private Integer duracion;
+    private List<String> urlsMultimedia;
+
 }

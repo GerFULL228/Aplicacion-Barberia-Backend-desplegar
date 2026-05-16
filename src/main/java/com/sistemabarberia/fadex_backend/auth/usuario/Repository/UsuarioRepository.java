@@ -27,5 +27,6 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
     Optional<Usuario> findByUser(String user);
     @EntityGraph(attributePaths = "roles")
     List<Usuario> findAll();
+    boolean existsByUser(String user);
 
 }

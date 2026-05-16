@@ -60,6 +60,8 @@ public class BarberoController {
        }
     * */
 
+
+
     //Eliminar barbero
     @DeleteMapping("/eliminar/{id}")
     public ResponseEntity<ApiResponse<BarberoResponseDTO>> eliminar(@PathVariable Integer id) {

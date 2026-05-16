@@ -5,6 +5,8 @@
     import lombok.*;
 
     import java.math.BigDecimal;
+    import java.util.ArrayList;
+    import java.util.List;
 
     @Entity
     @Table(name = "cortes")
@@ -31,4 +33,10 @@
         private Categoria categoria;
 
         private Integer duracion;
+
+        @ElementCollection
+        @CollectionTable(name = "servicio_multimedia", joinColumns = @JoinColumn(name = "id_servicio"))
+        @Column(name = "url_recurso")
+        @Builder.Default
+        private List<String> urlsMultimedia = new ArrayList<>();
     }
