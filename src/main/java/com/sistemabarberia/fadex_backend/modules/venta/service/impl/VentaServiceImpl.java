@@ -85,6 +85,52 @@ public class VentaServiceImpl implements IVentaService {
     }
 
     @Override
+    @Transactional
+    public VentaResponseDTO actualizar(Integer id, VentaRequestDTO dto) {
+
+        Venta venta = ventaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Venta no encontrada"));
+
+        Cliente cliente = clienteRepository.findById(dto.getClienteId())
+                .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado"));
+
+        Barbero barbero = barberoRepository.findById(dto.getBarberoId())
+                .orElseThrow(() -> new ResourceNotFoundException("Barbero no encontrado"));
+
+        // ACTUALIZAR VENTA
+        venta.setCliente(cliente);
+        venta.setBarbero(barbero);
+        venta.setFecha(dto.getFecha());
+
+        // ELIMINAR DETALLES ANTERIORES
+        detalleVentaRepository.deleteAll(venta.getDetalles());
+
+        // LIMPIAR
+        venta.getDetalles().clear();
+
+        for (DetalleVentaRequestDTO detDto : dto.getDetalles()) {
+
+            DetalleVenta detalle = detalleVentaMapper.toEntity(detDto);
+
+            detalle.setVenta(venta);
+
+            venta.getDetalles().add(detalle);
+        }
+
+        Venta ventaActualizada = ventaRepository.save(venta);
+
+        // GUARDAR
+        HistorialVenta historial = new HistorialVenta();
+
+        historial.setVenta(ventaActualizada);
+        historial.setFecha(LocalDateTime.now());
+
+        historialVentaRepository.save(historial);
+
+        return ventaMapper.toResponse(ventaActualizada);
+    }
+
+    @Override
     public void eliminar(Integer id) {
 
         if (!ventaRepository.existsById(id)) {
