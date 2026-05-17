@@ -65,8 +65,9 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler({AccessDeniedException.class, AuthorizationDeniedException.class})
-    public ResponseEntity<ApiResponse<Void>> handleAuthorizationDenied() {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+    public ResponseEntity<ApiResponse<Void>> handleAuthorizationDenied(Exception ex) {
+        System.out.println(">>> AUTHORIZATION DENIED: " + ex.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)  // ← cambia a 403
                 .body(ApiResponse.error("No tienes permisos para este recurso"));
     }
 }

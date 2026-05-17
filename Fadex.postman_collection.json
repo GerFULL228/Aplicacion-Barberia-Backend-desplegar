@@ -1,24 +1,29 @@
 {
   "info": {
-    "_postman_id": "7c8db1e0-966b-481f-bb0d-afb95bb169f9",
+    "_postman_id": "d4675da1-4388-4073-93f1-ab9325d3307c",
     "name": "Fadex",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "47585629",
-    "_collection_link": "https://go.postman.co/collection/47585629-7c8db1e0-966b-481f-bb0d-afb95bb169f9?source=collection_link"
+    "_exporter_id": "48827961",
+    "_collection_link": "https://go.postman.co/collection/48827961-d4675da1-4388-4073-93f1-ab9325d3307c?source=collection_link"
   },
   "item": [
     {
       "name": "Usuario",
       "item": [
         {
-          "name": "Listar usuarios",
+          "name": "listarUsuarios",
           "request": {
             "auth": {
-              "type": "bearer",
-              "bearer": [
+              "type": "basic",
+              "basic": [
                 {
-                  "key": "token",
-                  "value": "{{token}}",
+                  "key": "password",
+                  "value": "1234",
+                  "type": "string"
+                },
+                {
+                  "key": "username",
+                  "value": "admin",
                   "type": "string"
                 }
               ]
@@ -37,30 +42,24 @@
           },
           "response": [
             {
-              "name": "Obtener usuario ID",
+              "name": "listarUsuariosID",
               "originalRequest": {
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{api}}/categorias",
+                  "raw": "{{api}}api/usuarios",
                   "host": [
-                    "{{api}}"
+                    "{{api}}api"
                   ],
                   "path": [
-                    "categorias"
+                    "usuarios"
                   ]
                 }
               },
-              "_postman_previewlanguage": "Text",
-              "header": [],
-              "cookie": [
-                {
-                  "expires": "Invalid Date",
-                  "domain": "",
-                  "path": ""
-                }
-              ],
-              "body": "{\r\n    \"success\": true,\r\n    \"message\": \"Categorías recuperadas con éxito\",\r\n    \"data\": [\r\n        {\r\n            \"id\": 2,\r\n            \"nombre\": \"Corte de cabello\",\r\n            \"descripcion\": null,\r\n            \"estado\": true,\r\n            \"padreId\": null,\r\n            \"padreNombre\": null,\r\n            \"subcategorias\": [\r\n                {\r\n                    \"id\": 5,\r\n                    \"nombre\": \"Cortes modernos\",\r\n                    \"descripcion\": \"Estilos actuales\",\r\n                    \"estado\": true,\r\n                    \"padreId\": 2,\r\n                    \"padreNombre\": \"Corte de cabello\",\r\n                    \"subcategorias\": []\r\n                },\r\n                {\r\n                    \"id\": 6,\r\n                    \"nombre\": \"Cortes militares\",\r\n                    \"descripcion\": \"Estilos actuales\",\r\n                    \"estado\": true,\r\n                    \"padreId\": 2,\r\n                    \"padreNombre\": \"Corte de cabello\",\r\n                    \"subcategorias\": []\r\n                }\r\n            ]\r\n        },\r\n        {\r\n            \"id\": 3,\r\n            \"nombre\": \"Corte de barba\",\r\n            \"descripcion\": null,\r\n            \"estado\": true,\r\n            \"padreId\": null,\r\n            \"padreNombre\": null,\r\n            \"subcategorias\": []\r\n        },\r\n        {\r\n            \"id\": 4,\r\n            \"nombre\": \"Cortes modernos\",\r\n            \"descripcion\": \"Estilos actuales\",\r\n            \"estado\": true,\r\n            \"padreId\": null,\r\n            \"padreNombre\": null,\r\n            \"subcategorias\": []\r\n        }\r\n    ],\r\n    \"timestamp\": \"2026-04-19T14:53:52.331057300\"\r\n}"
+              "_postman_previewlanguage": null,
+              "header": null,
+              "cookie": [],
+              "body": null
             }
           ]
         },
@@ -71,7 +70,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"username\": \"admin1\",\r\n  \"password\": \"admin123\"\r\n}\r\n\r\n",
+              "raw": "{\r\n  \"nombre\": \"Shampoo\",\r\n  \"descripcion\": \"Estilos actuales de corte\",\r\n  \"estado\": true,\r\n  \"tipo\":\"PRODUCTO\",\r\n  \"padreId\": null\r\n}\r\n\r\n\r\n// {\r\n//   \"nombre\": \"Cortes\",\r\n//   \"descripcion\": \"Estilos actuales de corte\",\r\n//   \"estado\": true,\r\n//   \"tipo\":\"SERVICIO\",\r\n//   \"padreId\": null\r\n// }",
               "options": {
                 "raw": {
                   "language": "json"
@@ -79,26 +78,35 @@
               }
             },
             "url": {
-              "raw": "{{api}}/auth/login",
+              "raw": "{{api}}/categorias",
               "host": [
                 "{{api}}"
               ],
               "path": [
-                "auth",
-                "login"
+                "categorias"
               ]
             }
           },
           "response": []
         },
         {
-          "name": "PUT Actualizar usuario",
+          "name": "crearBarbero",
           "request": {
-            "method": "PUT",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"nombre\": \"Afeitados\",\r\n  \"descripcion\": \"Estilos actuales de corte\",\r\n  \"estado\": true,\r\n  \"tipo\":\"SERVICIO\",\r\n  \"padreId\": 2\r\n}\r\n\r\n// {\r\n//   \"nombre\": \"Cortes\",\r\n//   \"descripcion\": \"Estilos actuales de corte\",\r\n//   \"estado\": true,\r\n//   \"tipo\":\"SERVICIO\",\r\n//   \"padreId\": 4\r\n// }",
+              "raw": "{\r\n  \"username\": \"Fernado123\",\r\n  \"password\": \"Fernando123\",\r\n  \"idRol\": 2,\r\n  \"nombre\": \"Fernando\",\r\n  \"apellido\": \"Chavez\",\r\n  \"telefono\": \"956789123\",\r\n  \"email\": \"Fernado@gmail.com\",\r\n  \"experiencia\": 4,\r\n  \"sueldo\": 1800.00,\r\n  \"comision\": 9.50,\r\n  \"descripcion\": \"Especialista en cortes modernos\",\r\n  \"fotoUrl\": null\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -106,13 +114,52 @@
               }
             },
             "url": {
-              "raw": "{{api}}/categorias/1",
+              "raw": "{{api}}api/v1/usuarios/barbero",
               "host": [
-                "{{api}}"
+                "{{api}}api"
               ],
               "path": [
-                "categorias",
-                "1"
+                "v1",
+                "usuarios",
+                "barbero"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "crearCliente",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"username\": \"Pia123\",\r\n  \"password\": \"Pia123\",\r\n  \"idRol\": 3,\r\n  \"nombre\": \"Pia\",\r\n  \"apellido\": \"García\",\r\n  \"telefono\": \"912345111\",\r\n  \"email\": \"Pia@gmail.com\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{api}}api/v1/usuarios/cliente",
+              "host": [
+                "{{api}}api"
+              ],
+              "path": [
+                "v1",
+                "usuarios",
+                "cliente"
               ]
             }
           },
@@ -618,7 +665,7 @@
                   ]
                 }
               },
-              "_postman_previewlanguage": "",
+              "_postman_previewlanguage": "Text",
               "header": [],
               "cookie": [
                 {
@@ -678,7 +725,7 @@
                   ]
                 }
               },
-              "_postman_previewlanguage": "",
+              "_postman_previewlanguage": "Text",
               "header": [],
               "cookie": [
                 {
@@ -704,7 +751,7 @@
                   ]
                 }
               },
-              "_postman_previewlanguage": "",
+              "_postman_previewlanguage": "Text",
               "header": [],
               "cookie": [
                 {
@@ -885,6 +932,133 @@
                   "key": "publicado",
                   "value": "false"
                 }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Reserva",
+      "item": [
+        {
+          "name": "listarBarberos",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{api}}api/v1/barbero/citas/hoy",
+              "host": [
+                "{{api}}api"
+              ],
+              "path": [
+                "v1",
+                "barbero",
+                "citas",
+                "hoy"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reserva de citas para barberos",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "\r\n{\r\n    \"clienteId\": 1,\r\n    \"servicioId\": 1,\r\n    \"barberoId\": 1,\r\n    \"fecha\": \"2026-05-16\",\r\n    \"horaInicio\": \"11:00:00\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{api}}api/v1/reservas",
+              "host": [
+                "{{api}}api"
+              ],
+              "path": [
+                "v1",
+                "reservas"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "activarEstado",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"estado\": \"FINALIZADA\" }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8081/api/v1/barbero/citas/1/estado",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8081",
+              "path": [
+                "api",
+                "v1",
+                "barbero",
+                "citas",
+                "1",
+                "estado"
               ]
             }
           },

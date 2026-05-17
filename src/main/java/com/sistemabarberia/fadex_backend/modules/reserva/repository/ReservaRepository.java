@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ReservaRepository extends JpaRepository<Reserva, Long> {
@@ -142,5 +143,31 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
     """, nativeQuery = true)
     java.sql.Date ultimaVisitaCliente(
             @Param("clienteId") Integer clienteId
+    );
+    @Query("""
+        SELECT r FROM Reserva r
+        JOIN FETCH r.barbero b
+        JOIN FETCH b.persona p
+        JOIN FETCH p.usuario u
+        WHERE u.user = :username
+          AND r.fecha = :fecha
+        ORDER BY r.horaInicio ASC
+        """)
+    List<Reserva> findByBarberoUsernameAndFecha(
+            @Param("username") String username,
+            @Param("fecha") LocalDate fecha
+    );
+
+    @Query("""
+        SELECT r FROM Reserva r
+        JOIN r.barbero b
+        JOIN b.persona p
+        JOIN p.usuario u
+        WHERE r.id = :idReserva
+          AND u.user = :username
+        """)
+    Optional<Reserva> findByIdAndBarberoUsername(
+            @Param("idReserva") Long idReserva,
+            @Param("username") String username
     );
 }
