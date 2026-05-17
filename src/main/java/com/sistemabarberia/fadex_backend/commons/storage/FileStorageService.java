@@ -19,7 +19,7 @@ import java.util.UUID;
 
 @Service
 @Slf4j
-public class FileStorageService {
+public class  FileStorageService {
 
     @Value("${file.upload-dir}") private String uploadDir;
 
