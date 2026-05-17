@@ -1,10 +1,10 @@
 {
   "info": {
-    "_postman_id": "d6d68d8c-db3f-4db1-8fae-b59c6e44abf2",
+    "_postman_id": "0ce0cfef-b6b2-4a26-9482-087390482a98",
     "name": "Fadex",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "45294781",
-    "_collection_link": "https://go.postman.co/collection/45294781-d6d68d8c-db3f-4db1-8fae-b59c6e44abf2?source=collection_link"
+    "_exporter_id": "48827961",
+    "_collection_link": "https://go.postman.co/collection/48827961-0ce0cfef-b6b2-4a26-9482-087390482a98?source=collection_link"
   },
   "item": [
     {
@@ -14,16 +14,11 @@
           "name": "listarUsuarios",
           "request": {
             "auth": {
-              "type": "basic",
-              "basic": [
+              "type": "bearer",
+              "bearer": [
                 {
-                  "key": "password",
-                  "value": "1234",
-                  "type": "string"
-                },
-                {
-                  "key": "username",
-                  "value": "admin",
+                  "key": "token",
+                  "value": "{{token}}",
                   "type": "string"
                 }
               ]
@@ -31,9 +26,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{api}}api/usuarios",
+              "raw": "{{api}}/usuarios",
               "host": [
-                "{{api}}api"
+                "{{api}}"
               ],
               "path": [
                 "usuarios"
@@ -47,9 +42,9 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{api}}api/usuarios",
+                  "raw": "{{api}}/usuarios",
                   "host": [
-                    "{{api}}api"
+                    "{{api}}"
                   ],
                   "path": [
                     "usuarios"
@@ -66,11 +61,21 @@
         {
           "name": "POST Auth",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "POST",
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"nombre\": \"Shampoo\",\r\n  \"descripcion\": \"Estilos actuales de corte\",\r\n  \"estado\": true,\r\n  \"tipo\":\"PRODUCTO\",\r\n  \"padreId\": null\r\n}\r\n\r\n\r\n// {\r\n//   \"nombre\": \"Cortes\",\r\n//   \"descripcion\": \"Estilos actuales de corte\",\r\n//   \"estado\": true,\r\n//   \"tipo\":\"SERVICIO\",\r\n//   \"padreId\": null\r\n// }",
+              "raw": "{\r\n  \"username\": \"admin1\",\r\n  \"password\": \"admin123\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -78,12 +83,13 @@
               }
             },
             "url": {
-              "raw": "{{api}}/categorias",
+              "raw": "{{api}}/auth/login",
               "host": [
                 "{{api}}"
               ],
               "path": [
-                "categorias"
+                "auth",
+                "login"
               ]
             }
           },
@@ -114,12 +120,11 @@
               }
             },
             "url": {
-              "raw": "{{api}}api/v1/usuarios/barbero",
+              "raw": "{{api}}/usuarios/barbero",
               "host": [
-                "{{api}}api"
+                "{{api}}"
               ],
               "path": [
-                "v1",
                 "usuarios",
                 "barbero"
               ]
@@ -152,12 +157,11 @@
               }
             },
             "url": {
-              "raw": "{{api}}api/v1/usuarios/cliente",
+              "raw": "{{api}}/usuarios/cliente",
               "host": [
-                "{{api}}api"
+                "{{api}}"
               ],
               "path": [
-                "v1",
                 "usuarios",
                 "cliente"
               ]
@@ -970,12 +974,11 @@
               }
             },
             "url": {
-              "raw": "{{api}}api/v1/barbero/citas/hoy",
+              "raw": "{{api}}/barbero/citas/hoy",
               "host": [
-                "{{api}}api"
+                "{{api}}"
               ],
               "path": [
-                "v1",
                 "barbero",
                 "citas",
                 "hoy"
@@ -1009,12 +1012,11 @@
               }
             },
             "url": {
-              "raw": "{{api}}api/v1/reservas",
+              "raw": "{{api}}/reservas",
               "host": [
-                "{{api}}api"
+                "{{api}}"
               ],
               "path": [
-                "v1",
                 "reservas"
               ]
             }
@@ -1046,15 +1048,11 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8081/api/v1/barbero/citas/1/estado",
-              "protocol": "http",
+              "raw": "{{api}}/barbero/citas/1/estado",
               "host": [
-                "localhost"
+                "{{api}}"
               ],
-              "port": "8081",
               "path": [
-                "api",
-                "v1",
                 "barbero",
                 "citas",
                 "1",
@@ -1737,6 +1735,10 @@
   "variable": [
     {
       "key": "api",
+      "value": ""
+    },
+    {
+      "key": "token",
       "value": ""
     }
   ]
