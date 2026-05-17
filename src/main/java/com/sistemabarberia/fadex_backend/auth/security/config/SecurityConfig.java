@@ -79,6 +79,8 @@ public class SecurityConfig {
                                 "/api/v1/barberos/**",
                                 "/api/v1/productos/**"
                         ).permitAll()
+                        .requestMatchers("/api/v1/barbero/citas/**").
+                        hasAnyAuthority("ROLE_barbero")
 
 
                         .anyRequest().authenticated()

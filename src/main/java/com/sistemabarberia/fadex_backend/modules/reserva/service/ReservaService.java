@@ -1,30 +1,31 @@
 package com.sistemabarberia.fadex_backend.modules.reserva.service;
 
+import com.sistemabarberia.fadex_backend.auth.security.service.CustomUserDetails;
 import com.sistemabarberia.fadex_backend.auth.usuario.Entity.Usuario;
 import com.sistemabarberia.fadex_backend.auth.usuario.service.UsuarioSecurityService;
 import com.sistemabarberia.fadex_backend.commons.exception.BusinessException;
 import com.sistemabarberia.fadex_backend.commons.exception.ResourceNotFoundException;
-import com.sistemabarberia.fadex_backend.commons.response.ApiResponse;
 import com.sistemabarberia.fadex_backend.modules.barbero.entity.Barbero;
 
 import com.sistemabarberia.fadex_backend.modules.barbero.repository.BarberoRepository;
 import com.sistemabarberia.fadex_backend.modules.cliente.entity.Cliente;
 import com.sistemabarberia.fadex_backend.modules.cliente.repository.ClienteRepository;
 import com.sistemabarberia.fadex_backend.modules.reserva.dto.Request.ReservaRequest;
-import com.sistemabarberia.fadex_backend.modules.reserva.dto.Response.ReservaDTO;
-import com.sistemabarberia.fadex_backend.modules.reserva.dto.Response.ResumenDiarioDTO;
-import com.sistemabarberia.fadex_backend.modules.reserva.dto.Response.ResumenSemanalDTO;
+import com.sistemabarberia.fadex_backend.modules.reserva.dto.Response.*;
 import com.sistemabarberia.fadex_backend.modules.reserva.entity.EstadoReserva;
 import com.sistemabarberia.fadex_backend.modules.reserva.entity.Reserva;
 import com.sistemabarberia.fadex_backend.modules.reserva.entity.TipoReserva;
 import com.sistemabarberia.fadex_backend.modules.reserva.mapper.ReservaMapper;
 import com.sistemabarberia.fadex_backend.modules.reserva.repository.ReservaRepository;
-
+import com.sistemabarberia.fadex_backend.modules.reserva.dto.Request.ActualizarEstadoReservaDTO;
+import com.sistemabarberia.fadex_backend.modules.persona.entity.Persona;
+import org.springframework.security.core.Authentication;
 import com.sistemabarberia.fadex_backend.modules.servicio.entity.Servicio;
 
 import com.sistemabarberia.fadex_backend.modules.servicio.repository.ServicioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -247,5 +248,77 @@ public class ReservaService {
         return reservaMapper.toDto(reservaRepository.save(reserva));
     }
 
+    @Transactional(readOnly = true)
+    public List<CitaBarberoResponseDTO> obtenerCitasHoy() {
+        if (!securityService.isBarbero()) {
+            throw new BusinessException("Acceso denegado: se requiere rol barbero", HttpStatus.FORBIDDEN);
+        }
+
+        Usuario usuario = securityService.getUsuarioLogueado();
+
+        List<Reserva> reservas = reservaRepository
+                .findByBarberoUsernameAndFecha(usuario.getUser(), LocalDate.now());
+
+        return reservas.stream()
+                .map(this::mapToCitaBarberoDTO)
+                .toList();
+    }
+
+    @Transactional
+    public CitaBarberoResponseDTO actualizarEstadoReserva(Long idReserva,
+                                                          ActualizarEstadoReservaDTO dto) {
+        if (!securityService.isBarbero()) {
+            throw new BusinessException("Acceso denegado: se requiere rol barbero", HttpStatus.FORBIDDEN);
+        }
+
+        Usuario usuario = securityService.getUsuarioLogueado();
+        Reserva reserva = reservaRepository
+                .findByIdAndBarberoUsername(idReserva, usuario.getUser())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Reserva no encontrada o no pertenece a este barbero"));
+
+        reserva.setEstadoReserva(dto.getEstado());
+        return mapToCitaBarberoDTO(reservaRepository.save(reserva));
+    }
+
+
+    private CitaBarberoResponseDTO mapToCitaBarberoDTO(Reserva reserva) {
+        String nombre = "", apellido = "", telefono = "";
+
+        if (reserva.getCliente() != null && reserva.getCliente().getPersona() != null) {
+            Persona p = reserva.getCliente().getPersona();
+            nombre   = p.getNombre();
+            apellido = p.getApellido();
+            telefono = p.getTelefono();
+        }
+
+        String nombreServicio = "";
+        Double precioServicio = 0.0;
+        if (reserva.getServicio() != null) {
+            nombreServicio = reserva.getServicio().getNombre();
+            precioServicio = reserva.getServicio().getPrecio() != null
+                    ? reserva.getServicio().getPrecio().doubleValue()
+                    : 0.0;
+        }
+
+        List<DetalleReservaDTO> servicios = List.of(
+                DetalleReservaDTO.builder()
+                        .nombreCorte(nombreServicio)
+                        .precio(precioServicio)
+                        .build()
+        );
+
+        return CitaBarberoResponseDTO.builder()
+                .idReserva(reserva.getId())
+                .nombreCliente(nombre)
+                .apellidoCliente(apellido)
+                .telefonoCliente(telefono)
+                .fecha(reserva.getFecha())
+                .horaInicio(reserva.getHoraInicio())
+                .estado(reserva.getEstadoReserva())
+                .tipoReserva(reserva.getTipoReserva())
+                .servicios(servicios)
+                .build();
+    }
 
 }
