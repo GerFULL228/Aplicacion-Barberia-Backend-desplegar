@@ -16,6 +16,6 @@ public class ResumenDiarioDTO {
     private long enProceso;
     private long completados;
     private long totalDia;
-    private BigDecimal totalIngresos;     //  (el $450 del dashboard)
+    private BigDecimal totalIngresos;
     private List<ReservaDTO> reservas;
 }

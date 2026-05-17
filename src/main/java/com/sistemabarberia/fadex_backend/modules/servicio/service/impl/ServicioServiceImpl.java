@@ -5,8 +5,6 @@ import com.sistemabarberia.fadex_backend.commons.exception.ResourceNotFoundExcep
 import com.sistemabarberia.fadex_backend.commons.storage.FileStorageService;
 import com.sistemabarberia.fadex_backend.modules.categoria.entity.Categoria;
 import com.sistemabarberia.fadex_backend.modules.categoria.repository.CategoriaRepository;
-
-import com.sistemabarberia.fadex_backend.modules.producto.entity.Producto;
 import com.sistemabarberia.fadex_backend.modules.servicio.dto.request.ServicioRequestDTO;
 import com.sistemabarberia.fadex_backend.modules.servicio.dto.response.ServicioResponseDTO;
 import com.sistemabarberia.fadex_backend.modules.servicio.entity.Servicio;
@@ -29,7 +27,6 @@ public class ServicioServiceImpl implements IServicioService {
     private final ServicioRepository servicioRepository;
     private final CategoriaRepository categoriaRepository;
     private final ServicioMapper servicioMapper;
-    private final ServicioMapper ServicioMapper;
     private final FileStorageService fileStorageService;
     private static final List<String> TIPOS_IMAGEN = List.of("image/jpeg", "image/png", "image/webp");
 
@@ -37,27 +34,47 @@ public class ServicioServiceImpl implements IServicioService {
     @Override
     public ServicioResponseDTO crear(ServicioRequestDTO dto, List<MultipartFile> archivos) {
 
-        Categoria categoria = categoriaRepository.findById(dto.getCategoriaId()).orElseThrow(() -> new BusinessException("La categoría con ID " + dto.getCategoriaId() + " no existe", HttpStatus.BAD_REQUEST));
+        Categoria categoria = categoriaRepository.findById(dto.getCategoriaId())
+                .orElseThrow(() -> new BusinessException(
+                        "La categoría con ID " + dto.getCategoriaId() + " no existe",
+                        HttpStatus.BAD_REQUEST
+                ));
+
+        if (servicioRepository.existsByNombre(dto.getNombre().trim())) {
+            throw new BusinessException(
+                    "El servicio ya existe",
+                    HttpStatus.BAD_REQUEST
+            );
+        }
+
         Servicio servicio = servicioMapper.toEntity(dto);
         servicio.setCategoria(categoria);
+
         List<String> urls = new ArrayList<>();
+
         List<MultipartFile> archivosValidos = filtrarArchivosNoVacios(archivos);
 
         if (!archivosValidos.isEmpty()) {
+
             for (MultipartFile file : archivosValidos) {
+
                 validarArchivoImagen(file);
-                String url = fileStorageService.guardarArchivo(file, "productos", TIPOS_IMAGEN);
+
+                String url = fileStorageService.guardarArchivo(
+                        file,
+                        "servicios",
+                        TIPOS_IMAGEN
+                );
+
                 urls.add(url);
             }
         }
-        servicio.setUrlsMultimedia(urls);
-        Servicio guardado = servicioRepository.save(servicio);
-        
-//        if (servicioRepository.existsByNombre(dto.getNombre())) {
-//            throw new BusinessException("Servicio ya existe", HttpStatus.BAD_REQUEST);
-//        }
 
-        return ServicioMapper.toResponse(servicioRepository.save(servicio));
+        servicio.setUrlsMultimedia(urls);
+
+        Servicio guardado = servicioRepository.save(servicio);
+
+        return servicioMapper.toResponse(guardado);
     }
 
     @Override
@@ -88,27 +105,31 @@ public class ServicioServiceImpl implements IServicioService {
     @Override
     public ServicioResponseDTO actualizar(Long id, ServicioRequestDTO dto) {
 
-        Servicio corte = servicioRepository.findById(id)
+        Servicio servicio = servicioRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Servicio no encontrado"));
 
-        if (!corte.getNombre().equals(dto.getNombre()) &&
+        if (!servicio.getNombre().equals(dto.getNombre()) &&
                 servicioRepository.existsByNombre(dto.getNombre())) {
-            throw new BusinessException("Corte ya existe", HttpStatus.BAD_REQUEST);
+            throw new BusinessException("Servicio ya existe", HttpStatus.BAD_REQUEST);
         }
 
         Categoria categoria = categoriaRepository.findById(dto.getCategoriaId())
                 .orElseThrow(() -> new ResourceNotFoundException("Categoría no encontrada"));
 
-        servicioMapper.updateEntityFromDto(dto, corte);
+        servicioMapper.updateEntityFromDto(dto, servicio);
 
-        return servicioMapper.toResponse(servicioRepository.save(corte));
+        servicio.setCategoria(categoria);
+
+        Servicio actualizado = servicioRepository.save(servicio);
+
+        return servicioMapper.toResponse(actualizado);
     }
 
     @Override
     public void eliminar(Long id) {
 
         if (!servicioRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Corte no encontrado");
+            throw new ResourceNotFoundException("Servicio no encontrado");
         }
 
         servicioRepository.deleteById(id);
