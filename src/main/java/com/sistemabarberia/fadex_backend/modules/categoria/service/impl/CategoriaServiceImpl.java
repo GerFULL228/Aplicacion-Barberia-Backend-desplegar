@@ -12,7 +12,6 @@ import com.sistemabarberia.fadex_backend.modules.categoria.repository.CategoriaR
 import com.sistemabarberia.fadex_backend.modules.categoria.service.ICategoriaService;
 import com.sistemabarberia.fadex_backend.modules.categoria.specs.CategoriaSpecification;
 import com.sistemabarberia.fadex_backend.modules.producto.repository.ProductoRepository;
-
 import com.sistemabarberia.fadex_backend.modules.servicio.repository.ServicioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -32,7 +31,7 @@ public class CategoriaServiceImpl implements ICategoriaService {
 
     private final CategoriaRepository categoriaRepository;
     private final ProductoRepository productoRepository;
-    private final ServicioRepository corteRepository;
+    private final ServicioRepository servicioRepository;
     private final CategoriaMapper categoriaMapper;
 
     @Override
@@ -134,7 +133,7 @@ public class CategoriaServiceImpl implements ICategoriaService {
                     throw new BusinessException("No se puede cambiar el tipo porque tiene productos asociados", HttpStatus.BAD_REQUEST);
                 }
             } else {
-                boolean tieneServicios = corteRepository.existsByCategoriaId(id);
+                boolean tieneServicios = servicioRepository.existsByCategoriaId(id);
                 if (tieneServicios) {
                     throw new BusinessException("No se puede cambiar el tipo porque tiene servicios asociados", HttpStatus.BAD_REQUEST);
                 }
@@ -167,7 +166,7 @@ public class CategoriaServiceImpl implements ICategoriaService {
                 }
 
             } else {
-                boolean tieneServicios = corteRepository.existsByCategoriaId(id);
+                boolean tieneServicios = servicioRepository.existsByCategoriaId(id);
                 if (tieneServicios) {
                     throw new BusinessException("No se puede desactivar la categoría porque tiene servicios asociados", HttpStatus.BAD_REQUEST);
                 }
@@ -190,7 +189,7 @@ public class CategoriaServiceImpl implements ICategoriaService {
                 throw new BusinessException("No se puede eliminar la categoría porque tiene productos asociados", HttpStatus.BAD_REQUEST);
             }
         } else {
-            boolean tieneServicios = corteRepository.existsByCategoriaId(id);
+            boolean tieneServicios = servicioRepository.existsByCategoriaId(id);
             if (tieneServicios) {
                 throw new BusinessException("No se puede eliminar la categoría porque tiene servicios asociados", HttpStatus.BAD_REQUEST);
             }

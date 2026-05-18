@@ -9,4 +9,6 @@ import com.sistemabarberia.fadex_backend.modules.producto.entity.Producto;
 @Repository
 public interface ProductoRepository extends JpaRepository<Producto, Long>,JpaSpecificationExecutor<Producto> {
     boolean existsByCategoriaId(Long categoriaId);
+    boolean existsByNombreIgnoreCase(String nombre);
+    boolean existsByNombreIgnoreCaseAndIdNot(String nombre, Long id);
 }

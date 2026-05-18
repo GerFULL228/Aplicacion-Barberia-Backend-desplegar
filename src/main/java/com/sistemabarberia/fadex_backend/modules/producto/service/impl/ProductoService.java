@@ -4,6 +4,7 @@ import com.sistemabarberia.fadex_backend.commons.exception.BusinessException;
 import com.sistemabarberia.fadex_backend.commons.response.PageResponse;
 import com.sistemabarberia.fadex_backend.commons.storage.FileStorageService;
 import com.sistemabarberia.fadex_backend.modules.categoria.entity.Categoria;
+import com.sistemabarberia.fadex_backend.modules.categoria.entity.CategoriaEnum;
 import com.sistemabarberia.fadex_backend.modules.categoria.repository.CategoriaRepository;
 import com.sistemabarberia.fadex_backend.modules.producto.dto.ProductoFiltro;
 import com.sistemabarberia.fadex_backend.modules.producto.dto.request.ProductoRequest;
@@ -46,7 +47,13 @@ public class ProductoService implements IProductoService {
 
     @Override
     public ProductoResponse crearProducto(ProductoRequest request, List<MultipartFile> archivos)  {
-        Categoria categoria = categoriaRepository.findById(request.getIdCategoria()).orElseThrow(() -> new BusinessException("La categoría con ID " + request.getIdCategoria() + " no existe",HttpStatus.BAD_REQUEST));
+        Categoria categoria = obtenerCategoriaProducto(request.getIdCategoria());
+        String nombre = validarNombreProducto(request.getNombre());
+        request.setNombre(nombre);
+        if (productoRepository.existsByNombreIgnoreCase(nombre)) {
+            throw new BusinessException("Ya existe un producto con ese nombre", HttpStatus.BAD_REQUEST);
+        }
+
         Producto producto = productoMapper.toEntity(request);
         producto.setCategoria(categoria);
         List<String> urls = new ArrayList<>();
@@ -67,14 +74,22 @@ public class ProductoService implements IProductoService {
     @Override
     public ProductoResponse actualizarProducto(Long id, ProductoRequest request, List<MultipartFile> archivos) {
         Producto producto = productoRepository.findById(id).orElseThrow(() ->new BusinessException("Producto no encontrado",HttpStatus.NOT_FOUND));
-        Categoria categoria = categoriaRepository.findById(request.getIdCategoria()).orElseThrow(() -> new BusinessException("Categoría no encontrada", HttpStatus.BAD_REQUEST));
+        Categoria categoria = obtenerCategoriaProducto(request.getIdCategoria());
+        String nombre = validarNombreProducto(request.getNombre());
+        request.setNombre(nombre);
+        boolean existe = productoRepository.existsByNombreIgnoreCaseAndIdNot(nombre, id);
+        if (existe) {
+            throw new BusinessException("Ya existe un producto con ese nombre", HttpStatus.BAD_REQUEST);
+        }
         productoMapper.updateFromRequest(request, producto);
         producto.setCategoria(categoria);
         List<MultipartFile> archivosValidos = filtrarArchivosNoVacios(archivos);
 
         if (!archivosValidos.isEmpty()) {
-            for (String url : producto.getUrlsMultimedia()) {
-                fileStorageService.eliminarArchivo(url);
+            if (producto.getUrlsMultimedia() != null) {
+                for (String url : producto.getUrlsMultimedia()) {
+                    fileStorageService.eliminarArchivo(url);
+                }
             }
             List<String> nuevasUrls = new ArrayList<>();
             for (MultipartFile file : archivosValidos) {
@@ -106,8 +121,10 @@ public class ProductoService implements IProductoService {
     @Override
     public void eliminarProducto(Long id) {
         Producto producto = productoRepository.findById(id).orElseThrow(() -> new BusinessException("Producto no encontrado", HttpStatus.NOT_FOUND));
-        for (String url : producto.getUrlsMultimedia()) {
-            fileStorageService.eliminarArchivo(url);
+        if (producto.getUrlsMultimedia() != null) {
+            for (String url : producto.getUrlsMultimedia()) {
+                fileStorageService.eliminarArchivo(url);
+            }
         }
         productoRepository.delete(producto);
     }
@@ -132,5 +149,23 @@ public class ProductoService implements IProductoService {
             }
         }
         return archivosValidos;
+    }
+    private String validarNombreProducto(String nombre) {
+        if (nombre == null) {
+            throw new BusinessException("El nombre del producto es obligatorio", HttpStatus.BAD_REQUEST);
+        }
+        nombre = nombre.trim();
+        if (nombre.isBlank()) {
+            throw new BusinessException("El nombre del producto es obligatorio", HttpStatus.BAD_REQUEST);
+        }
+        return nombre;
+    }
+
+    private Categoria obtenerCategoriaProducto(Long idCategoria) {
+        Categoria categoria = categoriaRepository.findById(idCategoria).orElseThrow(() -> new BusinessException("Categoría no encontrada", HttpStatus.BAD_REQUEST));
+        if (categoria.getTipo() != CategoriaEnum.PRODUCTO) {
+            throw new BusinessException("La categoría seleccionada no pertenece a productos", HttpStatus.BAD_REQUEST);
+        }
+        return categoria;
     }
 }

@@ -9,6 +9,7 @@ import com.sistemabarberia.fadex_backend.modules.servicio.dto.request.ServicioRe
 import com.sistemabarberia.fadex_backend.modules.servicio.dto.response.ServicioResponseDTO;
 import com.sistemabarberia.fadex_backend.modules.servicio.entity.Servicio;
 import com.sistemabarberia.fadex_backend.modules.servicio.mapper.ServicioMapper;
+import com.sistemabarberia.fadex_backend.modules.categoria.entity.CategoriaEnum;
 
 import com.sistemabarberia.fadex_backend.modules.servicio.repository.ServicioRepository;
 import com.sistemabarberia.fadex_backend.modules.servicio.service.IServicioService;
@@ -33,47 +34,25 @@ public class ServicioServiceImpl implements IServicioService {
 
     @Override
     public ServicioResponseDTO crear(ServicioRequestDTO dto, List<MultipartFile> archivos) {
-
-        Categoria categoria = categoriaRepository.findById(dto.getCategoriaId())
-                .orElseThrow(() -> new BusinessException(
-                        "La categoría con ID " + dto.getCategoriaId() + " no existe",
-                        HttpStatus.BAD_REQUEST
-                ));
-
-        if (servicioRepository.existsByNombre(dto.getNombre().trim())) {
-            throw new BusinessException(
-                    "El servicio ya existe",
-                    HttpStatus.BAD_REQUEST
-            );
+        Categoria categoria = obtenerCategoriaServicio(dto.getCategoriaId());
+        String nombre = validarNombreServicio(dto.getNombre());
+        dto.setNombre(nombre);
+        if (servicioRepository.existsByNombreIgnoreCase(nombre)) {
+            throw new BusinessException("Ya existe un servicio con ese nombre", HttpStatus.BAD_REQUEST);
         }
-
         Servicio servicio = servicioMapper.toEntity(dto);
         servicio.setCategoria(categoria);
-
         List<String> urls = new ArrayList<>();
-
         List<MultipartFile> archivosValidos = filtrarArchivosNoVacios(archivos);
-
         if (!archivosValidos.isEmpty()) {
-
             for (MultipartFile file : archivosValidos) {
-
                 validarArchivoImagen(file);
-
-                String url = fileStorageService.guardarArchivo(
-                        file,
-                        "servicios",
-                        TIPOS_IMAGEN
-                );
-
+                String url = fileStorageService.guardarArchivo(file, "servicios", TIPOS_IMAGEN);
                 urls.add(url);
             }
         }
-
         servicio.setUrlsMultimedia(urls);
-
         Servicio guardado = servicioRepository.save(servicio);
-
         return servicioMapper.toResponse(guardado);
     }
 
@@ -84,56 +63,45 @@ public class ServicioServiceImpl implements IServicioService {
 
     @Override
     public List<ServicioResponseDTO> listarPorCategoria(Long categoriaId) {
-
         if (!categoriaRepository.existsById(categoriaId)) {
             throw new ResourceNotFoundException("Categoría no encontrada");
         }
-
-        return servicioMapper.toResponseList(
-                servicioRepository.findByCategoriaId_Id(categoriaId)
-        );
+        return servicioMapper.toResponseList(servicioRepository.findByCategoriaId_Id(categoriaId));
     }
 
     @Override
     public ServicioResponseDTO obtenerPorId(Long id) {
-        Servicio servicio = servicioRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Servicio no encontrado"));
-
+        Servicio servicio = servicioRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Servicio no encontrado"));
         return servicioMapper.toResponse(servicio);
     }
 
     @Override
     public ServicioResponseDTO actualizar(Long id, ServicioRequestDTO dto) {
-
-        Servicio servicio = servicioRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Servicio no encontrado"));
-
-        if (!servicio.getNombre().equals(dto.getNombre()) &&
-                servicioRepository.existsByNombre(dto.getNombre())) {
-            throw new BusinessException("Servicio ya existe", HttpStatus.BAD_REQUEST);
+        Servicio servicio = servicioRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Servicio no encontrado"));
+        Categoria categoria = obtenerCategoriaServicio(dto.getCategoriaId());
+        String nombre = validarNombreServicio(dto.getNombre());
+        dto.setNombre(nombre);
+        boolean existe = servicioRepository.existsByNombreIgnoreCaseAndServicioIdNot(nombre, id);
+        if (existe) {
+            throw new BusinessException("Ya existe un servicio con ese nombre", HttpStatus.BAD_REQUEST);
         }
-
-        Categoria categoria = categoriaRepository.findById(dto.getCategoriaId())
-                .orElseThrow(() -> new ResourceNotFoundException("Categoría no encontrada"));
-
         servicioMapper.updateEntityFromDto(dto, servicio);
-
         servicio.setCategoria(categoria);
-
         Servicio actualizado = servicioRepository.save(servicio);
-
         return servicioMapper.toResponse(actualizado);
     }
 
     @Override
     public void eliminar(Long id) {
-
-        if (!servicioRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Servicio no encontrado");
+        Servicio servicio = servicioRepository.findById(id).orElseThrow(() -> new BusinessException("Servicio no encontrado", HttpStatus.NOT_FOUND));
+        if (servicio.getUrlsMultimedia() != null) {
+            for (String url : servicio.getUrlsMultimedia()) {
+                fileStorageService.eliminarArchivo(url);
+            }
         }
-
-        servicioRepository.deleteById(id);
+        servicioRepository.delete(servicio);
     }
+
     private List<MultipartFile> filtrarArchivosNoVacios(List<MultipartFile> archivos) {
         if (archivos == null || archivos.isEmpty()) {
             return List.of();
@@ -145,7 +113,6 @@ public class ServicioServiceImpl implements IServicioService {
             }
         }
         return archivosValidos;
-        
     }
 
     private void validarArchivoImagen(MultipartFile file) {
@@ -155,5 +122,23 @@ public class ServicioServiceImpl implements IServicioService {
         if (!TIPOS_IMAGEN.contains(file.getContentType())) {
             throw new BusinessException("Formato no permitido: " + file.getContentType(), HttpStatus.BAD_REQUEST);
         }
+    }
+    private Categoria obtenerCategoriaServicio(Long categoriaId) {
+        Categoria categoria = categoriaRepository.findById(categoriaId).orElseThrow(() -> new BusinessException("Categoría no encontrada", HttpStatus.BAD_REQUEST));
+        if (categoria.getTipo() != CategoriaEnum.SERVICIO) {
+            throw new BusinessException("La categoría seleccionada no pertenece a servicios", HttpStatus.BAD_REQUEST);
+        }
+        return categoria;
+    }
+
+    private String validarNombreServicio(String nombre) {
+        if (nombre == null) {
+            throw new BusinessException("El nombre del servicio es obligatorio", HttpStatus.BAD_REQUEST);
+        }
+        nombre = nombre.trim();
+        if (nombre.isBlank()) {
+            throw new BusinessException("El nombre del servicio es obligatorio", HttpStatus.BAD_REQUEST);
+        }
+        return nombre;
     }
 }
