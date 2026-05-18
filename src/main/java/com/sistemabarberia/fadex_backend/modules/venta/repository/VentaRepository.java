@@ -47,4 +47,13 @@ public interface VentaRepository extends JpaRepository<Venta, Integer> {
     Double totalGastadoCliente(
             @Param("clienteId") Integer clienteId
     );
+
+    @Query("""
+    SELECT v
+    FROM Venta v
+    LEFT JOIN FETCH v.detalles d
+    LEFT JOIN FETCH d.producto
+    WHERE v.ventaId = :id
+""")
+    Venta findByIdWithDetalles(@Param("id") Integer id);
 }
