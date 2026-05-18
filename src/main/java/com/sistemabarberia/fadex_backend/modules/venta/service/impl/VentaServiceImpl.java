@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -46,29 +47,42 @@ public class VentaServiceImpl implements IVentaService {
         Barbero barbero = barberoRepository.findById(dto.getBarberoId())
                 .orElseThrow(() -> new ResourceNotFoundException("Barbero no encontrado"));
 
-        // CREAR VENTA
-        Venta venta = ventaMapper.toEntity(dto);
+        Venta venta = new Venta();
+
         venta.setCliente(cliente);
         venta.setBarbero(barbero);
+        venta.setFecha(dto.getFecha());
+
+        List<DetalleVenta> detalles = dto.getDetalles()
+                .stream()
+                .map(detDto -> {
+
+                    DetalleVenta detalle = detalleVentaMapper.toEntity(detDto);
+
+                    detalle.setVenta(venta);
+
+                    return detalle;
+
+                }).toList();
+
+        venta.setDetalles(detalles);
 
         Venta ventaGuardada = ventaRepository.save(venta);
 
-        // DETALLES
-        if (dto.getDetalles() != null && !dto.getDetalles().isEmpty()) {
-            for (DetalleVentaRequestDTO detDto : dto.getDetalles()) {
-                DetalleVenta detalle = detalleVentaMapper.toEntity(detDto);
-                detalle.setVenta(ventaGuardada);
-                detalleVentaRepository.save(detalle);
-            }
-        }
+        ventaGuardada = ventaRepository.findById(
+                ventaGuardada.getVentaId()
+        ).orElseThrow();
 
-        // HISTORIAL AUTOMÁTICO
+        // HISTORIAL
         HistorialVenta historial = new HistorialVenta();
+
         historial.setVenta(ventaGuardada);
         historial.setFecha(LocalDateTime.now());
+
         historialVentaRepository.save(historial);
 
         return ventaMapper.toResponse(ventaGuardada);
+
     }
 
     @Override
@@ -78,8 +92,9 @@ public class VentaServiceImpl implements IVentaService {
 
     @Override
     public VentaResponseDTO obtenerPorId(Integer id) {
-        Venta venta = ventaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Venta no encontrada"));
+        Venta venta = Optional.ofNullable(
+                ventaRepository.findByIdWithDetalles(id)
+        ).orElseThrow(() -> new ResourceNotFoundException("Venta no encontrada"));
 
         return ventaMapper.toResponse(venta);
     }
@@ -102,7 +117,6 @@ public class VentaServiceImpl implements IVentaService {
         venta.setBarbero(barbero);
         venta.setFecha(dto.getFecha());
 
-        // ELIMINAR DETALLES ANTERIORES
         detalleVentaRepository.deleteAll(venta.getDetalles());
 
         // LIMPIAR
