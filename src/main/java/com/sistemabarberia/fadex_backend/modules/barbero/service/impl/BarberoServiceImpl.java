@@ -1,6 +1,7 @@
 package com.sistemabarberia.fadex_backend.modules.barbero.service.impl;
 
 import com.sistemabarberia.fadex_backend.commons.exception.BusinessException;
+import com.sistemabarberia.fadex_backend.commons.exception.ResourceNotFoundException;
 import com.sistemabarberia.fadex_backend.modules.barbero.dto.request.BarberoRequestDTO;
 import com.sistemabarberia.fadex_backend.modules.barbero.dto.request.BarberoUpdateRequestDTO;
 import com.sistemabarberia.fadex_backend.modules.barbero.dto.response.BarberoResponseDTO;
@@ -51,8 +52,16 @@ public class BarberoServiceImpl implements IBarberoService {
 
     @Override
     public Page<BarberoResponseDTO> listarBarberos(Pageable pageable) {
-        return barberoRepository.findAll(pageable)
+        return barberoRepository.findByActivoTrue(pageable)
                 .map(mapper::toResponseDTO);
+    }
+
+    @Override
+    public Page<BarberoResponseDTO> listarBarberosInhabilitados(Pageable pageable) {
+
+        return barberoRepository.findByActivoFalse(pageable)
+                .map(mapper::toResponseDTO);
+
     }
 
     @Override
@@ -134,11 +143,12 @@ public class BarberoServiceImpl implements IBarberoService {
 
         if (filtrarEstado) {
             boolean ocupado = estado.equalsIgnoreCase("ocupado");
-            return barberoRepository.findByOcupado(ocupado, pageableFinal)
+            return barberoRepository
+                    .findByActivoTrueAndOcupado(ocupado, pageableFinal)
                     .map(mapper::toResponseDTO);
         }
 
-        return barberoRepository.findAll(pageableFinal)
+        return barberoRepository.findByActivoTrue(pageableFinal)
                 .map(mapper::toResponseDTO);
     }
 
@@ -274,5 +284,29 @@ public class BarberoServiceImpl implements IBarberoService {
                 .comisionGanada(comisionGanada)
                 .reservasHoy(reservasHoy)
                 .build();
+    }
+
+    @Override
+    public void deshabilitarBarbero(Integer id) {
+
+        Barbero barbero = barberoRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Barbero no encontrado"));
+
+        barbero.setActivo(false);
+
+        barberoRepository.save(barbero);
+    }
+
+    @Override
+    public void reactivarBarbero(Integer id) {
+
+        Barbero barbero = barberoRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Barbero no encontrado"));
+
+        barbero.setActivo(true);
+
+        barberoRepository.save(barbero);
     }
 }

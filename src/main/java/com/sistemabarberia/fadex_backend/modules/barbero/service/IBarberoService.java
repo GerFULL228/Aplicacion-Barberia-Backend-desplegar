@@ -13,6 +13,8 @@ public interface IBarberoService {
     // Listar con paginación
     Page<BarberoResponseDTO> listarBarberos(Pageable pageable);
 
+    Page<BarberoResponseDTO> listarBarberosInhabilitados(Pageable pageable);
+
     // Crear
     BarberoResponseDTO crearBarbero(BarberoRequestDTO dto);
 
@@ -34,4 +36,8 @@ public interface IBarberoService {
     Page<BarberoResponseDTO> buscarPorNombre(String termino, Pageable pageable);
 
     ResumenIndividualBarberoDTO obtenerResumenIndividual(Integer id);
+
+    void deshabilitarBarbero(Integer id);
+
+    void reactivarBarbero(Integer id);
 }

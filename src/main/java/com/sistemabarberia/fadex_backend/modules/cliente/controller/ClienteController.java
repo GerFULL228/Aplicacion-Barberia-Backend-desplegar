@@ -42,6 +42,46 @@ public class ClienteController {
         return ResponseEntity.ok(ApiResponse.ok("Clientes obtenidos correctamente", result));
     }
 
+    @GetMapping("/inhabilitados")
+    public ResponseEntity<ApiResponse<PageResponse<ClienteResponseDTO>>> listarClientesInhabilitados(
+            @RequestParam(defaultValue = "0")  int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<ClienteResponseDTO> result =
+                clienteService.listarClientesInhabilitados(pageable);
+
+        return ResponseEntity.ok(
+                ApiResponse.ok("Clientes inhabilitados obtenidos correctamente", result)
+        );
+    }
+
+    @PatchMapping("/{id}/deshabilitar")
+    public ResponseEntity<ApiResponse<String>> deshabilitarCliente(
+            @PathVariable Integer id
+    ) {
+
+        clienteService.deshabilitarCliente(id);
+
+        return ResponseEntity.ok(
+                ApiResponse.ok("Cliente deshabilitado correctamente", "OK")
+        );
+    }
+
+    @PatchMapping("/{id}/reactivar")
+    public ResponseEntity<ApiResponse<String>> reactivarCliente(
+            @PathVariable Integer id
+    ) {
+
+        clienteService.reactivarCliente(id);
+
+        return ResponseEntity.ok(
+                ApiResponse.ok("Cliente reactivado correctamente", "OK")
+        );
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<ClienteResponseDTO>> buscarCliente(
             @PathVariable Integer id
