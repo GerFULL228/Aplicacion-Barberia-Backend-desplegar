@@ -16,12 +16,16 @@ import java.util.Optional;
 public interface BarberoRepository extends JpaRepository<Barbero, Integer> {
 
     Page<Barbero> findByActivoTrue(Pageable pageable);
+    Page<Barbero> findByActivoFalse(Pageable pageable);
     boolean existsByPersona_PersonaId(Integer personaId);
     Optional<Barbero> findByPersona_Usuario_IdUsuario(Integer usuarioId);
     Optional<Barbero> findByPersonaUsuario(Usuario usuario);
 
     // Filtrar por estado ocupado
-    Page<Barbero> findByOcupado(boolean ocupado, Pageable pageable);
+    Page<Barbero> findByActivoTrueAndOcupado(
+            boolean ocupado,
+            Pageable pageable
+    );
 
     // Contar disponibles u ocupados
     long countByOcupado(boolean ocupado);
@@ -62,10 +66,16 @@ public interface BarberoRepository extends JpaRepository<Barbero, Integer> {
     @Query(value = """
     SELECT b.* FROM barbero b
     JOIN persona pe ON pe.id_persona = b.id_persona
-    WHERE LOWER(pe.nombre)   LIKE LOWER(CONCAT('%', :termino, '%'))
-       OR LOWER(pe.apellido) LIKE LOWER(CONCAT('%', :termino, '%'))
+    WHERE b.activo = true
+      AND (
+           LOWER(pe.nombre)   LIKE LOWER(CONCAT('%', :termino, '%'))
+        OR LOWER(pe.apellido) LIKE LOWER(CONCAT('%', :termino, '%'))
+      )
 """, nativeQuery = true)
-    Page<Barbero> buscarPorNombreOApellido(@Param("termino") String termino, Pageable pageable);
+    Page<Barbero> buscarPorNombreOApellido(
+            @Param("termino") String termino,
+            Pageable pageable
+    );
 
     // Cortes atendidos este mes por el barbero
     @Query(value = """

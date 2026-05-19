@@ -37,6 +37,46 @@ public class BarberoController {
         return ResponseEntity.ok(ApiResponse.ok("Barberos obtenidos correctamente", result));
     }
 
+    @GetMapping("/inhabilitados")
+    public ResponseEntity<ApiResponse<PageResponse<BarberoResponseDTO>>> listarBarberosInhabilitados(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<BarberoResponseDTO> result =
+                barberoService.listarBarberosInhabilitados(pageable);
+
+        return ResponseEntity.ok(
+                ApiResponse.ok("Barberos inhabilitados obtenidos", result)
+        );
+    }
+
+    @PatchMapping("/{id}/deshabilitar")
+    public ResponseEntity<ApiResponse<String>> deshabilitarBarbero(
+            @PathVariable Integer id
+    ) {
+
+        barberoService.deshabilitarBarbero(id);
+
+        return ResponseEntity.ok(
+                ApiResponse.ok("Barbero deshabilitado correctamente", "OK")
+        );
+    }
+
+    @PatchMapping("/{id}/reactivar")
+    public ResponseEntity<ApiResponse<String>> reactivarBarbero(
+            @PathVariable Integer id
+    ) {
+
+        barberoService.reactivarBarbero(id);
+
+        return ResponseEntity.ok(
+                ApiResponse.ok("Barbero reactivado correctamente", "OK")
+        );
+    }
+
     // ⚠️ Rutas estáticas SIEMPRE antes de /{id}
 
     // GET /api/v1/barberos/resumen
