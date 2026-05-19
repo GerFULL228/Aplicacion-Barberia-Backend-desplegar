@@ -15,6 +15,7 @@ import java.util.Optional;
 @Repository
 public interface BarberoRepository extends JpaRepository<Barbero, Integer> {
 
+    Page<Barbero> findByActivoTrue(Pageable pageable);
     boolean existsByPersona_PersonaId(Integer personaId);
     Optional<Barbero> findByPersona_Usuario_IdUsuario(Integer usuarioId);
     Optional<Barbero> findByPersonaUsuario(Usuario usuario);

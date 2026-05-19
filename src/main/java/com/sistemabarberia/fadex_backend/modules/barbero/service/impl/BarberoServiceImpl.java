@@ -51,7 +51,7 @@ public class BarberoServiceImpl implements IBarberoService {
 
     @Override
     public Page<BarberoResponseDTO> listarBarberos(Pageable pageable) {
-        return barberoRepository.findAll(pageable)
+        return barberoRepository.findByActivoTrue(pageable)
                 .map(mapper::toResponseDTO);
     }
 
