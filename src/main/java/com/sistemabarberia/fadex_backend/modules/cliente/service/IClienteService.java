@@ -17,6 +17,12 @@ public interface IClienteService {
 
     Page<ClienteResponseDTO> listarClientes(Pageable pageable);
 
+    Page<ClienteResponseDTO> listarClientesInhabilitados(Pageable pageable);
+
+    void deshabilitarCliente(Integer id);
+
+    void reactivarCliente(Integer id);
+
     ClienteResponseDTO crearCliente(ClienteRequestDTO dto);
 
     ClienteResponseDTO eliminar(Integer id);

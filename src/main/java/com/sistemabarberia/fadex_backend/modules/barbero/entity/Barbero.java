@@ -46,6 +46,9 @@ public class Barbero {
     @Column(name = "foto_url", length = 255)
     private String fotoUrl;
 
+    @Column(name = "activo")
+    private boolean activo;
+
     @PrePersist
     public void prePersist() {
         if (this.fechaIngreso == null) {

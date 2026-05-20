@@ -1,6 +1,7 @@
 package com.sistemabarberia.fadex_backend.modules.cliente.service.impl;
 
 import com.sistemabarberia.fadex_backend.commons.exception.BusinessException;
+import com.sistemabarberia.fadex_backend.commons.exception.ResourceNotFoundException;
 import com.sistemabarberia.fadex_backend.modules.barbero.repository.BarberoRepository;
 import com.sistemabarberia.fadex_backend.modules.cliente.dto.request.ClienteRequestDTO;
 import com.sistemabarberia.fadex_backend.modules.cliente.dto.response.ActividadRecienteResponse;
@@ -50,7 +51,13 @@ public class ClienteServiceImpl implements IClienteService {
 
     @Override
     public Page<ClienteResponseDTO> listarClientes(Pageable pageable) {
-        return clienteRepository.findAll(pageable)
+        return clienteRepository.findByActivoTrue(pageable)
+                .map(mapper::toResponseDTO);
+    }
+
+    @Override
+    public Page<ClienteResponseDTO> listarClientesInhabilitados(Pageable pageable) {
+        return clienteRepository.findByActivoFalse(pageable)
                 .map(mapper::toResponseDTO);
     }
 
@@ -225,5 +232,29 @@ public class ClienteServiceImpl implements IClienteService {
                         .color((String) row[4])
                         .build()
         ).toList();
+    }
+
+    @Override
+    public void deshabilitarCliente(Integer id) {
+
+        Cliente cliente = clienteRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Cliente no encontrado"));
+
+        cliente.setActivo(false);
+
+        clienteRepository.save(cliente);
+    }
+
+    @Override
+    public void reactivarCliente(Integer id) {
+
+        Cliente cliente = clienteRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Cliente no encontrado"));
+
+        cliente.setActivo(true);
+
+        clienteRepository.save(cliente);
     }
 }
