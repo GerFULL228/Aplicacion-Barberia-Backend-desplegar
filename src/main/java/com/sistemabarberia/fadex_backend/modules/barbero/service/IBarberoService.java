@@ -33,6 +33,9 @@ public interface IBarberoService {
     // Resumen del dashboard
     ResumenBarberoDTO obtenerResumen();
 
+    BarberoResponseDTO obtenerPerfilPropio(Integer usuarioId);
+    BarberoResponseDTO toggleOcupado(Integer id);
+
     Page<BarberoResponseDTO> buscarPorNombre(String termino, Pageable pageable);
 
     ResumenIndividualBarberoDTO obtenerResumenIndividual(Integer id);

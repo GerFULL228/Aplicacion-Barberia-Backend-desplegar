@@ -1,5 +1,6 @@
 package com.sistemabarberia.fadex_backend.modules.barbero.controller;
 
+import com.sistemabarberia.fadex_backend.auth.security.service.CustomUserDetails;
 import com.sistemabarberia.fadex_backend.commons.response.ApiResponse;
 import com.sistemabarberia.fadex_backend.commons.response.PageResponse;
 import com.sistemabarberia.fadex_backend.modules.barbero.dto.request.BarberoRequestDTO;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -151,5 +153,18 @@ public class BarberoController {
             @PathVariable Integer id) {
         ResumenIndividualBarberoDTO resumen = barberoService.obtenerResumenIndividual(id);
         return ResponseEntity.ok(ApiResponse.ok("Resumen del barbero obtenido", resumen));
+    }
+    @GetMapping("/perfil-propio")
+    public ResponseEntity<ApiResponse<BarberoResponseDTO>> perfilPropio(
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ResponseEntity.ok(ApiResponse.ok("Perfil obtenido",
+                barberoService.obtenerPerfilPropio(userDetails.getUsuario().getIdUsuario())));
+    }
+
+    @PatchMapping("/{id}/ocupado")
+    public ResponseEntity<ApiResponse<BarberoResponseDTO>> toggleOcupado(
+            @PathVariable Integer id) {
+        return ResponseEntity.ok(ApiResponse.ok("Estado actualizado",
+                barberoService.toggleOcupado(id)));
     }
 }

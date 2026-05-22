@@ -14,6 +14,10 @@ public interface BarberoMapper {
 
     //Listar
     @Mapping(source = "barberoId", target = "barberoId")
+    @Mapping(source = "persona.nombre", target = "nombre")
+    @Mapping(source = "persona.apellido", target = "apellido")
+    @Mapping(source = "persona.telefono", target = "telefono")
+    @Mapping(source = "persona.email", target = "email")
     BarberoResponseDTO toResponseDTO(Barbero barbero);
 
     //Registrar

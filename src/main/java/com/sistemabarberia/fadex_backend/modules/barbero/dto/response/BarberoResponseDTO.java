@@ -11,7 +11,10 @@ import java.time.LocalDate;
 @Builder
 public class BarberoResponseDTO {
     private Integer barberoId;
-    private Persona persona;
+    private String nombre;
+    private String apellido;
+    private String telefono;
+    private String email;
     private Integer experiencia;
     private LocalDate fechaIngreso;
     private boolean ocupado;

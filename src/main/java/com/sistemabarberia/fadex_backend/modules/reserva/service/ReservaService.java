@@ -29,9 +29,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -191,27 +193,56 @@ public class ReservaService {
 
         LocalDate hoy = LocalDate.now();
 
+        Barbero barbero = barberoRepository.findById(barberoId)
+                .orElseThrow(() -> new ResourceNotFoundException("Barbero no encontrado"));
+
         List<ResumenSemanalDTO.DiaSemana> dias = hoy.minusDays(6)
                 .datesUntil(hoy.plusDays(1))
                 .map(fecha -> {
 
-                    LocalDate d = fecha;
-                    LocalDate h = fecha;
+                    List<Reserva> reservasDia = reservaRepository
+                            .findByBarberoIdAndFechaBetween(
+                                    barberoId,
+                                    fecha,
+                                    fecha
+                            );
 
-                    List<Reserva> r = reservaRepository
-                            .findByBarberoIdAndFechaBetween(barberoId, d, h);
+                    long atendidos = contar(reservasDia, EstadoReserva.FINALIZADA);
+
+                    long cancelados = contar(reservasDia, EstadoReserva.CANCELADA);
+
+                    BigDecimal totalIngresos = reservasDia.stream()
+                            .filter(r -> r.getEstadoReserva() == EstadoReserva.FINALIZADA)
+                            .map(Reserva::getTotal)
+                            .filter(Objects::nonNull)
+                            .reduce(BigDecimal.ZERO, BigDecimal::add);
 
                     return new ResumenSemanalDTO.DiaSemana(
                             fecha.toString(),
-                            contar(r, EstadoReserva.FINALIZADA),
-                            contar(r, EstadoReserva.CANCELADA
-                            )
+                            atendidos,
+                            cancelados,
+                            totalIngresos
                     );
                 })
                 .collect(Collectors.toList());
 
+        BigDecimal ingresosSemana = dias.stream()
+                .map(ResumenSemanalDTO.DiaSemana::getTotalIngresos)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal sueldoBase = barbero.getSueldo();
+
+        BigDecimal comisionSemanal = ingresosSemana.multiply(
+                barbero.getComision().divide(BigDecimal.valueOf(100))
+        );
+
+        BigDecimal totalSemana = sueldoBase.add(comisionSemanal);
+
         return ResumenSemanalDTO.builder()
                 .dias(dias)
+                .sueldoBase(sueldoBase)
+                .comisionSemanal(comisionSemanal)
+                .totalSemana(totalSemana)
                 .build();
     }
 

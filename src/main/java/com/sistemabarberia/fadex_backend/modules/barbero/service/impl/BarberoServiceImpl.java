@@ -309,4 +309,18 @@ public class BarberoServiceImpl implements IBarberoService {
 
         barberoRepository.save(barbero);
     }
+    @Override
+    public BarberoResponseDTO obtenerPerfilPropio(Integer usuarioId) {
+        Barbero barbero = barberoRepository.findByPersona_Usuario_IdUsuario(usuarioId)
+                .orElseThrow(() -> new ResourceNotFoundException("Barbero no encontrado"));
+        return mapper.toResponseDTO(barbero);
+    }
+
+    @Override
+    public BarberoResponseDTO toggleOcupado(Integer id) {
+        Barbero barbero = barberoRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Barbero no encontrado"));
+        barbero.setOcupado(!barbero.isOcupado());
+        return mapper.toResponseDTO(barberoRepository.save(barbero));
+    }
 }
