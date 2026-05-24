@@ -495,6 +495,19 @@ public class UsuarioServiceImpl implements IUsuarioService {
                         .build());
     }
 
+    @Override
+    @Transactional
+    public void quitarRol(Integer idUsuario, Integer idRol) {
+        Usuario usuario = usuarioRepository.findById(idUsuario)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+
+        Rol rol = rolRepository.findById(idRol)
+                .orElseThrow(() -> new ResourceNotFoundException("Rol no encontrado"));
+
+        usuario.getRoles().remove(rol);
+        usuarioRepository.save(usuario);
+    }
+
 
 
 

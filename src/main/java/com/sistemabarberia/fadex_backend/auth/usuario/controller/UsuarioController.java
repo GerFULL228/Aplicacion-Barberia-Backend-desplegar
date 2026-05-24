@@ -250,6 +250,16 @@ public class UsuarioController {
         );
     }
 
+    @DeleteMapping("/{id}/roles/{idRol}")
+    @PreAuthorize("hasRole('admin')")
+    public ResponseEntity<ApiResponse<Void>> quitarRol(
+            @PathVariable Integer id,
+            @PathVariable Integer idRol
+    ) {
+        usuarioService.quitarRol(id, idRol);
+        return ResponseEntity.ok(ApiResponse.ok("Rol eliminado correctamente"));
+    }
+
 
 
 }

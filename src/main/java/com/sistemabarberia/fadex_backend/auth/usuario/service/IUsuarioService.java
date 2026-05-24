@@ -47,4 +47,6 @@ public interface IUsuarioService {
     List<RolResponse> obtenerRolesUsuario(Integer idUsuario);
 
     Page<PermisoResponse> obtenerPermisosUsuario(Integer idUsuario, Pageable pageable);
+
+    void quitarRol(Integer idUsuario, Integer idRol);
 }
