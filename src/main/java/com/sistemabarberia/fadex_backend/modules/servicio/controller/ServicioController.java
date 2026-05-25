@@ -1,16 +1,13 @@
 package com.sistemabarberia.fadex_backend.modules.servicio.controller;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sistemabarberia.fadex_backend.commons.response.ApiResponse;
 import com.sistemabarberia.fadex_backend.modules.servicio.dto.request.ServicioRequestDTO;
-
 import com.sistemabarberia.fadex_backend.modules.servicio.dto.response.ServicioResponseDTO;
-
-
 import com.sistemabarberia.fadex_backend.modules.servicio.service.IServicioService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,18 +24,37 @@ public class ServicioController {
     private final IServicioService servicioService;
 
     @GetMapping
-    public ResponseEntity<List<ServicioResponseDTO>> listar() {
-        return ResponseEntity.ok(servicioService.listar());
+    public ResponseEntity<ApiResponse<List<ServicioResponseDTO>>> listar() {
+        return ResponseEntity.ok(
+                ApiResponse.ok(
+                        "Servicios obtenidos correctamente",
+                        servicioService.listar()
+                )
+        );
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ServicioResponseDTO> obtenerPorId(@PathVariable Long id) {
-        return ResponseEntity.ok(servicioService.obtenerPorId(id));
+    public ResponseEntity<ApiResponse<ServicioResponseDTO>> obtenerPorId(
+            @PathVariable Long id
+    ) {
+        return ResponseEntity.ok(
+                ApiResponse.ok(
+                        "Servicio obtenido correctamente",
+                        servicioService.obtenerPorId(id)
+                )
+        );
     }
 
     @GetMapping("/categoria/{categoriaId}")
-    public ResponseEntity<List<ServicioResponseDTO>> listarPorCategoria(@PathVariable Long categoriaId) {
-        return ResponseEntity.ok(servicioService.listarPorCategoria(categoriaId));
+    public ResponseEntity<ApiResponse<List<ServicioResponseDTO>>> listarPorCategoria(
+            @PathVariable Long categoriaId
+    ) {
+        return ResponseEntity.ok(
+                ApiResponse.ok(
+                        "Servicios por categoría obtenidos correctamente",
+                        servicioService.listarPorCategoria(categoriaId)
+                )
+        );
     }
 
     @PreAuthorize("hasAuthority('SERVICIO_CREATE')")
@@ -56,23 +72,47 @@ public class ServicioController {
         ServicioResponseDTO responseDTO =
                 servicioService.crear(request, archivos);
 
-        return ResponseEntity.ok(
-                ApiResponse.ok("Servicio creado correctamente", responseDTO)
-        );
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(
+                        ApiResponse.ok(
+                                "Servicio creado correctamente",
+                                responseDTO
+                        )
+                );
     }
 
     @PreAuthorize("hasAuthority('SERVICIO_UPDATE_ALL')")
     @PutMapping("/{id}")
-    public ResponseEntity<ServicioResponseDTO> actualizar(
+    public ResponseEntity<ApiResponse<ServicioResponseDTO>> actualizar(
             @PathVariable Long id,
-            @Valid @RequestBody ServicioRequestDTO dto) {
-        return ResponseEntity.ok(servicioService.actualizar(id, dto));
+            @Valid @RequestBody ServicioRequestDTO dto
+    ) {
+
+        ServicioResponseDTO actualizado =
+                servicioService.actualizar(id, dto);
+
+        return ResponseEntity.ok(
+                ApiResponse.ok(
+                        "Servicio actualizado correctamente",
+                        actualizado
+                )
+        );
     }
 
     @PreAuthorize("hasAuthority('SERVICIO_DELETE_ALL')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+    public ResponseEntity<?> eliminar(
+            @PathVariable Long id
+    ) {
+
         servicioService.eliminar(id);
-        return ResponseEntity.noContent().build();
+
+        return ResponseEntity.ok(
+                ApiResponse.ok(
+                        "Servicio eliminado correctamente",
+                        null
+                )
+        );
     }
 }

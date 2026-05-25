@@ -19,6 +19,8 @@ import com.sistemabarberia.fadex_backend.modules.reserva.mapper.ReservaMapper;
 import com.sistemabarberia.fadex_backend.modules.reserva.repository.ReservaRepository;
 import com.sistemabarberia.fadex_backend.modules.reserva.dto.Request.ActualizarEstadoReservaDTO;
 import com.sistemabarberia.fadex_backend.modules.persona.entity.Persona;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import com.sistemabarberia.fadex_backend.modules.servicio.entity.Servicio;
 
@@ -128,8 +130,10 @@ public class ReservaService {
         return reservaMapper.toDtoLista(reservas);
     }
 
-    public List<ReservaDTO> ListarReservasAdmin() {
-        return reservaRepository.findAll().stream().map(reservaMapper::toDto).toList();
+    public Page<ReservaDTO> listarReservasAdmin(Pageable pageable) {
+
+        return reservaRepository.findAll(pageable)
+                .map(reservaMapper::toDto);
     }
 
     public List<ReservaDTO> ListarReservasBarbero(Usuario usuario) {
