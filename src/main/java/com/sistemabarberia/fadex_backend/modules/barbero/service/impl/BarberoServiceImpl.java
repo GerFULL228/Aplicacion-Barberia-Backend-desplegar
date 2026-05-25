@@ -4,6 +4,7 @@ import com.sistemabarberia.fadex_backend.commons.exception.BusinessException;
 import com.sistemabarberia.fadex_backend.commons.exception.ResourceNotFoundException;
 import com.sistemabarberia.fadex_backend.modules.barbero.dto.request.BarberoRequestDTO;
 import com.sistemabarberia.fadex_backend.modules.barbero.dto.request.BarberoUpdateRequestDTO;
+import com.sistemabarberia.fadex_backend.modules.barbero.dto.response.BarberoDetalleResponseDTO;
 import com.sistemabarberia.fadex_backend.modules.barbero.dto.response.BarberoResponseDTO;
 import com.sistemabarberia.fadex_backend.modules.barbero.dto.response.ResumenBarberoDTO;
 import com.sistemabarberia.fadex_backend.modules.barbero.dto.response.ResumenIndividualBarberoDTO;
@@ -310,10 +311,10 @@ public class BarberoServiceImpl implements IBarberoService {
         barberoRepository.save(barbero);
     }
     @Override
-    public BarberoResponseDTO obtenerPerfilPropio(Integer usuarioId) {
+    public BarberoDetalleResponseDTO obtenerPerfilPropio(Integer usuarioId) {
         Barbero barbero = barberoRepository.findByPersona_Usuario_IdUsuario(usuarioId)
                 .orElseThrow(() -> new ResourceNotFoundException("Barbero no encontrado"));
-        return mapper.toResponseDTO(barbero);
+        return mapper.toDetalleResponseDTO(barbero);
     }
 
     @Override

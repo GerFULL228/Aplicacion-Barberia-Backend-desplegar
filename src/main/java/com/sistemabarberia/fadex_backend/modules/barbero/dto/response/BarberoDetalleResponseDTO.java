@@ -1,17 +1,18 @@
 package com.sistemabarberia.fadex_backend.modules.barbero.dto.response;
 
-import com.sistemabarberia.fadex_backend.modules.persona.entity.Persona;
 import lombok.Builder;
 import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-
 @Data
 @Builder
-public class BarberoResponseDTO {
+public class BarberoDetalleResponseDTO {
     private Integer barberoId;
-    private Persona persona;
+    private String nombre;
+    private String apellido;
+    private String telefono;
+    private String email;
     private Integer experiencia;
     private LocalDate fechaIngreso;
     private boolean ocupado;

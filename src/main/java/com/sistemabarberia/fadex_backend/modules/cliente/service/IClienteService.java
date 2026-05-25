@@ -57,4 +57,7 @@ public interface IClienteService {
     ClienteDetalleResumenDTO obtenerResumenCliente(Integer clienteId);
 
     List<ActividadRecienteResponse> obtenerActividadReciente(Integer idCliente);
+    ClienteResponseDTO obtenerPerfilPropio(Integer usuarioId);
+
+    ClienteDetalleResumenDTO obtenerResumenPropio(Integer usuarioId);
 }

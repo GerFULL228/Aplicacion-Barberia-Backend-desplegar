@@ -2,6 +2,7 @@ package com.sistemabarberia.fadex_backend.modules.barbero.service;
 
 import com.sistemabarberia.fadex_backend.modules.barbero.dto.request.BarberoRequestDTO;
 import com.sistemabarberia.fadex_backend.modules.barbero.dto.request.BarberoUpdateRequestDTO;
+import com.sistemabarberia.fadex_backend.modules.barbero.dto.response.BarberoDetalleResponseDTO;
 import com.sistemabarberia.fadex_backend.modules.barbero.dto.response.BarberoResponseDTO;
 import com.sistemabarberia.fadex_backend.modules.barbero.dto.response.ResumenBarberoDTO;
 import com.sistemabarberia.fadex_backend.modules.barbero.dto.response.ResumenIndividualBarberoDTO;
@@ -33,7 +34,7 @@ public interface IBarberoService {
     // Resumen del dashboard
     ResumenBarberoDTO obtenerResumen();
 
-    BarberoResponseDTO obtenerPerfilPropio(Integer usuarioId);
+    BarberoDetalleResponseDTO obtenerPerfilPropio(Integer usuarioId);
     BarberoResponseDTO toggleOcupado(Integer id);
 
     Page<BarberoResponseDTO> buscarPorNombre(String termino, Pageable pageable);

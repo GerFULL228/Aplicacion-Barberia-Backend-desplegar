@@ -79,9 +79,19 @@ public class SecurityConfig {
                                 "/api/v1/barberos/**",
                                 "/api/v1/productos/**"
                         ).permitAll()
-                        .requestMatchers("/api/v1/barbero/citas/**").
-                        hasAnyAuthority("ROLE_barbero")
+                        .requestMatchers("/api/v1/barbero/citas/**")
+                        .hasAnyAuthority("ROLE_barbero", "ROLE_admin")
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/v1/reservas/mis-reservas",
+                                "/api/v1/clientes/perfil-propio",
+                                "/api/v1/clientes/perfil-propio/resumen",
+                                "/api/v1/servicio",
+                                "/api/v1/servicio/**"
+                        ).hasRole("cliente")
 
+                        .requestMatchers(HttpMethod.POST,
+                                "/api/v1/reservas"
+                        ).hasAnyAuthority("ROLE_barbero", "ROLE_admin", "ROLE_cliente")
 
                         .anyRequest().authenticated()
 

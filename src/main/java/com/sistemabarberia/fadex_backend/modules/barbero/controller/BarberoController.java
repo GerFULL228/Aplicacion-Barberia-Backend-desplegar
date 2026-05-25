@@ -5,6 +5,7 @@ import com.sistemabarberia.fadex_backend.commons.response.ApiResponse;
 import com.sistemabarberia.fadex_backend.commons.response.PageResponse;
 import com.sistemabarberia.fadex_backend.modules.barbero.dto.request.BarberoRequestDTO;
 import com.sistemabarberia.fadex_backend.modules.barbero.dto.request.BarberoUpdateRequestDTO;
+import com.sistemabarberia.fadex_backend.modules.barbero.dto.response.BarberoDetalleResponseDTO;
 import com.sistemabarberia.fadex_backend.modules.barbero.dto.response.BarberoResponseDTO;
 import com.sistemabarberia.fadex_backend.modules.barbero.dto.response.ResumenBarberoDTO;
 import com.sistemabarberia.fadex_backend.modules.barbero.dto.response.ResumenIndividualBarberoDTO;
@@ -155,7 +156,7 @@ public class BarberoController {
         return ResponseEntity.ok(ApiResponse.ok("Resumen del barbero obtenido", resumen));
     }
     @GetMapping("/perfil-propio")
-    public ResponseEntity<ApiResponse<BarberoResponseDTO>> perfilPropio(
+    public ResponseEntity<ApiResponse<BarberoDetalleResponseDTO>> perfilPropio(
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         return ResponseEntity.ok(ApiResponse.ok("Perfil obtenido",
                 barberoService.obtenerPerfilPropio(userDetails.getUsuario().getIdUsuario())));

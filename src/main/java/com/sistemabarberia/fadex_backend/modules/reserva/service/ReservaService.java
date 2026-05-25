@@ -114,9 +114,16 @@ public class ReservaService {
     }
 
     public List<ReservaDTO> ListarReservasPorCliente(Usuario usuario) {
-        Cliente cliente = clienteRepository.findByPersonaUsuario(usuario).orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado"));
+        System.out.println("USUARIO ID: " + usuario.getIdUsuario());
+
+        Cliente cliente = clienteRepository.findByPersona_Usuario_IdUsuario(usuario.getIdUsuario())
+                .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado"));
+
+        System.out.println("CLIENTE ID: " + cliente.getClienteId());
 
         List<Reserva> reservas = reservaRepository.findByCliente_ClienteId(cliente.getClienteId());
+
+        System.out.println("RESERVAS ENCONTRADAS: " + reservas.size());
 
         return reservaMapper.toDtoLista(reservas);
     }
@@ -281,14 +288,27 @@ public class ReservaService {
 
     @Transactional(readOnly = true)
     public List<CitaBarberoResponseDTO> obtenerCitasHoy() {
-        if (!securityService.isBarbero()) {
-            throw new BusinessException("Acceso denegado: se requiere rol barbero", HttpStatus.FORBIDDEN);
-        }
 
         Usuario usuario = securityService.getUsuarioLogueado();
+        String rol = securityService.getRolePrincipal();
 
-        List<Reserva> reservas = reservaRepository
-                .findByBarberoUsernameAndFecha(usuario.getUser(), LocalDate.now());
+        List<Reserva> reservas;
+
+        if ("ROLE_admin".equals(rol)) {
+
+            reservas = reservaRepository.findByFechaOrderByHoraInicioAsc(LocalDate.now());
+
+        } else if ("ROLE_barbero".equals(rol)) {
+
+            reservas = reservaRepository
+                    .findByBarberoUsernameAndFecha(usuario.getUser(), LocalDate.now());
+
+        } else {
+            throw new BusinessException(
+                    "Acceso denegado",
+                    HttpStatus.FORBIDDEN
+            );
+        }
 
         return reservas.stream()
                 .map(this::mapToCitaBarberoDTO)

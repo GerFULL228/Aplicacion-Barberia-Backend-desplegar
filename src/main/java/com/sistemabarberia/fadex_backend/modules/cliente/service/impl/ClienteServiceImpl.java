@@ -257,4 +257,19 @@ public class ClienteServiceImpl implements IClienteService {
 
         clienteRepository.save(cliente);
     }
+    @Override
+    public ClienteResponseDTO obtenerPerfilPropio(Integer usuarioId) {
+        Cliente cliente = clienteRepository.findByPersona_Usuario_IdUsuario(usuarioId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Cliente no encontrado para el usuario autenticado"));
+        return mapper.toResponseDTO(cliente);
+    }
+
+    @Override
+    public ClienteDetalleResumenDTO obtenerResumenPropio(Integer usuarioId) {
+        Cliente cliente = clienteRepository.findByPersona_Usuario_IdUsuario(usuarioId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Cliente no encontrado para el usuario autenticado"));
+        return obtenerResumenCliente(cliente.getClienteId());
+    }
 }
