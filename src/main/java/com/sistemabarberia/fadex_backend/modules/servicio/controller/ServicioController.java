@@ -1,13 +1,15 @@
 package com.sistemabarberia.fadex_backend.modules.servicio.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sistemabarberia.fadex_backend.commons.response.ApiResponse;
+import com.sistemabarberia.fadex_backend.commons.response.PageResponse;
+import com.sistemabarberia.fadex_backend.modules.servicio.dto.ServicioFiltro;
 import com.sistemabarberia.fadex_backend.modules.servicio.dto.request.ServicioRequestDTO;
 import com.sistemabarberia.fadex_backend.modules.servicio.dto.response.ServicioResponseDTO;
 import com.sistemabarberia.fadex_backend.modules.servicio.service.IServicioService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,42 +19,76 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/servicio")
+@RequestMapping("/api/v1/servicios")
 @RequiredArgsConstructor
 public class ServicioController {
 
     private final IServicioService servicioService;
 
-    @GetMapping
-    public ResponseEntity<ApiResponse<List<ServicioResponseDTO>>> listar() {
+    @GetMapping("/publicados/{id}")
+    public ResponseEntity<ApiResponse<ServicioResponseDTO>> obtenerServicioPublicado(
+            @PathVariable Long id
+    ) {
+
+        ServicioResponseDTO servicio =
+                servicioService.obtenerServicioPublicadoPorId(id);
+
         return ResponseEntity.ok(
                 ApiResponse.ok(
-                        "Servicios obtenidos correctamente",
-                        servicioService.listar()
+                        "Servicio obtenido correctamente",
+                        servicio
                 )
         );
     }
 
+    @GetMapping("/publicados")
+    public ResponseEntity<ApiResponse<PageResponse<ServicioResponseDTO>>> obtenerServiciosPublicos(
+            @Valid @ModelAttribute ServicioFiltro filtro,
+            @PageableDefault(size = 10, page = 0) Pageable pageable
+    ) {
+
+        PageResponse<ServicioResponseDTO> servicios =
+                servicioService.listarServiciosPublicos(filtro, pageable);
+
+        return ResponseEntity.ok(
+                ApiResponse.ok(
+                        "Servicios obtenidos correctamente",
+                        servicios
+                )
+        );
+    }
+
+    @PreAuthorize("hasAuthority('SERVICIO_READ')")
+    @GetMapping
+    public ResponseEntity<ApiResponse<PageResponse<ServicioResponseDTO>>> obtenerServicios(
+            @Valid @ModelAttribute ServicioFiltro filtro,
+            @PageableDefault(size = 10, page = 0) Pageable pageable
+    ) {
+
+        PageResponse<ServicioResponseDTO> servicios =
+                servicioService.listarServicioFiltros(filtro, pageable);
+
+        return ResponseEntity.ok(
+                ApiResponse.ok(
+                        "Servicios obtenidos correctamente",
+                        servicios
+                )
+        );
+    }
+
+    @PreAuthorize("hasAuthority('SERVICIO_READ')")
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<ServicioResponseDTO>> obtenerPorId(
             @PathVariable Long id
     ) {
+
+        ServicioResponseDTO servicio =
+                servicioService.obtenerPorId(id);
+
         return ResponseEntity.ok(
                 ApiResponse.ok(
                         "Servicio obtenido correctamente",
-                        servicioService.obtenerPorId(id)
-                )
-        );
-    }
-
-    @GetMapping("/categoria/{categoriaId}")
-    public ResponseEntity<ApiResponse<List<ServicioResponseDTO>>> listarPorCategoria(
-            @PathVariable Long categoriaId
-    ) {
-        return ResponseEntity.ok(
-                ApiResponse.ok(
-                        "Servicios por categoría obtenidos correctamente",
-                        servicioService.listarPorCategoria(categoriaId)
+                        servicio
                 )
         );
     }
@@ -60,49 +96,81 @@ public class ServicioController {
     @PreAuthorize("hasAuthority('SERVICIO_CREATE')")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<ServicioResponseDTO>> crear(
-            @RequestPart("servicio") String servicio,
-            @RequestPart(value = "archivos", required = false) List<MultipartFile> archivos
-    ) throws Exception {
+            @RequestPart("servicio") ServicioRequestDTO request,
+            @RequestPart(value = "archivos", required = false)
+            List<MultipartFile> archivos
+    ) {
 
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        ServicioRequestDTO request =
-                objectMapper.readValue(servicio, ServicioRequestDTO.class);
-
-        ServicioResponseDTO responseDTO =
+        ServicioResponseDTO servicio =
                 servicioService.crear(request, archivos);
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(
-                        ApiResponse.ok(
-                                "Servicio creado correctamente",
-                                responseDTO
-                        )
-                );
+        return ResponseEntity.ok(
+                ApiResponse.ok(
+                        "Servicio creado correctamente",
+                        servicio
+                )
+        );
     }
 
     @PreAuthorize("hasAuthority('SERVICIO_UPDATE_ALL')")
-    @PutMapping("/{id}")
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<ServicioResponseDTO>> actualizar(
             @PathVariable Long id,
-            @Valid @RequestBody ServicioRequestDTO dto
+            @RequestPart("servicio") ServicioRequestDTO request,
+            @RequestPart(value = "archivos", required = false)
+            List<MultipartFile> archivos
     ) {
 
-        ServicioResponseDTO actualizado =
-                servicioService.actualizar(id, dto);
+        ServicioResponseDTO servicio =
+                servicioService.actualizar(id, request, archivos);
 
         return ResponseEntity.ok(
                 ApiResponse.ok(
                         "Servicio actualizado correctamente",
-                        actualizado
+                        servicio
+                )
+        );
+    }
+
+    @PreAuthorize("hasAuthority('SERVICIO_UPDATE_ALL')")
+    @PatchMapping("/{id}/estado")
+    public ResponseEntity<ApiResponse<ServicioResponseDTO>> cambiarEstadoServicio(
+            @PathVariable Long id,
+            @RequestParam boolean estado
+    ) {
+
+        ServicioResponseDTO servicio =
+                servicioService.cambiarEstadoServicio(id, estado);
+
+        return ResponseEntity.ok(
+                ApiResponse.ok(
+                        "Estado actualizado correctamente",
+                        servicio
+                )
+        );
+    }
+
+    @PreAuthorize("hasAuthority('SERVICIO_UPDATE_ALL')")
+    @PatchMapping("/{id}/publicacion")
+    public ResponseEntity<ApiResponse<ServicioResponseDTO>> cambiarPublicacion(
+            @PathVariable Long id,
+            @RequestParam boolean publicado
+    ) {
+
+        ServicioResponseDTO servicio =
+                servicioService.cambiarPublicacion(id, publicado);
+
+        return ResponseEntity.ok(
+                ApiResponse.ok(
+                        "Publicación actualizada correctamente",
+                        servicio
                 )
         );
     }
 
     @PreAuthorize("hasAuthority('SERVICIO_DELETE_ALL')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> eliminar(
+    public ResponseEntity<ApiResponse<Void>> eliminar(
             @PathVariable Long id
     ) {
 
@@ -110,8 +178,7 @@ public class ServicioController {
 
         return ResponseEntity.ok(
                 ApiResponse.ok(
-                        "Servicio eliminado correctamente",
-                        null
+                        "Servicio eliminado correctamente"
                 )
         );
     }
