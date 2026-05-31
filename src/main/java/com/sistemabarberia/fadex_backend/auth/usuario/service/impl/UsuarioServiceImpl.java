@@ -447,18 +447,18 @@ public class UsuarioServiceImpl implements IUsuarioService {
     }
 
 
-        @Override
-        public List<RolResponse> listarRoles() {
+    @Override
+    public List<RolResponse> listarRoles() {
 
-            return rolRepository.findAll()
-                    .stream()
-                    .map(rol -> RolResponse.builder()
-                            .idRol(rol.getIdRol())
-                            .nombre(rol.getNombre())
-                            .build()
-                    )
-                    .toList();
-        }
+        return rolRepository.findAll()
+                .stream()
+                .map(rol -> RolResponse.builder()
+                        .idRol(rol.getIdRol())
+                        .nombre(rol.getNombre())
+                        .build()
+                )
+                .toList();
+    }
 
     @Override
     public List<RolResponse> obtenerRolesUsuario(Integer idUsuario) {

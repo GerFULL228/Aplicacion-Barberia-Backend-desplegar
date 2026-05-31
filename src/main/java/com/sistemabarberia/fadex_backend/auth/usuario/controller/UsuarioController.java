@@ -65,7 +65,6 @@ public class UsuarioController {
     }
 
     @PostMapping("/cliente")
-    @PreAuthorize("hasRole('admin')")
     public ResponseEntity<ApiResponse<UsuarioResponse>> crearCliente(
             @Valid @RequestBody CreateClienteRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
