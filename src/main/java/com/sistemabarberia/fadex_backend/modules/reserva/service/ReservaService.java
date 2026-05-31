@@ -10,6 +10,7 @@ import com.sistemabarberia.fadex_backend.modules.barbero.entity.Barbero;
 import com.sistemabarberia.fadex_backend.modules.barbero.repository.BarberoRepository;
 import com.sistemabarberia.fadex_backend.modules.cliente.entity.Cliente;
 import com.sistemabarberia.fadex_backend.modules.cliente.repository.ClienteRepository;
+import com.sistemabarberia.fadex_backend.modules.recompensa.service.IRecompensaService;
 import com.sistemabarberia.fadex_backend.modules.reserva.dto.Request.ReservaRequest;
 import com.sistemabarberia.fadex_backend.modules.reserva.dto.Response.*;
 import com.sistemabarberia.fadex_backend.modules.reserva.entity.EstadoReserva;
@@ -48,6 +49,7 @@ public class ReservaService {
     private final ServicioRepository servicioRepository;
     private final ReservaMapper reservaMapper;
     private final UsuarioSecurityService securityService;
+    private final IRecompensaService recompensaService;
 
     @Transactional
     public ReservaDTO crearReserva(ReservaRequest request) {
@@ -80,7 +82,13 @@ public class ReservaService {
         }
         LocalTime horaFin = request.horaInicio().plusMinutes(servicio.getDuracion());
         validarConflicto(barbero, request.fecha(), request.horaInicio(), horaFin);
-        Reserva reserva = crearReservaInterna(cliente, servicio, barbero, request.fecha(), request.horaInicio(), TipoReserva.RESERVA_VIRTUAL, EstadoReserva.CONFIRMADA);
+
+        TipoReserva tipo = request.esGratis() ? TipoReserva.RESERVA_GRATIS : TipoReserva.RESERVA_VIRTUAL;
+        if (request.esGratis()) {
+            recompensaService.canjearCorteGratis(cliente.getClienteId());
+        }
+        Reserva reserva = crearReservaInterna(cliente, servicio, barbero, request.fecha(), request.horaInicio(), tipo, EstadoReserva.CONFIRMADA);
+        //Reserva reserva = crearReservaInterna(cliente, servicio, barbero, request.fecha(), request.horaInicio(), TipoReserva.RESERVA_VIRTUAL, EstadoReserva.CONFIRMADA);
         return reservaMapper.toDto(reserva);
     }
 
@@ -102,7 +110,7 @@ public class ReservaService {
         reserva.setHoraInicio(horaInicio);
         reserva.setTipoReserva(tipo);
         reserva.setHoraFin(horaFin);
-        reserva.setTotal(servicio.getPrecio());
+        reserva.setTotal(tipo == TipoReserva.RESERVA_GRATIS ? BigDecimal.ZERO : servicio.getPrecio());
         reserva.setEstadoReserva(estado);
         return reservaRepository.save(reserva);
     }
@@ -196,7 +204,9 @@ public class ReservaService {
 
         reserva.setEstadoReserva(EstadoReserva.FINALIZADA);
         reserva.setHoraFin(LocalTime.now());
-        return reservaMapper.toDto(reservaRepository.save(reserva));
+        Reserva guardada = reservaRepository.save(reserva);
+
+        return reservaMapper.toDto(guardada);
     }
 
 

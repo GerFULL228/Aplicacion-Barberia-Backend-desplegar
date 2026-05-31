@@ -27,8 +27,10 @@ public class PagoRequestDTO {
 
     private Integer ventaId;
 
+
     @NotNull(message = "Monto obligatorio")
-    @DecimalMin(value = "0.01", message = "El monto debe ser mayor a cero")
+    //@DecimalMin(value = "0.01", message = "El monto debe ser mayor a cero")
+    @DecimalMin(value = "0.00", message = "El monto no puede ser negativo")
     private BigDecimal monto;
 
     @NotNull(message = "Método de pago obligatorio")

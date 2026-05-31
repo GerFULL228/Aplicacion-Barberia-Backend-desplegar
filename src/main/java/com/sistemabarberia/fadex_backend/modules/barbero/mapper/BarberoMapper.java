@@ -24,6 +24,8 @@ public interface BarberoMapper {
     //Registrar
     @Mapping(source = "persona", target = "persona")
     @Mapping(target = "barberoId", ignore = true)
+    @Mapping(target = "activo", ignore = true) // ── NUEVO ──
+    @Mapping(target = "fechaIngreso", ignore = true)
     Barbero toEntity(BarberoRequestDTO dto, Persona persona);
 
 }

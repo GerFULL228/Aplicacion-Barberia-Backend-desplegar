@@ -54,5 +54,8 @@ public class Barbero {
         if (this.fechaIngreso == null) {
             this.fechaIngreso = LocalDate.now();
         }
+        this.activo = true;
     }
+
+
 }

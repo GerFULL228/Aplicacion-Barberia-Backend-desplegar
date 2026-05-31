@@ -9,6 +9,6 @@ public record ReservaRequest(
         Long servicioId,
         LocalDate fecha,
         LocalTime horaInicio,
-        String observacion
-
+        String observacion,
+        boolean esGratis
 ) {}

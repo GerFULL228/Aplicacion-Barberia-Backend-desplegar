@@ -88,6 +88,7 @@ public class BarberoServiceImpl implements IBarberoService {
         }
 
         Barbero barbero = mapper.toEntity(dto, persona);
+        barbero.setActivo(true); // ── NUEVO ──
         return mapper.toResponseDTO(barberoRepository.save(barbero));
     }
 
