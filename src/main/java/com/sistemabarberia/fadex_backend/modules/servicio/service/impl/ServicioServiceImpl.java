@@ -66,7 +66,7 @@ public class ServicioServiceImpl implements IServicioService {
     ) {
 
         filtro.setEstado(true);
-        filtro.setPublicado(true);
+
 
         Page<Servicio> pagina = servicioRepository.findAll(
                 ServicioSpecification.filtrar(filtro),
