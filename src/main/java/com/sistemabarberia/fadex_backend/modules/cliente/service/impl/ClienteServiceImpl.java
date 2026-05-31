@@ -14,8 +14,11 @@ import com.sistemabarberia.fadex_backend.modules.cliente.repository.ClienteRepos
 import com.sistemabarberia.fadex_backend.modules.cliente.service.IClienteService;
 import com.sistemabarberia.fadex_backend.modules.persona.entity.Persona;
 import com.sistemabarberia.fadex_backend.modules.persona.repository.PersonaRepository;
+import com.sistemabarberia.fadex_backend.modules.recompensa.entity.Recompensa;
+import com.sistemabarberia.fadex_backend.modules.recompensa.repository.RecompensaRepository;
 import com.sistemabarberia.fadex_backend.modules.reserva.repository.ReservaRepository;
 import com.sistemabarberia.fadex_backend.modules.venta.repository.VentaRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +27,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -45,6 +49,9 @@ public class ClienteServiceImpl implements IClienteService {
     private VentaRepository ventaRepository;
 
     @Autowired
+    private RecompensaRepository recompensaRepository;
+
+    @Autowired
     private ClienteMapper mapper;
 
     //CRUD básico
@@ -61,6 +68,8 @@ public class ClienteServiceImpl implements IClienteService {
                 .map(mapper::toResponseDTO);
     }
 
+
+    @Transactional
     @Override
     public ClienteResponseDTO crearCliente(ClienteRequestDTO dto) {
 
@@ -83,6 +92,16 @@ public class ClienteServiceImpl implements IClienteService {
 
         Cliente cliente = mapper.toEntity(dto, persona);
         Cliente guardado = clienteRepository.save(cliente);
+
+        // ✅ Se crea la tarjeta de recompensas automáticamente
+        Recompensa recompensa = Recompensa.builder()
+                .cliente(guardado)
+                .cortesAcumulados(0)
+                .cortesGratis(0)
+                .fechaActualizacion(LocalDateTime.now())
+                .build();
+        recompensaRepository.save(recompensa);
+
         return mapper.toResponseDTO(guardado);
     }
 
