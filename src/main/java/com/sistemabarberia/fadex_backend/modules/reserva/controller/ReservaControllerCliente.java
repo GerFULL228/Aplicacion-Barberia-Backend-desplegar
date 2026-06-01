@@ -2,6 +2,8 @@ package com.sistemabarberia.fadex_backend.modules.reserva.controller;
 
 import com.sistemabarberia.fadex_backend.auth.security.service.CustomUserDetails;
 import com.sistemabarberia.fadex_backend.auth.usuario.Entity.Usuario;
+import com.sistemabarberia.fadex_backend.commons.response.ApiResponse;
+import com.sistemabarberia.fadex_backend.commons.response.PageResponse;
 import com.sistemabarberia.fadex_backend.modules.cliente.entity.Cliente;
 import com.sistemabarberia.fadex_backend.modules.cliente.repository.ClienteRepository;
 import com.sistemabarberia.fadex_backend.modules.reserva.dto.Request.ReservaRequest;
@@ -10,6 +12,9 @@ import com.sistemabarberia.fadex_backend.modules.reserva.dto.Response.ReservaDTO
 import com.sistemabarberia.fadex_backend.modules.reserva.service.ReservaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -38,12 +43,26 @@ public class ReservaControllerCliente {
 
     @PreAuthorize("hasAuthority('RESERVA_READ_SELF')")
     @GetMapping("/mis-reservas")
-    public ResponseEntity<List<ReservaDTO>> obtenerReservasCliente(@AuthenticationPrincipal CustomUserDetails userDetails){
+    public ResponseEntity<ApiResponse<PageResponse<ReservaDTO>>> obtenerReservasCliente(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+
+        Pageable pageable = PageRequest.of(page, size);
+
+
+        Page<ReservaDTO> result = reservaService.listarReservasPorCliente(
+                userDetails.getUsuario(),
+                pageable
+        );
+
+
+
+
 
         return ResponseEntity.ok(
-                reservaService.ListarReservasPorCliente(
-                        userDetails.getUsuario()
-                )
+                ApiResponse.ok("Reservas obtenidas correctamente", result)
         );
     }
 }

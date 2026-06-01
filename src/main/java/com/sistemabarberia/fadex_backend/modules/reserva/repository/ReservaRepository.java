@@ -1,6 +1,8 @@
 package com.sistemabarberia.fadex_backend.modules.reserva.repository;
 
 import com.sistemabarberia.fadex_backend.modules.reserva.entity.Reserva;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -29,7 +31,7 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
     );
 
 
-    List<Reserva> findByCliente_ClienteId (Integer clienteId);
+    Page<Reserva> findByCliente_ClienteId (Integer clienteId, Pageable  pageable);
     List<Reserva> findByBarbero_BarberoId (Integer barberoId);
 
 

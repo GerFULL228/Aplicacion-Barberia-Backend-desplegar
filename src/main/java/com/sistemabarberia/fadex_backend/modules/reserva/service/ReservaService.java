@@ -123,19 +123,26 @@ public class ReservaService {
         }
     }
 
-    public List<ReservaDTO> ListarReservasPorCliente(Usuario usuario) {
+
+    public Page<ReservaDTO> listarReservasPorCliente(Usuario usuario, Pageable pageable) {
         System.out.println("USUARIO ID: " + usuario.getIdUsuario());
 
-        Cliente cliente = clienteRepository.findByPersona_Usuario_IdUsuario(usuario.getIdUsuario())
+        Cliente cliente = clienteRepository
+                .findByPersona_Usuario_IdUsuario(usuario.getIdUsuario())
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado"));
 
         System.out.println("CLIENTE ID: " + cliente.getClienteId());
 
-        List<Reserva> reservas = reservaRepository.findByCliente_ClienteId(cliente.getClienteId());
 
-        System.out.println("RESERVAS ENCONTRADAS: " + reservas.size());
+        Page<Reserva> reservasPage = reservaRepository.findByCliente_ClienteId(
+                cliente.getClienteId(),
+                pageable
+        );
 
-        return reservaMapper.toDtoLista(reservas);
+
+
+
+        return reservasPage.map(reservaMapper::toDto);
     }
 
     public Page<ReservaDTO> listarReservasAdmin(Pageable pageable) {
