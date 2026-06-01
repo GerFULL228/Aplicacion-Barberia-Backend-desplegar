@@ -61,11 +61,9 @@ public class AuthService {
 
         CustomUserDetails custom = (CustomUserDetails) authentication.getPrincipal();
         Usuario usuario = custom.getUsuario();
-
         String token = jwtService.generateToken(custom);
-
         String username = jwtService.extractClaim(token, Claims::getSubject);
-        long expiredIn = props.getExpiration() / 1000;  // ← era jwtProperties, ahora props
+        long expiredIn = props.getExpiration() / 1000;
 
         List<String> roles = jwtService.extractClaim(token,
                 claims -> claims.get("roles", List.class));
@@ -79,7 +77,7 @@ public class AuthService {
 
         RefreshToken refreshToken = tokenRefreshService.crearRefreshToken(usuario);
 
-        return new TokenResponse(token, refreshToken.getToken(), "bearer", expiredIn, username, rol, permisos);
+        return new TokenResponse(token, refreshToken.getToken(), "bearer", expiredIn,  usuario.getIdUsuario(),username, rol, permisos);
     }
 
     @Transactional
