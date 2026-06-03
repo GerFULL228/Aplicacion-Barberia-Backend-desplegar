@@ -1,14 +1,13 @@
 package com.sistemabarberia.fadex_backend.modules.reserva.controller;
 
 import com.sistemabarberia.fadex_backend.auth.security.service.CustomUserDetails;
-import com.sistemabarberia.fadex_backend.auth.usuario.Entity.Usuario;
 import com.sistemabarberia.fadex_backend.commons.response.ApiResponse;
 import com.sistemabarberia.fadex_backend.commons.response.PageResponse;
-import com.sistemabarberia.fadex_backend.modules.cliente.entity.Cliente;
 import com.sistemabarberia.fadex_backend.modules.cliente.repository.ClienteRepository;
 import com.sistemabarberia.fadex_backend.modules.reserva.dto.Request.ReservaRequest;
 import com.sistemabarberia.fadex_backend.modules.reserva.dto.Response.ReservaDTO;
 
+import com.sistemabarberia.fadex_backend.modules.reserva.dto.Response.ReservaPendienteDTO;
 import com.sistemabarberia.fadex_backend.modules.reserva.service.ReservaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +36,6 @@ public class ReservaControllerCliente {
     @PreAuthorize("hasAuthority('RESERVA_CREATE')")
     @PostMapping
     public ResponseEntity<ReservaDTO> crearReserva(@RequestBody @Valid ReservaRequest request){
-
         return ResponseEntity.status(HttpStatus.CREATED).body(reservaService.crearReserva(request));
     }
 
@@ -47,22 +45,21 @@ public class ReservaControllerCliente {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
-
-
         Pageable pageable = PageRequest.of(page, size);
-
-
         Page<ReservaDTO> result = reservaService.listarReservasPorCliente(
                 userDetails.getUsuario(),
                 pageable
         );
-
-
-
-
-
         return ResponseEntity.ok(
                 ApiResponse.ok("Reservas obtenidas correctamente", result)
+        );
+    }
+
+    @GetMapping("/cliente/pendientes-pago")
+    public ResponseEntity<ApiResponse<List<ReservaPendienteDTO>>> obtenerPendientesPago() {
+        List<ReservaPendienteDTO> pendientes = reservaService.obtenerReservasPendientesDePago();
+        return ResponseEntity.ok(
+                ApiResponse.ok("Reservas pendientes obtenidas correctamente", pendientes)
         );
     }
 }

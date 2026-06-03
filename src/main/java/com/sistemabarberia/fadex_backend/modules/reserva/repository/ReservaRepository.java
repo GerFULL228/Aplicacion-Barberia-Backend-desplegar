@@ -173,4 +173,7 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
             @Param("username") String username
     );
     List<Reserva> findByFechaOrderByHoraInicioAsc(LocalDate fecha);
+
+    @Query("SELECT r FROM Reserva r WHERE r.estadoReserva != 'CANCELADA' AND r.id NOT IN (SELECT p.reserva.id FROM Pago p WHERE p.reserva IS NOT NULL)")
+    List<Reserva> findReservasSinPago();
 }
