@@ -1,5 +1,6 @@
 package com.sistemabarberia.fadex_backend.modules.reserva.repository;
 
+import com.sistemabarberia.fadex_backend.modules.reporte.dto.ResumenDiaDTO;
 import com.sistemabarberia.fadex_backend.modules.reserva.entity.Reserva;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -8,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -176,4 +178,23 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
 
     @Query("SELECT r FROM Reserva r WHERE r.estadoReserva != 'CANCELADA' AND r.id NOT IN (SELECT p.reserva.id FROM Pago p WHERE p.reserva IS NOT NULL)")
     List<Reserva> findReservasSinPago();
+    @Query(value = """
+    SELECT
+        TRIM(TO_CHAR(r.fecha, 'Day')) AS dia,
+        COUNT(*) AS total,
+        SUM(CASE WHEN r.estado_reserva = 'FINALIZADA' THEN 1 ELSE 0 END) AS finalizadas,
+        SUM(CASE WHEN r.estado_reserva = 'CANCELADA' THEN 1 ELSE 0 END) AS canceladas,
+        SUM(CASE WHEN r.estado_reserva = 'FINALIZADA' THEN r.total ELSE 0 END) AS ingresos
+    FROM reservas r
+    WHERE r.fecha BETWEEN :desde AND :hasta
+    GROUP BY TRIM(TO_CHAR(r.fecha, 'Day')), EXTRACT(DOW FROM r.fecha)
+    ORDER BY EXTRACT(DOW FROM r.fecha)
+    """, nativeQuery = true)
+    List<Object[]> resumenSemanal(@Param("desde") LocalDate desde, @Param("hasta") LocalDate hasta);
+    @Query("SELECT r FROM Reserva r WHERE r.fecha BETWEEN :desde AND :hasta")
+    List<Reserva> findReservasPorPeriodo(@Param("desde") LocalDate desde, @Param("hasta") LocalDate hasta);
+
+    @Query("SELECT SUM(r.total) FROM Reserva r WHERE r.fecha BETWEEN :desde AND :hasta AND r.estadoReserva = 'FINALIZADA'")
+    BigDecimal calcularIngresosPorPeriodo(@Param("desde") LocalDate desde, @Param("hasta") LocalDate hasta);
+
 }

@@ -10,13 +10,14 @@ import com.sistemabarberia.fadex_backend.auth.rol.Entity.Rol;
 import com.sistemabarberia.fadex_backend.auth.rol.Entity.RolRepository;
 import com.sistemabarberia.fadex_backend.auth.security.jwt.JwtProperties;
 import com.sistemabarberia.fadex_backend.auth.security.jwt.JwtService;
-import com.sistemabarberia.fadex_backend.auth.security.service.CustomUserDetailService;
 import com.sistemabarberia.fadex_backend.auth.security.service.CustomUserDetails;
 import com.sistemabarberia.fadex_backend.auth.usuario.Entity.Usuario;
 import com.sistemabarberia.fadex_backend.auth.usuario.Repository.UsuarioRepository;
 import com.sistemabarberia.fadex_backend.auth.authentication.dto.request.RegisterRequest;
 import com.sistemabarberia.fadex_backend.auth.usuario.dto.response.UsuarioResponse;
 import com.sistemabarberia.fadex_backend.commons.exception.BusinessException;
+import com.sistemabarberia.fadex_backend.modules.persona.entity.Persona;
+import com.sistemabarberia.fadex_backend.modules.persona.repository.PersonaRepository;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,13 +43,14 @@ public class AuthService {
 
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
-    private final JwtProperties props;          // ← solo este, borramos jwtProperties
+    private final JwtProperties props;
     private final RefreshTokenService tokenRefreshService;
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserDetailsService userDetailsService;
     private final UsuarioRepository usuarioRepository;
     private final RolRepository rolRepository;
     private final PasswordEncoder passwordEncoder;
+    private final PersonaRepository personaRepository;
 
 
     public TokenResponse login(LoginRequest request) {
@@ -142,7 +144,7 @@ public class AuthService {
     }
 
     public UsuarioResponse register(RegisterRequest request) {
-        if (usuarioRepository.existsByCorreo(request.getCorreo())) {
+        if (personaRepository.existsByEmail(request.getCorreo())) {
             throw new BusinessException("El correo ya está registrado", HttpStatus.CONFLICT);
         }
 
@@ -150,23 +152,26 @@ public class AuthService {
                 .orElseThrow(() -> new BusinessException("Rol cliente no encontrado", HttpStatus.NOT_FOUND));
 
         Usuario usuario = new Usuario();
-        usuario.setUser(request.getCorreo());
-        usuario.setNombre(request.getNombre());
-        usuario.setApellido(request.getApellido());
-        usuario.setTelefono(request.getTelefono());
-        usuario.setCorreo(request.getCorreo());
+        usuario.setUser(request.getCorreo()); // username = correo
         usuario.setPassword(passwordEncoder.encode(request.getPassword()));
         usuario.setRoles(new HashSet<>(Set.of(rolCliente)));
-
         Usuario guardado = usuarioRepository.save(usuario);
+
+        Persona persona = new Persona();
+        persona.setNombre(request.getNombre());
+        persona.setApellido(request.getApellido());
+        persona.setTelefono(request.getTelefono());
+        persona.setEmail(request.getCorreo());
+        persona.setUsuario(guardado);
+        personaRepository.save(persona);
 
         UsuarioResponse response = new UsuarioResponse();
         response.setIdUsuario(guardado.getIdUsuario());
         response.setUsername(guardado.getUser());
-        response.setNombre(guardado.getNombre());
-        response.setApellido(guardado.getApellido());
-        response.setEmail(guardado.getCorreo());
-        response.setTelefono(guardado.getTelefono());
+        response.setNombre(persona.getNombre());
+        response.setApellido(persona.getApellido());
+        response.setEmail(persona.getEmail());
+        response.setTelefono(persona.getTelefono());
         response.setRol(guardado.getRoles().stream()
                 .findFirst()
                 .map(Rol::getNombre)
