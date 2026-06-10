@@ -22,6 +22,12 @@ public class Usuario {
     @Column(name = "qr_token")
     private String qrToken;
 
+    @Column(name = "oauth_provider")
+    private String oauthProvider;
+
+    @Column(name = "oauth_id")
+    private String oauthId;
+
     @Column(name = "usuario")
     private String user;
 
