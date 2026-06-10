@@ -1,7 +1,11 @@
 package com.sistemabarberia.fadex_backend.auth.authentication.service;
 
-
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.gson.GsonFactory;
 import com.sistemabarberia.fadex_backend.auth.authentication.dto.request.LoginRequest;
+import com.sistemabarberia.fadex_backend.auth.authentication.dto.request.RegisterRequest;
 import com.sistemabarberia.fadex_backend.auth.authentication.dto.response.TokenResponse;
 import com.sistemabarberia.fadex_backend.auth.refreshToken.entity.RefreshToken;
 import com.sistemabarberia.fadex_backend.auth.refreshToken.repository.RefreshTokenRepository;
@@ -10,16 +14,22 @@ import com.sistemabarberia.fadex_backend.auth.rol.Entity.Rol;
 import com.sistemabarberia.fadex_backend.auth.rol.Entity.RolRepository;
 import com.sistemabarberia.fadex_backend.auth.security.jwt.JwtProperties;
 import com.sistemabarberia.fadex_backend.auth.security.jwt.JwtService;
-import com.sistemabarberia.fadex_backend.auth.security.service.CustomUserDetailService;
 import com.sistemabarberia.fadex_backend.auth.security.service.CustomUserDetails;
 import com.sistemabarberia.fadex_backend.auth.usuario.Entity.Usuario;
 import com.sistemabarberia.fadex_backend.auth.usuario.Repository.UsuarioRepository;
-import com.sistemabarberia.fadex_backend.auth.authentication.dto.request.RegisterRequest;
 import com.sistemabarberia.fadex_backend.auth.usuario.dto.response.UsuarioResponse;
 import com.sistemabarberia.fadex_backend.commons.exception.BusinessException;
+import com.sistemabarberia.fadex_backend.modules.cliente.entity.Cliente;
+import com.sistemabarberia.fadex_backend.modules.cliente.repository.ClienteRepository;
+import com.sistemabarberia.fadex_backend.modules.persona.entity.Persona;
+import com.sistemabarberia.fadex_backend.modules.persona.repository.PersonaRepository;
+import com.sistemabarberia.fadex_backend.modules.recompensa.entity.Recompensa;
+import com.sistemabarberia.fadex_backend.modules.recompensa.repository.RecompensaRepository;
+
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -30,19 +40,21 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
-
-
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
-    private final JwtProperties props;          // ← solo este, borramos jwtProperties
+    private final JwtProperties props;
     private final RefreshTokenService tokenRefreshService;
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserDetailsService userDetailsService;
@@ -50,6 +62,12 @@ public class AuthService {
     private final RolRepository rolRepository;
     private final PasswordEncoder passwordEncoder;
 
+    private final PersonaRepository personaRepository;
+    private final ClienteRepository clienteRepository;
+    private final RecompensaRepository recompensaRepository;
+
+    @Value("${spring.security.oauth2.client.registration.google.client-id}")
+    private String googleClientId;
 
     public TokenResponse login(LoginRequest request) {
         Authentication authentication = authenticationManager.authenticate(
@@ -77,33 +95,26 @@ public class AuthService {
 
         RefreshToken refreshToken = tokenRefreshService.crearRefreshToken(usuario);
 
-        return new TokenResponse(token, refreshToken.getToken(), "bearer", expiredIn,  usuario.getIdUsuario(),username, rol, permisos);
+        return new TokenResponse(token, refreshToken.getToken(), "bearer", expiredIn, usuario.getIdUsuario(), username, rol, permisos);
     }
 
     @Transactional
     public TokenResponse refresh(String token) {
 
-
         if (token == null || token.isBlank()) {
             throw new BusinessException("Refresh token es requerido", HttpStatus.BAD_REQUEST);
         }
 
-
         RefreshToken storedToken = tokenRefreshService.validarRefreshToken(token);
-
 
         storedToken.setRevoked(true);
         refreshTokenRepository.save(storedToken);
 
-
         Usuario usuario = storedToken.getUsuario();
-
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(usuario.getUser());
 
-
         String newAccessToken = jwtService.generateToken(userDetails);
-
 
         RefreshToken newRefreshToken = tokenRefreshService.crearRefreshToken(usuario);
 
@@ -133,7 +144,6 @@ public class AuthService {
                 .permisos(permisos)
                 .build();
     }
-
 
     public void logout(String refreshToken) {
         RefreshToken token = refreshTokenRepository.findByToken(refreshToken).orElseThrow(() -> new BusinessException("token no existe", HttpStatus.BAD_REQUEST));
@@ -173,5 +183,98 @@ public class AuthService {
                 .orElse(null));
 
         return response;
+    }
+
+    @Transactional
+    public TokenResponse loginWithGoogle(String idTokenString) {
+        try {
+            GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
+                    .setAudience(Collections.singletonList(googleClientId))
+                    .build();
+            GoogleIdToken idToken = verifier.verify(idTokenString);
+            if (idToken == null) {
+                throw new BusinessException("Token de Google inválido", HttpStatus.UNAUTHORIZED);
+            }
+            GoogleIdToken.Payload payload = idToken.getPayload();
+            String email = payload.getEmail();
+            String googleId = payload.getSubject();
+            String name = (String) payload.get("given_name");
+            String familyName = (String) payload.get("family_name");
+            Usuario usuario = usuarioRepository.findByUser(email).orElse(null);
+            if (usuario == null) {
+                Rol rolCliente = rolRepository.findByNombre("cliente")
+                        .orElseThrow(() -> new BusinessException("Rol cliente no encontrado", HttpStatus.INTERNAL_SERVER_ERROR));
+
+                usuario = Usuario.builder()
+                        .user(email)
+                        .correo(email)
+                        .qrToken(UUID.randomUUID().toString())
+                        .roles(new HashSet<>(Set.of(rolCliente)))
+                        .oauthProvider("GOOGLE")
+                        .oauthId(googleId)
+                        .build();
+                usuario = usuarioRepository.save(usuario);
+
+                Persona persona = Persona.builder()
+                        .usuario(usuario)
+                        .nombre(name != null ? name : "Usuario")
+                        .apellido(familyName != null ? familyName : "")
+                        .email(email)
+                        .build();
+                personaRepository.save(persona);
+
+                Cliente cliente = Cliente.builder()
+                        .persona(persona)
+                        .activo(true)
+                        .build();
+                Cliente guardado = clienteRepository.save(cliente);
+
+                Recompensa recompensa = Recompensa.builder()
+                        .cliente(guardado)
+                        .cortesAcumulados(0)
+                        .cortesGratis(0)
+                        .fechaActualizacion(LocalDateTime.now())
+                        .build();
+                recompensaRepository.save(recompensa);
+            }
+
+            UserDetails userDetails = userDetailsService.loadUserByUsername(usuario.getUser());
+            CustomUserDetails customUserDetails;
+            if (userDetails instanceof CustomUserDetails) {
+                customUserDetails = (CustomUserDetails) userDetails;
+            } else {
+                customUserDetails = new CustomUserDetails(usuario, userDetails.getAuthorities());
+            }
+
+            String token = jwtService.generateToken(customUserDetails);
+            RefreshToken refreshToken = tokenRefreshService.crearRefreshToken(usuario);
+
+            List<String> roles = customUserDetails.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .filter(auth -> auth.startsWith("ROLE_"))
+                    .toList();
+
+            List<String> permisos = customUserDetails.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .filter(auth -> !auth.startsWith("ROLE_"))
+                    .toList();
+
+            String rol = (roles != null && !roles.isEmpty()) ? roles.get(0).replace("ROLE_", "") : null;
+
+            return new TokenResponse(
+                    token,
+                    refreshToken.getToken(),
+                    "bearer",
+                    props.getExpiration() / 1000,
+                    usuario.getIdUsuario(),
+                    usuario.getUser(),
+                    rol,
+                    permisos
+            );
+
+        } catch (Exception e) {
+            log.error("Error validando token de Google: ", e);
+            throw new BusinessException("No se pudo autenticar con Google", HttpStatus.UNAUTHORIZED);
+        }
     }
 }

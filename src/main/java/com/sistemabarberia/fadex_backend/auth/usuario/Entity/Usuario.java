@@ -28,6 +28,12 @@ public class Usuario {
     @Column(name = "password")
     private String password;
 
+    @Column(name = "oauth_provider")
+    private String oauthProvider;
+
+    @Column(name = "oauth_id")
+    private String oauthId;
+
     @Column(name = "nombre")
     private String nombre;
 
