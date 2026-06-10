@@ -1,14 +1,13 @@
 package com.sistemabarberia.fadex_backend.auth.authentication.controller;
 
+import com.sistemabarberia.fadex_backend.auth.authentication.dto.request.GoogleLoginRequest;
 import com.sistemabarberia.fadex_backend.auth.authentication.dto.request.LoginRequest;
 import com.sistemabarberia.fadex_backend.auth.authentication.dto.request.RefreshRequest;
 import com.sistemabarberia.fadex_backend.auth.authentication.dto.response.TokenResponse;
 import com.sistemabarberia.fadex_backend.auth.authentication.service.AuthService;
-import com.sistemabarberia.fadex_backend.auth.authentication.dto.request.RegisterRequest;
 import com.sistemabarberia.fadex_backend.auth.refreshToken.dto.request.ForgotPasswordRequest;
 import com.sistemabarberia.fadex_backend.auth.refreshToken.dto.request.ResetPasswordRequest;
 import com.sistemabarberia.fadex_backend.auth.refreshToken.service.PasswordResetService;
-import com.sistemabarberia.fadex_backend.auth.usuario.dto.response.UsuarioResponse;
 import com.sistemabarberia.fadex_backend.commons.response.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -52,6 +51,12 @@ public class AuthController {
     public ResponseEntity<ApiResponse<Void>> resetPassword(@RequestBody ResetPasswordRequest request) {
         passwordResetService.resetPassword(request.getToken(), request.getNuevaPassword());
         return ResponseEntity.ok(ApiResponse.ok("Contraseña actualizada correctamente"));
+    }
+
+    @PostMapping("/google")
+    public ResponseEntity<ApiResponse<TokenResponse>> loginWithGoogle(@RequestBody @Valid GoogleLoginRequest request) {
+        TokenResponse response = authService.loginWithGoogle(request.getIdToken());
+        return ResponseEntity.ok(ApiResponse.ok("Login con Google correctamente", response));
     }
 
 }
