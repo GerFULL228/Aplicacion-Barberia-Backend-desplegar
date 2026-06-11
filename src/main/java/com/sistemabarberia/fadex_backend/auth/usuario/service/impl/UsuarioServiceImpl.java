@@ -290,6 +290,7 @@ public class UsuarioServiceImpl implements IUsuarioService {
                                     usuario.getQrToken() != null
                                             && !usuario.getQrToken().isBlank()
                             )
+                            .tienePin(usuario.getPin() != null && !usuario.getPin().isBlank())
 
                             .roles(roles)
                             .build();
@@ -323,27 +324,13 @@ public class UsuarioServiceImpl implements IUsuarioService {
                             .orElse(null);
 
                     return UsuarioTablaResponse.builder()
-
                             .idUsuario(usuario.getIdUsuario())
-
                             .usuario(usuario.getUser())
+                            .nombre(persona != null ? persona.getNombre() : null)
+                            .apellido(persona != null ? persona.getApellido() : null)
+                            .tieneQr(usuario.getQrToken() != null && !usuario.getQrToken().isBlank())
 
-                            .nombre(
-                                    persona != null
-                                            ? persona.getNombre()
-                                            : null
-                            )
-
-                            .apellido(
-                                    persona != null
-                                            ? persona.getApellido()
-                                            : null
-                            )
-
-                            .tieneQr(
-                                    usuario.getQrToken() != null
-                                            && !usuario.getQrToken().isBlank()
-                            )
+                            .tienePin(usuario.getPin() != null && !usuario.getPin().isBlank())
 
                             .roles(
                                     usuario.getRoles()
@@ -351,7 +338,6 @@ public class UsuarioServiceImpl implements IUsuarioService {
                                             .map(Rol::getNombre)
                                             .toList()
                             )
-
                             .build();
                 });
     }
