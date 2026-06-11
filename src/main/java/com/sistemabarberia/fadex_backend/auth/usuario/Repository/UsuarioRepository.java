@@ -48,10 +48,10 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
     @Query("""
 SELECT DISTINCT u
 FROM Usuario u
-LEFT JOIN FETCH u.roles r
+LEFT JOIN  u.roles r
 WHERE
 
-    (:rol IS NULL OR LOWER(r.nombre) = LOWER(:rol))
+    (:rol IS NULL OR r.nombre = :rol)
 
 AND (
 
@@ -98,15 +98,15 @@ AND (
     @Query("""
 SELECT DISTINCT u
 FROM Usuario u
-LEFT JOIN FETCH u.roles r
+LEFT JOIN u.roles r
 LEFT JOIN Persona p ON p.usuario.idUsuario = u.idUsuario
 WHERE
 
-    LOWER(u.user) LIKE LOWER(CONCAT('%', :texto, '%'))
-
-    OR LOWER(p.nombre) LIKE LOWER(CONCAT('%', :texto, '%'))
-
-    OR LOWER(p.apellido) LIKE LOWER(CONCAT('%', :texto, '%'))
+(:texto IS NULL OR
+    u.user ILIKE CONCAT('%', :texto, '%')
+    OR p.nombre ILIKE CONCAT('%', :texto, '%')
+    OR p.apellido ILIKE CONCAT('%', :texto, '%')
+)
 """)
     Page<Usuario> buscarUsuarios(
             @Param("texto") String texto,
@@ -133,4 +133,6 @@ WHERE
     """)
     Optional<Usuario> buscarPorCorreo(@Param("correo") String correo);
 
+
+    Optional<Usuario> findByQrToken(String qrToken);
 }

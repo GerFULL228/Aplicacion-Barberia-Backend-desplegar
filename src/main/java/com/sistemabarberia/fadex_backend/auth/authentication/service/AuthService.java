@@ -277,4 +277,74 @@ public class AuthService {
             throw new BusinessException("No se pudo autenticar con Google", HttpStatus.UNAUTHORIZED);
         }
     }
+
+
+    @Transactional
+    public TokenResponse loginWithQr(String qrToken, String pin) {
+
+        System.out.println("=== QR LOGIN ===");
+        System.out.println("QR TOKEN RECIBIDO: " + qrToken);
+        System.out.println("PIN RECIBIDO: " + pin);
+
+        Usuario usuario = usuarioRepository.findByQrToken(qrToken)
+                .orElseThrow(() -> {
+                    System.out.println("ERROR: USUARIO NO ENCONTRADO");
+                    return new BusinessException("QR inválido o no registrado", HttpStatus.UNAUTHORIZED);
+                });
+
+        System.out.println("USUARIO ENCONTRADO: " + usuario.getUser());
+        System.out.println("PIN EN BD: " + usuario.getPin());
+
+        if (usuario.getPin() == null) {
+            System.out.println("ERROR: PIN NULL");
+            throw new BusinessException("Este usuario no tiene PIN configurado", HttpStatus.UNAUTHORIZED);
+        }
+
+        boolean pinValido = passwordEncoder.matches(pin, usuario.getPin());
+        System.out.println("PIN VALIDO: " + pinValido);
+
+        if (!pinValido) {
+            System.out.println("ERROR: PIN INCORRECTO");
+            throw new BusinessException("PIN incorrecto", HttpStatus.UNAUTHORIZED);
+        }
+
+        UserDetails userDetails = userDetailsService.loadUserByUsername(usuario.getUser());
+
+        CustomUserDetails customUserDetails;
+        if (userDetails instanceof CustomUserDetails) {
+            customUserDetails = (CustomUserDetails) userDetails;
+        } else {
+            customUserDetails = new CustomUserDetails(usuario, userDetails.getAuthorities());
+        }
+
+        String token = jwtService.generateToken(customUserDetails);
+        RefreshToken refreshToken = tokenRefreshService.crearRefreshToken(usuario);
+
+        List<String> roles = customUserDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .filter(auth -> auth.startsWith("ROLE_"))
+                .toList();
+
+        List<String> permisos = customUserDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .filter(auth -> !auth.startsWith("ROLE_"))
+                .toList();
+
+        String rol = (roles != null && !roles.isEmpty())
+                ? roles.get(0).replace("ROLE_", "")
+                : null;
+
+        System.out.println("LOGIN EXITOSO para: " + usuario.getUser());
+
+        return new TokenResponse(
+                token,
+                refreshToken.getToken(),
+                "bearer",
+                props.getExpiration() / 1000,
+                usuario.getIdUsuario(),
+                usuario.getUser(),
+                rol,
+                permisos
+        );
+    }
 }

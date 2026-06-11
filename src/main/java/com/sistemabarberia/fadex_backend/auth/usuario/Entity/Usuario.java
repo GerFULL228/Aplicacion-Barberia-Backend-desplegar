@@ -53,4 +53,7 @@ public class Usuario {
     )
     private Set<Rol> roles = new HashSet<>();
 
+    @Column(name = "pin")
+    private String pin;
+
 }
