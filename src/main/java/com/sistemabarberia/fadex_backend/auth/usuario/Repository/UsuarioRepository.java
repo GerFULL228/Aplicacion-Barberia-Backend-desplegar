@@ -133,4 +133,6 @@ WHERE
     """)
     Optional<Usuario> buscarPorCorreo(@Param("correo") String correo);
 
+
+    Optional<Usuario> findByQrToken(String qrToken);
 }

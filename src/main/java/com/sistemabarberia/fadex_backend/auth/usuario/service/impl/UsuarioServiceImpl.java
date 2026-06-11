@@ -222,6 +222,10 @@ public class UsuarioServiceImpl implements IUsuarioService {
                 .email(persona != null ? persona.getEmail() : null)
                 .telefono(persona != null ? persona.getTelefono() : null)
                 .rol(rolNombre)
+                .tieneQr(
+                        usuario.getQrToken() != null
+                                && !usuario.getQrToken().isBlank()
+                )
                 .build();
     }
 
@@ -237,6 +241,10 @@ public class UsuarioServiceImpl implements IUsuarioService {
                 .email(persona.getEmail())
                 .telefono(persona.getTelefono())
                 .rol(rolNombre)
+                .tieneQr(
+                        usuario.getQrToken() != null
+                                && !usuario.getQrToken().isBlank()
+                )
                 .build();
     }
 
@@ -433,6 +441,32 @@ public class UsuarioServiceImpl implements IUsuarioService {
                     "Error al generar QR"
             );
         }
+    }
+
+    @Override
+    @Transactional
+    public byte[] regenerarQr(Integer idUsuario) {
+
+        Usuario usuario = usuarioRepository.findById(idUsuario)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Usuario no encontrado")
+                );
+
+        usuario.setQrToken(UUID.randomUUID().toString());
+
+        usuarioRepository.save(usuario);
+
+        return generarQr(idUsuario);
+    }
+
+
+    @Override
+    public void asignarPin(Integer idUsuario, AsignarPinRequest request) {
+        Usuario usuario = usuarioRepository.findById(idUsuario)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+
+        usuario.setPin(passwordEncoder.encode(request.getPin()));
+        usuarioRepository.save(usuario);
     }
 
     @Override
