@@ -1,11 +1,11 @@
 package com.sistemabarberia.fadex_backend.auth.authentication.service;
 
+
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.sistemabarberia.fadex_backend.auth.authentication.dto.request.LoginRequest;
-import com.sistemabarberia.fadex_backend.auth.authentication.dto.request.RegisterRequest;
 import com.sistemabarberia.fadex_backend.auth.authentication.dto.response.TokenResponse;
 import com.sistemabarberia.fadex_backend.auth.refreshToken.entity.RefreshToken;
 import com.sistemabarberia.fadex_backend.auth.refreshToken.repository.RefreshTokenRepository;
@@ -14,11 +14,15 @@ import com.sistemabarberia.fadex_backend.auth.rol.Entity.Rol;
 import com.sistemabarberia.fadex_backend.auth.rol.Entity.RolRepository;
 import com.sistemabarberia.fadex_backend.auth.security.jwt.JwtProperties;
 import com.sistemabarberia.fadex_backend.auth.security.jwt.JwtService;
+import com.sistemabarberia.fadex_backend.auth.security.service.CustomUserDetailService;
 import com.sistemabarberia.fadex_backend.auth.security.service.CustomUserDetails;
 import com.sistemabarberia.fadex_backend.auth.usuario.Entity.Usuario;
 import com.sistemabarberia.fadex_backend.auth.usuario.Repository.UsuarioRepository;
+import com.sistemabarberia.fadex_backend.auth.authentication.dto.request.RegisterRequest;
 import com.sistemabarberia.fadex_backend.auth.usuario.dto.response.UsuarioResponse;
 import com.sistemabarberia.fadex_backend.commons.exception.BusinessException;
+import com.sistemabarberia.fadex_backend.modules.persona.entity.Persona;
+import com.sistemabarberia.fadex_backend.modules.persona.repository.PersonaRepository;
 import com.sistemabarberia.fadex_backend.modules.cliente.entity.Cliente;
 import com.sistemabarberia.fadex_backend.modules.cliente.repository.ClienteRepository;
 import com.sistemabarberia.fadex_backend.modules.persona.entity.Persona;
@@ -52,6 +56,8 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class AuthService {
+
+
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final JwtProperties props;
@@ -61,8 +67,8 @@ public class AuthService {
     private final UsuarioRepository usuarioRepository;
     private final RolRepository rolRepository;
     private final PasswordEncoder passwordEncoder;
-
     private final PersonaRepository personaRepository;
+
     private final ClienteRepository clienteRepository;
     private final RecompensaRepository recompensaRepository;
 
@@ -101,20 +107,27 @@ public class AuthService {
     @Transactional
     public TokenResponse refresh(String token) {
 
+
         if (token == null || token.isBlank()) {
             throw new BusinessException("Refresh token es requerido", HttpStatus.BAD_REQUEST);
         }
 
+
         RefreshToken storedToken = tokenRefreshService.validarRefreshToken(token);
+
 
         storedToken.setRevoked(true);
         refreshTokenRepository.save(storedToken);
 
+
         Usuario usuario = storedToken.getUsuario();
+
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(usuario.getUser());
 
+
         String newAccessToken = jwtService.generateToken(userDetails);
+
 
         RefreshToken newRefreshToken = tokenRefreshService.crearRefreshToken(usuario);
 
@@ -145,6 +158,7 @@ public class AuthService {
                 .build();
     }
 
+
     public void logout(String refreshToken) {
         RefreshToken token = refreshTokenRepository.findByToken(refreshToken).orElseThrow(() -> new BusinessException("token no existe", HttpStatus.BAD_REQUEST));
         token.setRevoked(true);
@@ -152,7 +166,7 @@ public class AuthService {
     }
 
     public UsuarioResponse register(RegisterRequest request) {
-        if (usuarioRepository.existsByCorreo(request.getCorreo())) {
+        if (personaRepository.existsByEmail(request.getCorreo())) {
             throw new BusinessException("El correo ya está registrado", HttpStatus.CONFLICT);
         }
 
@@ -160,23 +174,27 @@ public class AuthService {
                 .orElseThrow(() -> new BusinessException("Rol cliente no encontrado", HttpStatus.NOT_FOUND));
 
         Usuario usuario = new Usuario();
-        usuario.setUser(request.getCorreo());
-        usuario.setNombre(request.getNombre());
-        usuario.setApellido(request.getApellido());
-        usuario.setTelefono(request.getTelefono());
-        usuario.setCorreo(request.getCorreo());
+        usuario.setUser(request.getCorreo()); // username = correo
         usuario.setPassword(passwordEncoder.encode(request.getPassword()));
         usuario.setRoles(new HashSet<>(Set.of(rolCliente)));
 
         Usuario guardado = usuarioRepository.save(usuario);
 
+        Persona persona = new Persona();
+        persona.setNombre(request.getNombre());
+        persona.setApellido(request.getApellido());
+        persona.setTelefono(request.getTelefono());
+        persona.setEmail(request.getCorreo());
+        persona.setUsuario(guardado);
+        personaRepository.save(persona);
+
         UsuarioResponse response = new UsuarioResponse();
         response.setIdUsuario(guardado.getIdUsuario());
         response.setUsername(guardado.getUser());
-        response.setNombre(guardado.getNombre());
-        response.setApellido(guardado.getApellido());
-        response.setEmail(guardado.getCorreo());
-        response.setTelefono(guardado.getTelefono());
+        response.setNombre(persona.getNombre());
+        response.setApellido(persona.getApellido());
+        response.setEmail(persona.getEmail());
+        response.setTelefono(persona.getTelefono());
         response.setRol(guardado.getRoles().stream()
                 .findFirst()
                 .map(Rol::getNombre)
@@ -207,7 +225,6 @@ public class AuthService {
 
                 usuario = Usuario.builder()
                         .user(email)
-                        .correo(email)
                         .qrToken(UUID.randomUUID().toString())
                         .roles(new HashSet<>(Set.of(rolCliente)))
                         .oauthProvider("GOOGLE")

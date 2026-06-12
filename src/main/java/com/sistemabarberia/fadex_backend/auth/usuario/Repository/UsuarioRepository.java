@@ -33,7 +33,6 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
     @EntityGraph(attributePaths = "roles")
     List<Usuario> findAll();
     boolean existsByUser(String user);
-    boolean existsByCorreo(String correo);
 
 
     @Query("""
@@ -125,13 +124,7 @@ WHERE
             @Param("idUsuario") Integer idUsuario,
             Pageable pageable
     );
-    Optional<Usuario> findByCorreo(String correo);
-    @Query("""
-        SELECT u
-        FROM Usuario u
-        WHERE u.correo = :correo
-    """)
-    Optional<Usuario> buscarPorCorreo(@Param("correo") String correo);
+
 
 
     Optional<Usuario> findByQrToken(String qrToken);

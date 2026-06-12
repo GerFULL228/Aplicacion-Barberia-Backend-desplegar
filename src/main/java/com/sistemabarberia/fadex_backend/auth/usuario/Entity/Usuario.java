@@ -22,29 +22,17 @@ public class Usuario {
     @Column(name = "qr_token")
     private String qrToken;
 
-    @Column(name = "usuario")
-    private String user;
-
-    @Column(name = "password")
-    private String password;
-
     @Column(name = "oauth_provider")
     private String oauthProvider;
 
     @Column(name = "oauth_id")
     private String oauthId;
 
-    @Column(name = "nombre")
-    private String nombre;
+    @Column(name = "usuario")
+    private String user;
 
-    @Column(name = "apellido")
-    private String apellido;
-
-    @Column(name = "telefono")
-    private String telefono;
-
-    @Column(name = "correo", unique = true)
-    private String correo;
+    @Column(name = "password")
+    private String password;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "usuario_rol",
