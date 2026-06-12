@@ -1,6 +1,10 @@
 package com.sistemabarberia.fadex_backend.auth.authentication.service;
 
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.gson.GsonFactory;
 import com.sistemabarberia.fadex_backend.auth.authentication.dto.request.LoginRequest;
 import com.sistemabarberia.fadex_backend.auth.authentication.dto.response.TokenResponse;
 import com.sistemabarberia.fadex_backend.auth.refreshToken.entity.RefreshToken;
@@ -65,7 +69,6 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final PersonaRepository personaRepository;
 
-    private final PersonaRepository personaRepository;
     private final ClienteRepository clienteRepository;
     private final RecompensaRepository recompensaRepository;
 
@@ -222,7 +225,6 @@ public class AuthService {
 
                 usuario = Usuario.builder()
                         .user(email)
-                        .correo(email)
                         .qrToken(UUID.randomUUID().toString())
                         .roles(new HashSet<>(Set.of(rolCliente)))
                         .oauthProvider("GOOGLE")

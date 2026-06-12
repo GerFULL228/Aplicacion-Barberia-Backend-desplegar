@@ -1,9 +1,9 @@
-package com.sistemabarberia.fadex_backend.modules.reporte.controller;
+package com.sistemabarberia.fadex_backend.modules.analisis.controller;
 
 
 import com.sistemabarberia.fadex_backend.commons.response.ApiResponse;
-import com.sistemabarberia.fadex_backend.modules.reporte.Service.ReporteService;
-import com.sistemabarberia.fadex_backend.modules.reporte.dto.ResumenDiaDTO;
+import com.sistemabarberia.fadex_backend.modules.analisis.Service.ReporteService;
+import com.sistemabarberia.fadex_backend.modules.analisis.dto.ResumenDiaDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;

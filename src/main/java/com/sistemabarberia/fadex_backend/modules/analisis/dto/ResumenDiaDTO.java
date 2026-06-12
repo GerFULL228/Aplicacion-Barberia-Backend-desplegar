@@ -1,4 +1,4 @@
-package com.sistemabarberia.fadex_backend.modules.reporte.dto;
+package com.sistemabarberia.fadex_backend.modules.analisis.dto;
 
 
 import lombok.*;

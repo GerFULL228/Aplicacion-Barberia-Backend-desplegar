@@ -1,7 +1,7 @@
-package com.sistemabarberia.fadex_backend.modules.reporte.Service;
+package com.sistemabarberia.fadex_backend.modules.analisis.Service;
 
 
-import com.sistemabarberia.fadex_backend.modules.reporte.dto.ResumenDiaDTO;
+import com.sistemabarberia.fadex_backend.modules.analisis.dto.ResumenDiaDTO;
 
 import java.time.LocalDate;
 import java.util.List;
