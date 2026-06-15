@@ -28,4 +28,11 @@ public class ReclamoController {
 
     private final IReclamoService reclamoService;
 
+   //@PreAuthorize("hasAuthority('RECLAMO_CREATE')")
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponse<ReclamoResponse>> crear(@RequestPart("reclamo") @Valid ReclamoRequest request, @RequestPart(value = "archivos", required = false) List<MultipartFile> archivos) {
+        ReclamoResponse reclamo = reclamoService.crearReclamo(request, archivos);
+        return ResponseEntity.ok(ApiResponse.ok("Reclamo creado correctamente", reclamo));
+    }
+
 }
