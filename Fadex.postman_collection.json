@@ -1,10 +1,10 @@
 {
   "info": {
-    "_postman_id": "34a65960-42f0-4cf8-ba4d-32ef20137f59",
+    "_postman_id": "b37784f4-3bfd-4ddc-9291-4398f55a9362",
     "name": "Fadex",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "45294781",
-    "_collection_link": "https://go.postman.co/collection/45294781-34a65960-42f0-4cf8-ba4d-32ef20137f59?source=collection_link"
+    "_exporter_id": "47585629",
+    "_collection_link": "https://go.postman.co/collection/47585629-b37784f4-3bfd-4ddc-9291-4398f55a9362?source=collection_link"
   },
   "item": [
     {
@@ -1337,7 +1337,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhZG1pbjEiLCJyb2xlcyI6WyJST0xFX2FkbWluIl0sInBlcm1pc29zIjpbIlJFU0VSVkFfUkVBRF9BTEwiLCJSRVNFUlZBX1VQREFURV9BTEwiLCJVU1VBUklPX1JFQURfQUxMIiwiQ09SVEVfREVMRVRFX0FMTCIsIlBST0RVQ1RPX1JFQUQiLCJVU1VBUklPX1VQREFURV9BTEwiLCJDT05GSUdVUkFDSU9OX1VQREFURSIsIkJBUkJFUk9fVVBEQVRFX0FMTCIsIlJFUE9SVEVfUkVBRF9BTEwiLCJQUk9EVUNUT19DUkVBVEUiLCJWRU5UQV9SRUFEX0FMTCIsIlJFU0VSVkFfQ0FOQ0VMX0FMTCIsIkNBVEVHT1JJQV9SRUFEIiwiU0VSVklDSU9fUkVBRCIsIlBST0RVQ1RPX0RFTEVURV9BTEwiLCJSRVNFUlZBX0RFTEVURV9BTEwiLCJWRU5UQV9DQU5DRUxfQUxMIiwiQ0xJRU5URV9VUERBVEVfQUxMIiwiVkVOVEFfQ1JFQVRFIiwiVVNVQVJJT19ERUxFVEVfQUxMIiwiRVNUQURJU1RJQ0FfUkVBRF9BTEwiLCJVU1VBUklPX0NSRUFURSIsIkNBVEVHT1JJQV9DUkVBVEUiLCJQUk9EVUNUT19VUERBVEVfQUxMIiwiQkFSQkVST19ERUxFVEVfQUxMIiwiQ0FURUdPUklBX1VQREFURV9BTEwiLCJDT1JURV9SRUFEX0FMTCIsIkNMSUVOVEVfUkVBRF9BTEwiLCJDQVRFR09SSUFfREVMRVRFX0FMTCIsIkJBUkJFUk9fQ1JFQVRFIiwiQ09ORklHVVJBQ0lPTl9SRUFEIiwiQ0xJRU5URV9ERUxFVEVfQUxMIiwiREFTSEJPQVJEX1JFQURfQURNSU4iLCJTRVJWSUNJT19VUERBVEVfQUxMIiwiU0VSVklDSU9fQ1JFQVRFIiwiQ0xJRU5URV9DUkVBVEUiLCJSRVNFUlZBX0NSRUFURSIsIlZFTlRBX1VQREFURV9BTEwiLCJTRVJWSUNJT19ERUxFVEVfQUxMIiwiUkVTRVJWQV9NQU5BR0UiLCJWRU5UQV9ERUxFVEVfQUxMIiwiQkFSQkVST19SRUFEX0FMTCJdLCJpYXQiOjE3ODAwNjIyNTYsImV4cCI6MTc4MDA2MzE1Nn0.grG1fOZi4GBOPu_YEG1v7g_IbhwaRuUiL4ovsjML9ZbfJBn7sDw7gwpkgg_KR3uj",
+                  "value": "{{token}}",
                   "type": "string"
                 }
               ]
@@ -1364,7 +1364,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhZG1pbjEiLCJyb2xlcyI6WyJST0xFX2FkbWluIl0sInBlcm1pc29zIjpbIlJFU0VSVkFfUkVBRF9BTEwiLCJSRVNFUlZBX1VQREFURV9BTEwiLCJVU1VBUklPX1JFQURfQUxMIiwiQ09SVEVfREVMRVRFX0FMTCIsIlBST0RVQ1RPX1JFQUQiLCJVU1VBUklPX1VQREFURV9BTEwiLCJDT05GSUdVUkFDSU9OX1VQREFURSIsIkJBUkJFUk9fVVBEQVRFX0FMTCIsIlJFUE9SVEVfUkVBRF9BTEwiLCJQUk9EVUNUT19DUkVBVEUiLCJWRU5UQV9SRUFEX0FMTCIsIlJFU0VSVkFfQ0FOQ0VMX0FMTCIsIkNBVEVHT1JJQV9SRUFEIiwiU0VSVklDSU9fUkVBRCIsIlBST0RVQ1RPX0RFTEVURV9BTEwiLCJSRVNFUlZBX0RFTEVURV9BTEwiLCJWRU5UQV9DQU5DRUxfQUxMIiwiQ0xJRU5URV9VUERBVEVfQUxMIiwiVkVOVEFfQ1JFQVRFIiwiVVNVQVJJT19ERUxFVEVfQUxMIiwiRVNUQURJU1RJQ0FfUkVBRF9BTEwiLCJVU1VBUklPX0NSRUFURSIsIkNBVEVHT1JJQV9DUkVBVEUiLCJQUk9EVUNUT19VUERBVEVfQUxMIiwiQkFSQkVST19ERUxFVEVfQUxMIiwiQ0FURUdPUklBX1VQREFURV9BTEwiLCJDT1JURV9SRUFEX0FMTCIsIkNMSUVOVEVfUkVBRF9BTEwiLCJDQVRFR09SSUFfREVMRVRFX0FMTCIsIkJBUkJFUk9fQ1JFQVRFIiwiQ09ORklHVVJBQ0lPTl9SRUFEIiwiQ0xJRU5URV9ERUxFVEVfQUxMIiwiREFTSEJPQVJEX1JFQURfQURNSU4iLCJTRVJWSUNJT19VUERBVEVfQUxMIiwiU0VSVklDSU9fQ1JFQVRFIiwiQ0xJRU5URV9DUkVBVEUiLCJSRVNFUlZBX0NSRUFURSIsIlZFTlRBX1VQREFURV9BTEwiLCJTRVJWSUNJT19ERUxFVEVfQUxMIiwiUkVTRVJWQV9NQU5BR0UiLCJWRU5UQV9ERUxFVEVfQUxMIiwiQkFSQkVST19SRUFEX0FMTCJdLCJpYXQiOjE3Nzk3Nzc0MTcsImV4cCI6MTc3OTc3ODMxN30.IgZXkOwiWVq30AyJ6DRTpY8ZPQH9DIOekZccAgcyoMt50inbKfq7Y6hkB9rIINTv",
+                  "value": "{{token}}",
                   "type": "string"
                 }
               ]
@@ -1412,7 +1412,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhZG1pbjEiLCJyb2xlcyI6WyJST0xFX2FkbWluIl0sInBlcm1pc29zIjpbIlJFU0VSVkFfUkVBRF9BTEwiLCJSRVNFUlZBX1VQREFURV9BTEwiLCJVU1VBUklPX1JFQURfQUxMIiwiQ09SVEVfREVMRVRFX0FMTCIsIlBST0RVQ1RPX1JFQUQiLCJVU1VBUklPX1VQREFURV9BTEwiLCJDT05GSUdVUkFDSU9OX1VQREFURSIsIkJBUkJFUk9fVVBEQVRFX0FMTCIsIlJFUE9SVEVfUkVBRF9BTEwiLCJQUk9EVUNUT19DUkVBVEUiLCJWRU5UQV9SRUFEX0FMTCIsIlJFU0VSVkFfQ0FOQ0VMX0FMTCIsIkNBVEVHT1JJQV9SRUFEIiwiU0VSVklDSU9fUkVBRCIsIlBST0RVQ1RPX0RFTEVURV9BTEwiLCJSRVNFUlZBX0RFTEVURV9BTEwiLCJWRU5UQV9DQU5DRUxfQUxMIiwiQ0xJRU5URV9VUERBVEVfQUxMIiwiVkVOVEFfQ1JFQVRFIiwiVVNVQVJJT19ERUxFVEVfQUxMIiwiRVNUQURJU1RJQ0FfUkVBRF9BTEwiLCJVU1VBUklPX0NSRUFURSIsIkNBVEVHT1JJQV9DUkVBVEUiLCJQUk9EVUNUT19VUERBVEVfQUxMIiwiQkFSQkVST19ERUxFVEVfQUxMIiwiQ0FURUdPUklBX1VQREFURV9BTEwiLCJDT1JURV9SRUFEX0FMTCIsIkNMSUVOVEVfUkVBRF9BTEwiLCJDQVRFR09SSUFfREVMRVRFX0FMTCIsIkJBUkJFUk9fQ1JFQVRFIiwiQ09ORklHVVJBQ0lPTl9SRUFEIiwiQ0xJRU5URV9ERUxFVEVfQUxMIiwiREFTSEJPQVJEX1JFQURfQURNSU4iLCJTRVJWSUNJT19VUERBVEVfQUxMIiwiU0VSVklDSU9fQ1JFQVRFIiwiQ0xJRU5URV9DUkVBVEUiLCJSRVNFUlZBX0NSRUFURSIsIlZFTlRBX1VQREFURV9BTEwiLCJTRVJWSUNJT19ERUxFVEVfQUxMIiwiUkVTRVJWQV9NQU5BR0UiLCJWRU5UQV9ERUxFVEVfQUxMIiwiQkFSQkVST19SRUFEX0FMTCJdLCJpYXQiOjE3ODAwNjIyNTYsImV4cCI6MTc4MDA2MzE1Nn0.grG1fOZi4GBOPu_YEG1v7g_IbhwaRuUiL4ovsjML9ZbfJBn7sDw7gwpkgg_KR3uj",
+                  "value": "{{token}}",
                   "type": "string"
                 }
               ]
@@ -1449,7 +1449,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhZG1pbjEiLCJyb2xlcyI6WyJST0xFX2FkbWluIl0sInBlcm1pc29zIjpbIlJFU0VSVkFfUkVBRF9BTEwiLCJSRVNFUlZBX1VQREFURV9BTEwiLCJVU1VBUklPX1JFQURfQUxMIiwiQ09SVEVfREVMRVRFX0FMTCIsIlBST0RVQ1RPX1JFQUQiLCJVU1VBUklPX1VQREFURV9BTEwiLCJDT05GSUdVUkFDSU9OX1VQREFURSIsIkJBUkJFUk9fVVBEQVRFX0FMTCIsIlJFUE9SVEVfUkVBRF9BTEwiLCJQUk9EVUNUT19DUkVBVEUiLCJWRU5UQV9SRUFEX0FMTCIsIlJFU0VSVkFfQ0FOQ0VMX0FMTCIsIkNBVEVHT1JJQV9SRUFEIiwiU0VSVklDSU9fUkVBRCIsIlBST0RVQ1RPX0RFTEVURV9BTEwiLCJSRVNFUlZBX0RFTEVURV9BTEwiLCJWRU5UQV9DQU5DRUxfQUxMIiwiQ0xJRU5URV9VUERBVEVfQUxMIiwiVkVOVEFfQ1JFQVRFIiwiVVNVQVJJT19ERUxFVEVfQUxMIiwiRVNUQURJU1RJQ0FfUkVBRF9BTEwiLCJVU1VBUklPX0NSRUFURSIsIkNBVEVHT1JJQV9DUkVBVEUiLCJQUk9EVUNUT19VUERBVEVfQUxMIiwiQkFSQkVST19ERUxFVEVfQUxMIiwiQ0FURUdPUklBX1VQREFURV9BTEwiLCJDT1JURV9SRUFEX0FMTCIsIkNMSUVOVEVfUkVBRF9BTEwiLCJDQVRFR09SSUFfREVMRVRFX0FMTCIsIkJBUkJFUk9fQ1JFQVRFIiwiQ09ORklHVVJBQ0lPTl9SRUFEIiwiQ0xJRU5URV9ERUxFVEVfQUxMIiwiREFTSEJPQVJEX1JFQURfQURNSU4iLCJTRVJWSUNJT19VUERBVEVfQUxMIiwiU0VSVklDSU9fQ1JFQVRFIiwiQ0xJRU5URV9DUkVBVEUiLCJSRVNFUlZBX0NSRUFURSIsIlZFTlRBX1VQREFURV9BTEwiLCJTRVJWSUNJT19ERUxFVEVfQUxMIiwiUkVTRVJWQV9NQU5BR0UiLCJWRU5UQV9ERUxFVEVfQUxMIiwiQkFSQkVST19SRUFEX0FMTCJdLCJpYXQiOjE3ODAwNjIyNTYsImV4cCI6MTc4MDA2MzE1Nn0.grG1fOZi4GBOPu_YEG1v7g_IbhwaRuUiL4ovsjML9ZbfJBn7sDw7gwpkgg_KR3uj",
+                  "value": "{{token}}",
                   "type": "string"
                 }
               ]
@@ -1483,7 +1483,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhZG1pbjEiLCJyb2xlcyI6WyJST0xFX2FkbWluIl0sInBlcm1pc29zIjpbIlJFU0VSVkFfUkVBRF9BTEwiLCJSRVNFUlZBX1VQREFURV9BTEwiLCJVU1VBUklPX1JFQURfQUxMIiwiQ09SVEVfREVMRVRFX0FMTCIsIlBST0RVQ1RPX1JFQUQiLCJVU1VBUklPX1VQREFURV9BTEwiLCJDT05GSUdVUkFDSU9OX1VQREFURSIsIkJBUkJFUk9fVVBEQVRFX0FMTCIsIlJFUE9SVEVfUkVBRF9BTEwiLCJQUk9EVUNUT19DUkVBVEUiLCJWRU5UQV9SRUFEX0FMTCIsIlJFU0VSVkFfQ0FOQ0VMX0FMTCIsIkNBVEVHT1JJQV9SRUFEIiwiU0VSVklDSU9fUkVBRCIsIlBST0RVQ1RPX0RFTEVURV9BTEwiLCJSRVNFUlZBX0RFTEVURV9BTEwiLCJWRU5UQV9DQU5DRUxfQUxMIiwiQ0xJRU5URV9VUERBVEVfQUxMIiwiVkVOVEFfQ1JFQVRFIiwiVVNVQVJJT19ERUxFVEVfQUxMIiwiRVNUQURJU1RJQ0FfUkVBRF9BTEwiLCJVU1VBUklPX0NSRUFURSIsIkNBVEVHT1JJQV9DUkVBVEUiLCJQUk9EVUNUT19VUERBVEVfQUxMIiwiQkFSQkVST19ERUxFVEVfQUxMIiwiQ0FURUdPUklBX1VQREFURV9BTEwiLCJDT1JURV9SRUFEX0FMTCIsIkNMSUVOVEVfUkVBRF9BTEwiLCJDQVRFR09SSUFfREVMRVRFX0FMTCIsIkJBUkJFUk9fQ1JFQVRFIiwiQ09ORklHVVJBQ0lPTl9SRUFEIiwiQ0xJRU5URV9ERUxFVEVfQUxMIiwiREFTSEJPQVJEX1JFQURfQURNSU4iLCJTRVJWSUNJT19VUERBVEVfQUxMIiwiU0VSVklDSU9fQ1JFQVRFIiwiQ0xJRU5URV9DUkVBVEUiLCJSRVNFUlZBX0NSRUFURSIsIlZFTlRBX1VQREFURV9BTEwiLCJTRVJWSUNJT19ERUxFVEVfQUxMIiwiUkVTRVJWQV9NQU5BR0UiLCJWRU5UQV9ERUxFVEVfQUxMIiwiQkFSQkVST19SRUFEX0FMTCJdLCJpYXQiOjE3ODAwNjIyNTYsImV4cCI6MTc4MDA2MzE1Nn0.grG1fOZi4GBOPu_YEG1v7g_IbhwaRuUiL4ovsjML9ZbfJBn7sDw7gwpkgg_KR3uj",
+                  "value": "{{token}}",
                   "type": "string"
                 }
               ]
@@ -1512,7 +1512,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhZG1pbjEiLCJyb2xlcyI6WyJST0xFX2FkbWluIl0sInBlcm1pc29zIjpbIlJFU0VSVkFfUkVBRF9BTEwiLCJSRVNFUlZBX1VQREFURV9BTEwiLCJVU1VBUklPX1JFQURfQUxMIiwiQ09SVEVfREVMRVRFX0FMTCIsIlBST0RVQ1RPX1JFQUQiLCJVU1VBUklPX1VQREFURV9BTEwiLCJDT05GSUdVUkFDSU9OX1VQREFURSIsIkJBUkJFUk9fVVBEQVRFX0FMTCIsIlJFUE9SVEVfUkVBRF9BTEwiLCJQUk9EVUNUT19DUkVBVEUiLCJWRU5UQV9SRUFEX0FMTCIsIlJFU0VSVkFfQ0FOQ0VMX0FMTCIsIkNBVEVHT1JJQV9SRUFEIiwiU0VSVklDSU9fUkVBRCIsIlBST0RVQ1RPX0RFTEVURV9BTEwiLCJSRVNFUlZBX0RFTEVURV9BTEwiLCJWRU5UQV9DQU5DRUxfQUxMIiwiQ0xJRU5URV9VUERBVEVfQUxMIiwiVkVOVEFfQ1JFQVRFIiwiVVNVQVJJT19ERUxFVEVfQUxMIiwiRVNUQURJU1RJQ0FfUkVBRF9BTEwiLCJVU1VBUklPX0NSRUFURSIsIkNBVEVHT1JJQV9DUkVBVEUiLCJQUk9EVUNUT19VUERBVEVfQUxMIiwiQkFSQkVST19ERUxFVEVfQUxMIiwiQ0FURUdPUklBX1VQREFURV9BTEwiLCJDT1JURV9SRUFEX0FMTCIsIkNMSUVOVEVfUkVBRF9BTEwiLCJDQVRFR09SSUFfREVMRVRFX0FMTCIsIkJBUkJFUk9fQ1JFQVRFIiwiQ09ORklHVVJBQ0lPTl9SRUFEIiwiQ0xJRU5URV9ERUxFVEVfQUxMIiwiREFTSEJPQVJEX1JFQURfQURNSU4iLCJTRVJWSUNJT19VUERBVEVfQUxMIiwiU0VSVklDSU9fQ1JFQVRFIiwiQ0xJRU5URV9DUkVBVEUiLCJSRVNFUlZBX0NSRUFURSIsIlZFTlRBX1VQREFURV9BTEwiLCJTRVJWSUNJT19ERUxFVEVfQUxMIiwiUkVTRVJWQV9NQU5BR0UiLCJWRU5UQV9ERUxFVEVfQUxMIiwiQkFSQkVST19SRUFEX0FMTCJdLCJpYXQiOjE3ODAwNjM4MDYsImV4cCI6MTc4MDA2NDcwNn0.-CCNrOhMfMbSeHpdz0lqvQ7Zy1R645WzJcw5sqvib-ApZ33YnaZgw-7xP0ukbJeQ",
+                  "value": "{{token}}",
                   "type": "string"
                 }
               ]
@@ -1551,7 +1551,32 @@
           "response": []
         },
         {
-          "name": "Cambiar Estado",
+          "name": "activarPublicacion",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{api}}/productos/11/publicacion?publicado=false",
+              "host": [
+                "{{api}}"
+              ],
+              "path": [
+                "productos",
+                "11",
+                "publicacion"
+              ],
+              "query": [
+                {
+                  "key": "publicado",
+                  "value": "false"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "activarEstado",
           "request": {
             "auth": {
               "type": "bearer",
@@ -1953,7 +1978,317 @@
           "name": "Historial Pago",
           "request": {
             "method": "GET",
-            "header": []
+            "header": [],
+            "url": {
+              "raw": ""
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Reclamos",
+      "item": [
+        {
+          "name": "listar ReclamoPorID",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{api}}/reclamos/2",
+              "host": [
+                "{{api}}"
+              ],
+              "path": [
+                "reclamos",
+                "2"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "listar Resumen",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{api}}/reclamos/resumen",
+              "host": [
+                "{{api}}"
+              ],
+              "path": [
+                "reclamos",
+                "resumen"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "listar ReclamoFiltros",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{api}}/reclamos",
+              "host": [
+                "{{api}}"
+              ],
+              "path": [
+                "reclamos"
+              ],
+              "query": [
+                {
+                  "key": "numeroReclamo",
+                  "value": "REC-20260614-000",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "estado",
+                  "value": "ABIERTO",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "tipoProblema",
+                  "value": "CORTE_INCORRECTO",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "clienteId",
+                  "value": "1",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "empleadoId",
+                  "value": "3",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "fechaInicio",
+                  "value": "2025-06-01",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "fechaFin",
+                  "value": "2025-06-30",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "0",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "size",
+                  "value": "10",
+                  "type": "text",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear Reclamo Interno",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "reclamo",
+                  "value": "{\n  \"idCliente\": 5,\n  \"idVenta\": 48,\n  \"nombreCliente\": \"JORGE DAVID Cruz\" ,\n  \"correoCliente\": \"jdcruzp22@gmail.com\",\n  \"telefonoCliente\": \"993888777\",\n  \"tipoDocumentoCliente\": \"DNI\",\n  \"numeroDocumentoCliente\": \"12445678\",\n  \"tipoReclamacion\": \"QUEJA\",\n  \"tipoProblema\": \"DEMORA_EN_ATENCION\",\n  \"causaReclamo\": \"MALA_ATENCION\",\n  \"descripcion\": \"El servicio demoró demasiado.\",\n  \"montoReclamado\": 50.00,\n  \"fechaOcurrencia\": \"2026-06-14T10:30:00\",\n  \"notasInternas\": \"Cliente molesto\",\n  \"idUsuarioResponsable\": 2\n}",
+                  "type": "text",
+                  "uuid": "807d3c6f-ba02-48c0-97c0-1ce426e137ca",
+                  "contentType": "application/json"
+                },
+                {
+                  "key": "archivos",
+                  "type": "file",
+                  "uuid": "40782075-6ee2-4fb3-b0fd-171a53ce9f48",
+                  "src": "/C:/Users/David/Downloads/imagen de reclamo.jpg"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{api}}/reclamos",
+              "host": [
+                "{{api}}"
+              ],
+              "path": [
+                "reclamos"
+              ],
+              "query": [
+                {
+                  "key": "",
+                  "value": "",
+                  "type": "text",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear ReclamoPublico",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "reclamo",
+                  "value": "{\n  \"nombres\": \"jorge David jorvix\",\n  \"apellidos\": \"cruz peña\",\n  \"email\": \"jdcruzp22@gmail.com\",\n  \"telefono\": \"999888777\",\n  \"tipoDocumento\": \"DNI\",\n  \"numeroDocumento\": \"12345678\",\n  \"tipoReclamacion\": \"RECLAMO\",\n  \"tipoProblema\": \"SERVICIO_DEFECTUOSO\",\n  \"descripcion\": \"El corte estuvo mal realizado.\",\n  \"montoReclamado\": 30.00,\n  \"fechaOcurrencia\": \"2026-06-14T09:00:00\"\n}",
+                  "type": "text",
+                  "uuid": "807d3c6f-ba02-48c0-97c0-1ce426e137ca",
+                  "contentType": "application/json"
+                },
+                {
+                  "key": "archivos",
+                  "type": "file",
+                  "uuid": "d78ebe19-8461-48a1-819c-b89b793fa985",
+                  "src": "/C:/Users/David/Downloads/imagen de reclamo.jpg"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{api}}/reclamos/publico",
+              "host": [
+                "{{api}}"
+              ],
+              "path": [
+                "reclamos",
+                "publico"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar Solucion",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"estadoReclamo\": \"RESUELTO\",\r\n  \"solucionReclamo\": \"CAMBIO_PRODUCTO\",\r\n  \"notasInternas\": \"Se devolvió el dinero.\",\r\n  \"montoCompensado\": 50.00\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{api}}/reclamos/3/solucion",
+              "host": [
+                "{{api}}"
+              ],
+              "path": [
+                "reclamos",
+                "3",
+                "solucion"
+              ],
+              "query": [
+                {
+                  "key": "",
+                  "value": "",
+                  "type": "text",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar Reclamo",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{api}}/reclamos/1",
+              "host": [
+                "{{api}}"
+              ],
+              "path": [
+                "reclamos",
+                "1"
+              ]
+            }
           },
           "response": []
         }
