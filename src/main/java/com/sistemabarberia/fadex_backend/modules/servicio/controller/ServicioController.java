@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/servicios")
@@ -84,5 +85,10 @@ public class ServicioController {
     public ResponseEntity<ApiResponse<Void>> eliminar(@PathVariable Long id) {
         servicioService.eliminar(id);
         return ResponseEntity.ok(ApiResponse.ok("Servicio eliminado correctamente"));
+    }
+
+    @GetMapping("/lista")
+    public ResponseEntity<ApiResponse<List<Map<String, Object>>>> lista() {
+        return ResponseEntity.ok(ApiResponse.success(servicioService.getLista()));
     }
 }

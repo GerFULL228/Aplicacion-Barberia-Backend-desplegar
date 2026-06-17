@@ -8,6 +8,8 @@ import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.properties.UnitValue;
 import com.sistemabarberia.fadex_backend.modules.analisis.dto.ResumenDiaDTO;
+import com.sistemabarberia.fadex_backend.modules.pagos.entity.MetodoPago;
+import com.sistemabarberia.fadex_backend.modules.reserva.entity.EstadoReserva;
 import com.sistemabarberia.fadex_backend.modules.reserva.entity.Reserva;
 import com.sistemabarberia.fadex_backend.modules.reserva.repository.ReservaRepository;
 import com.itextpdf.layout.element.Table;
@@ -41,22 +43,24 @@ public class ReporteServiceImpl implements ReporteService {
         )).toList();
     }
 
-    // ─── PDF RESERVAS ───────────────────────────────────────────
+    // ─── PDF RESERVAS
     @Override
-    public byte[] generarReservasPdf(LocalDate desde, LocalDate hasta) {
-        List<Reserva> reservas = reservaRepository.findReservasPorPeriodo(desde, hasta);
+    public byte[] generarReservasPdf(LocalDate desde, LocalDate hasta, Long barberoId, Long servicioId, EstadoReserva estado, MetodoPago metodoPago) {
+        List<Reserva> reservas = reservaRepository.findReservasFiltradas(
+                desde, hasta, barberoId, servicioId,
+                estado != null ? estado.name() : null,
+                metodoPago != null ? metodoPago.name() : null
+        );
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         PdfWriter writer = new PdfWriter(out);
         PdfDocument pdf = new PdfDocument(writer);
         Document doc = new Document(pdf);
 
-        // Colores
-        DeviceRgb negro  = new DeviceRgb(18, 18, 18);
-        DeviceRgb dorado = new DeviceRgb(201, 168, 76);
-        DeviceRgb blanco = new DeviceRgb(255, 255, 255);
+        DeviceRgb negro     = new DeviceRgb(18, 18, 18);
+        DeviceRgb dorado    = new DeviceRgb(201, 168, 76);
+        DeviceRgb blanco    = new DeviceRgb(255, 255, 255);
         DeviceRgb grisClaro = new DeviceRgb(245, 245, 245);
 
-        // Header negro
         Table header = new Table(UnitValue.createPercentArray(new float[]{1})).useAllAvailableWidth();
         Cell headerCell = new Cell()
                 .add(new Paragraph("FadeX — Barbería").setBold().setFontSize(20).setFontColor(dorado))
@@ -69,11 +73,9 @@ public class ReporteServiceImpl implements ReporteService {
         doc.add(header);
         doc.add(new Paragraph("\n"));
 
-        // Tabla
         Table table = new Table(UnitValue.createPercentArray(new float[]{1, 2, 2, 2, 2, 2}))
                 .useAllAvailableWidth();
 
-        // Headers dorados
         String[] cols = {"ID", "Fecha", "Cliente", "Barbero", "Servicio", "Total"};
         for (String col : cols) {
             table.addHeaderCell(new Cell()
@@ -82,20 +84,18 @@ public class ReporteServiceImpl implements ReporteService {
                     .setPadding(8));
         }
 
-        // Filas alternadas
         boolean par = false;
         for (Reserva r : reservas) {
             DeviceRgb fondo = par ? grisClaro : blanco;
             table.addCell(new Cell().add(new Paragraph(String.valueOf(r.getId()))).setBackgroundColor(fondo).setPadding(6));
             table.addCell(new Cell().add(new Paragraph(r.getFecha().toString())).setBackgroundColor(fondo).setPadding(6));
-            table.addCell(new Cell().add(new Paragraph(r.getCliente().getPersona().getNombre())).setBackgroundColor(fondo).setPadding(6));
-            table.addCell(new Cell().add(new Paragraph(r.getBarbero().getPersona().getNombre())).setBackgroundColor(fondo).setPadding(6));
-            table.addCell(new Cell().add(new Paragraph(r.getServicio().getNombre())).setBackgroundColor(fondo).setPadding(6));
+            table.addCell(new Cell().add(new Paragraph(r.getCliente() != null ? r.getCliente().getPersona().getNombre() : "Sin cliente")).setBackgroundColor(fondo).setPadding(6));
+            table.addCell(new Cell().add(new Paragraph(r.getBarbero() != null ? r.getBarbero().getPersona().getNombre() : "Sin barbero")).setBackgroundColor(fondo).setPadding(6));
+            table.addCell(new Cell().add(new Paragraph(r.getServicio() != null ? r.getServicio().getNombre() : "Sin servicio")).setBackgroundColor(fondo).setPadding(6));
             table.addCell(new Cell().add(new Paragraph("S/ " + r.getTotal())).setBackgroundColor(fondo).setPadding(6));
             par = !par;
         }
 
-        // Fila TOTAL
         long total = reservas.size();
         table.addCell(new Cell(1, 5).add(new Paragraph("TOTAL").setBold()).setBackgroundColor(dorado).setPadding(8));
         table.addCell(new Cell().add(new Paragraph(total + " reservas").setBold()).setBackgroundColor(dorado).setPadding(8));
@@ -105,10 +105,14 @@ public class ReporteServiceImpl implements ReporteService {
         return out.toByteArray();
     }
 
-    // ─── EXCEL RESERVAS ─────────────────────────────────────────
+    // ─── EXCEL RESERVAS
     @Override
-    public byte[] generarReservasExcel(LocalDate desde, LocalDate hasta) {
-        List<Reserva> reservas = reservaRepository.findReservasPorPeriodo(desde, hasta);
+    public byte[] generarReservasExcel(LocalDate desde, LocalDate hasta, Long barberoId, Long servicioId, EstadoReserva estado, MetodoPago metodoPago) {
+        List<Reserva> reservas = reservaRepository.findReservasFiltradas(
+                desde, hasta, barberoId, servicioId,
+                estado != null ? estado.name() : null,
+                metodoPago != null ? metodoPago.name() : null
+        );
         try (XSSFWorkbook workbook = new XSSFWorkbook();
              ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 
@@ -133,9 +137,9 @@ public class ReporteServiceImpl implements ReporteService {
                 XSSFCellStyle estilo = (rowNum % 2 == 0) ? filaParStyle : filaImparStyle;
                 setCellStyled(row, 0, String.valueOf(r.getId()), estilo);
                 setCellStyled(row, 1, r.getFecha().toString(), estilo);
-                setCellStyled(row, 2, r.getCliente().getPersona().getNombre(), estilo);
-                setCellStyled(row, 3, r.getBarbero().getPersona().getNombre(), estilo);
-                setCellStyled(row, 4, r.getServicio().getNombre(), estilo);
+                setCellStyled(row, 2, r.getCliente() != null ? r.getCliente().getPersona().getNombre() : "Sin cliente", estilo);
+                setCellStyled(row, 3, r.getBarbero() != null ? r.getBarbero().getPersona().getNombre() : "Sin barbero", estilo);
+                setCellStyled(row, 4, r.getServicio() != null ? r.getServicio().getNombre() : "Sin servicio", estilo);
                 setCellStyled(row, 5, r.getEstadoReserva().toString(), estilo);
                 setCellStyled(row, 6, "S/ " + r.getTotal(), estilo);
                 rowNum++;

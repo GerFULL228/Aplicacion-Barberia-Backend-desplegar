@@ -229,4 +229,22 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
 
     @Query("SELECT COUNT(r) FROM Reserva r WHERE r.estadoReserva = :estado AND r.fecha BETWEEN :desde AND :hasta")
     Long countByEstadoReservaAndFechaBetween(@Param("estado") EstadoReserva estado, @Param("desde") LocalDate desde, @Param("hasta") LocalDate hasta);
+
+    @Query(value = """
+SELECT r.* FROM reservas r
+LEFT JOIN pago p ON p.id_reservas = r.id_reservas
+WHERE r.fecha BETWEEN :desde AND :hasta
+AND (:barberoId IS NULL OR r.id_barbero = :barberoId)
+AND (:servicioId IS NULL OR r.id_servicio = :servicioId)
+AND (:estado IS NULL OR r.estado_reserva = :estado)
+AND (:metodoPago IS NULL OR p.metodo::TEXT = :metodoPago)
+""", nativeQuery = true)
+    List<Reserva> findReservasFiltradas(
+            @Param("desde") LocalDate desde,
+            @Param("hasta") LocalDate hasta,
+            @Param("barberoId") Long barberoId,
+            @Param("servicioId") Long servicioId,
+            @Param("estado") String estado,
+            @Param("metodoPago") String metodoPago
+    );
 }
