@@ -121,6 +121,26 @@ public class SecurityConfig {
                                 "/api/v1/pagos/**"
                         ).hasRole("admin")
 
+                        .requestMatchers(HttpMethod.POST,
+                                "/api/v1/reclamos/publico"
+                        ).permitAll()
+
+                        .requestMatchers(HttpMethod.POST,
+                                "/api/v1/reclamos/**"
+                        ).hasRole("admin")
+
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/v1/reclamos/**"
+                        ).hasRole("admin")
+
+                        .requestMatchers(HttpMethod.PUT,
+                                "/api/v1/reclamos/**"
+                        ).hasRole("admin")
+
+                        .requestMatchers(HttpMethod.DELETE,
+                                "/api/v1/reclamos/**"
+                        ).hasRole("admin")
+
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
