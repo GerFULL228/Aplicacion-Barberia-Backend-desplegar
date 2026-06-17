@@ -47,33 +47,58 @@ public class SecurityConfig {
                                 .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                                 .accessDeniedHandler(jwtAccesDeniedHandler)
                 )
-                .csrf(crsf -> crsf.disable())
+                .csrf(csrf -> csrf.disable())
                 .userDetailsService(UserDetailService)
-                .sessionManagement(sessionManagement ->
-                        sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
                 .authorizeHttpRequests(auth -> auth
+
+                        // ─────────────────────────────────────────────
+                        // AUTH PUBLICO
+                        // ─────────────────────────────────────────────
                         .requestMatchers(
                                 "/api/v1/auth/**",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/uploads/**"
                         ).permitAll()
+
+                        // ─────────────────────────────────────────────
+                        // CREACIÓN DE CLIENTES (PÚBLICO)
+                        // ─────────────────────────────────────────────
                         .requestMatchers(HttpMethod.POST,
                                 "/api/v1/usuarios/cliente"
                         ).permitAll()
+
+                        // ─────────────────────────────────────────────
+                        // IA MODULE (TU NUEVO BLOQUE)
+                        // ─────────────────────────────────────────────
+                        .requestMatchers("/api/v1/ia/**")
+                        .hasAnyRole("admin", "barbero", "cliente")
+
+                        // ─────────────────────────────────────────────
+                        // CREACIÓN BARBERO / ADMIN
+                        // ─────────────────────────────────────────────
                         .requestMatchers(HttpMethod.POST,
                                 "/api/v1/usuarios/barbero",
                                 "/api/v1/usuarios/admin"
                         ).hasRole("admin")
 
+                        // ─────────────────────────────────────────────
+                        // USUARIOS ADMIN ONLY
+                        // ─────────────────────────────────────────────
                         .requestMatchers(HttpMethod.GET,
                                 "/api/v1/usuarios/**"
-                        ).hasAnyRole("admin")
+                        ).hasRole("admin")
 
                         .requestMatchers(HttpMethod.PUT,
                                 "/api/v1/usuarios/**"
                         ).hasRole("admin")
 
+                        // ─────────────────────────────────────────────
+                        // SERVICIOS PUBLICOS
+                        // ─────────────────────────────────────────────
                         .requestMatchers(HttpMethod.GET,
                                 "/api/v1/servicios/**",
                                 "/api/v1/categorias/**",
@@ -81,9 +106,15 @@ public class SecurityConfig {
                                 "/api/v1/productos/**"
                         ).permitAll()
 
+                        // ─────────────────────────────────────────────
+                        // BARBERO PANEL
+                        // ─────────────────────────────────────────────
                         .requestMatchers("/api/v1/barbero/citas/**")
                         .hasAnyAuthority("ROLE_barbero", "ROLE_admin")
 
+                        // ─────────────────────────────────────────────
+                        // CLIENTE PRIVADO
+                        // ─────────────────────────────────────────────
                         .requestMatchers(HttpMethod.GET,
                                 "/api/v1/reservas/mis-reservas",
                                 "/api/v1/clientes/perfil-propio",
@@ -92,10 +123,16 @@ public class SecurityConfig {
                                 "/api/v1/servicio/**"
                         ).hasRole("cliente")
 
+                        // ─────────────────────────────────────────────
+                        // RESERVAS
+                        // ─────────────────────────────────────────────
                         .requestMatchers(HttpMethod.POST,
                                 "/api/v1/reservas"
                         ).hasAnyAuthority("ROLE_barbero", "ROLE_admin", "ROLE_cliente")
 
+                        // ─────────────────────────────────────────────
+                        // RECOMPENSAS
+                        // ─────────────────────────────────────────────
                         .requestMatchers(HttpMethod.GET,
                                 "/api/v1/recompensas/mi-tarjeta"
                         ).hasRole("cliente")
@@ -104,7 +141,9 @@ public class SecurityConfig {
                                 "/api/v1/recompensas/**"
                         ).hasAnyRole("admin", "barbero")
 
+                        // ─────────────────────────────────────────────
                         // PAGOS
+                        // ─────────────────────────────────────────────
                         .requestMatchers(HttpMethod.GET,
                                 "/api/v1/pagos/**"
                         ).hasAnyRole("admin", "barbero")
@@ -121,11 +160,16 @@ public class SecurityConfig {
                                 "/api/v1/pagos/**"
                         ).hasRole("admin")
 
+                        // ─────────────────────────────────────────────
+                        // RECLAMOS
+                        // ─────────────────────────────────────────────
                         .requestMatchers(HttpMethod.POST,
                                 "/api/v1/reclamos/publico"
                         ).permitAll()
 
                         .requestMatchers(HttpMethod.POST,
+                                "/api/v1/reclamos/**",
+                                "/api/v1/reclamos/**",
                                 "/api/v1/reclamos/**"
                         ).hasRole("admin")
 
@@ -141,9 +185,13 @@ public class SecurityConfig {
                                 "/api/v1/reclamos/**"
                         ).hasRole("admin")
 
+                        // ─────────────────────────────────────────────
+                        // DEFAULT
+                        // ─────────────────────────────────────────────
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 
