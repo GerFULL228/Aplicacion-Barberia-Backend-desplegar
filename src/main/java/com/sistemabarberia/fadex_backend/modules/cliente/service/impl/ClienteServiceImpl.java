@@ -291,4 +291,12 @@ public class ClienteServiceImpl implements IClienteService {
                         "Cliente no encontrado para el usuario autenticado"));
         return obtenerResumenCliente(cliente.getClienteId());
     }
+
+    // ClienteServiceImpl.java — implementación
+    @Override
+    public Integer obtenerIdClientePorUsuario(Integer idUsuario) {
+        return clienteRepository.findByUsuarioId(idUsuario)
+                .map(Cliente::getClienteId)
+                .orElseThrow(() -> new RuntimeException("Cliente no encontrado para el usuario: " + idUsuario));
+    }
 }

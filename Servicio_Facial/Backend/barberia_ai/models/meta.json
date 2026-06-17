@@ -1,0 +1,29 @@
+{
+  "trained_at": "2026-06-17T06:17:03.755327",
+  "face_model_path": "models\\face_shape_classifier.pkl",
+  "haircut_model_path": "models\\haircut_scorer.pkl",
+  "face_features": [
+    "ratio_largo_ancho",
+    "ratio_frente_mandibula",
+    "ratio_pomulos_mandibula",
+    "ratio_frente_pomulos",
+    "jaw_angle",
+    "face_roundness",
+    "jaw_curvature",
+    "lower_face_ratio",
+    "upper_face_ratio",
+    "middle_face_ratio",
+    "facial_symmetry",
+    "face_tilt"
+  ],
+  "haircut_features": [
+    "adds_height",
+    "reduces_width",
+    "softens_jaw",
+    "adds_volume_sides",
+    "adds_volume_top",
+    "reduces_forehead",
+    "maintenance_level"
+  ],
+  "trainer_version": "2.0"
+}
