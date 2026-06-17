@@ -4,6 +4,8 @@ package com.sistemabarberia.fadex_backend.modules.analisis.controller;
 import com.sistemabarberia.fadex_backend.commons.response.ApiResponse;
 import com.sistemabarberia.fadex_backend.modules.analisis.Service.ReporteService;
 import com.sistemabarberia.fadex_backend.modules.analisis.dto.ResumenDiaDTO;
+import com.sistemabarberia.fadex_backend.modules.pagos.entity.MetodoPago;
+import com.sistemabarberia.fadex_backend.modules.reserva.entity.EstadoReserva;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
@@ -37,8 +39,12 @@ public class ReporteController {
     @GetMapping("/reservas/pdf")
     public ResponseEntity<byte[]> reservasPdf(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta) {
-        byte[] pdf = reporteService.generarReservasPdf(desde, hasta);
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta,
+            @RequestParam(required = false) Long barberoId,
+            @RequestParam(required = false) Long servicioId,
+            @RequestParam(required = false) EstadoReserva estado,
+            @RequestParam(required = false) MetodoPago metodoPago) {
+        byte[] pdf = reporteService.generarReservasPdf(desde, hasta, barberoId, servicioId, estado, metodoPago);
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=reservas.pdf")
                 .contentType(MediaType.APPLICATION_PDF)
@@ -48,8 +54,12 @@ public class ReporteController {
     @GetMapping("/reservas/excel")
     public ResponseEntity<byte[]> reservasExcel(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta) {
-        byte[] excel = reporteService.generarReservasExcel(desde, hasta);
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta,
+            @RequestParam(required = false) Long barberoId,
+            @RequestParam(required = false) Long servicioId,
+            @RequestParam(required = false) EstadoReserva estado,
+            @RequestParam(required = false) MetodoPago metodoPago) {
+        byte[] excel = reporteService.generarReservasExcel(desde, hasta, barberoId, servicioId, estado, metodoPago);
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=reservas.xlsx")
                 .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
