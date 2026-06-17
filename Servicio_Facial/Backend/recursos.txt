@@ -1,0 +1,62 @@
+debes tener:
+
+activar el path al instalar phyton 3.11.x
+
+pip install fastapi
+pip install uvicorn
+pip install psycopg2-binary
+py -m pip install mediapipe==0.10.14
+pip install opencv-python
+pip install python-multipart
+pip install scikit-learn joblib pandas numpy
+
+
+-------------------------------------------------------
+# Ambos modelos con métricas
+python ml_trainer.py --eval
+
+# Solo el facial
+python ml_trainer.py --model face --eval
+
+# Solo el scorer de cortes
+python ml_trainer.py --model haircut --eval
+
+------------------------------------------------------
+Arranque diario:
+  database.py → main.py → usar normalmente
+
+Reentrenar ML1 (forma facial):
+  Cuando acumules 20+ clientes nuevos
+  → python ml_trainer.py --model face --eval
+
+Reentrenar ML2 (scorer):
+  Cuando acumules 30+ feedbacks nuevos
+  → python ml_trainer.py --model haircut --eval
+  (o esperar que el AutoRetrainer lo haga solo)
+
+------------------------------------------------------
+
+Te explico exactamente qué usa cada uno:
+
+ML 1 — Clasificador de forma facial
+RandomForestClassifier (Bosque Aleatorio)
+
+Crea 300 árboles de decisión en paralelo
+Cada árbol vota por una forma facial
+La forma ganadora es la que tiene más votos
+Por eso te da probabilidades — Redonda: 86.6% es literalmente el 86.6% de los 300 árboles votando por Redonda
+Es supervizado: aprende de tus registros reales en face_measurements
+
+
+ML 2 — Scorer de cortes
+GradientBoostingRegressor (Gradient Boosting)
+
+Construye árboles en secuencia, cada uno corrige los errores del anterior
+Aprende de haircut_scores + haircut_feedback (rating, liked)
+Predice un número continuo (0-100) en lugar de una clase
+Mejora progresivamente con cada feedback real que dan los clientes
+
+
+La diferencia clave entre los dos:
+RandomForestGradientBoostingTipoClasificaciónRegresiónOutputCategoría (Redonda)Número (88.5)ÁrbolesParalelosSecuencialesFortalezaRobusto, rápidoMás preciso con datosDebilidadMenos finoNecesita más datos
+Actualmente el ML1 está activo (tienes modelo entrenado) y el ML2 está en fallback heurístico porque solo tienes 4 registros de feedback — necesita mínimo ~20-30 para superar al heurístico.
