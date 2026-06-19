@@ -12,6 +12,7 @@ import com.sistemabarberia.fadex_backend.modules.reclamo.service.IReclamoService
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -50,7 +51,7 @@ public class ReclamoController {
 
     @PreAuthorize("hasAuthority('RECLAMO_READ')")
     @GetMapping
-    public ResponseEntity<ApiResponse<PageResponse<ReclamoResponse>>> listar(@Valid @ModelAttribute ReclamoFiltro filtro, @PageableDefault(size = 10, page = 0) Pageable pageable) {
+    public ResponseEntity<ApiResponse<PageResponse<ReclamoResponse>>> listar(@Valid @ModelAttribute ReclamoFiltro filtro, @PageableDefault(size = 10, page = 0, sort = "fechaReclamo", direction = Sort.Direction.DESC) Pageable pageable) {
         PageResponse<ReclamoResponse> reclamos = reclamoService.listarReclamoFiltros(filtro, pageable);
         return ResponseEntity.ok(ApiResponse.ok("Reclamos obtenidos correctamente", reclamos));
     }

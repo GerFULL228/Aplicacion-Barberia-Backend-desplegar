@@ -1,6 +1,8 @@
 package com.sistemabarberia.fadex_backend.modules.venta.service.impl;
 
 import com.sistemabarberia.fadex_backend.commons.exception.ResourceNotFoundException;
+import com.sistemabarberia.fadex_backend.modules.barbero.entity.Barbero;
+import com.sistemabarberia.fadex_backend.modules.barbero.repository.BarberoRepository;
 import com.sistemabarberia.fadex_backend.modules.cliente.entity.Cliente;
 import com.sistemabarberia.fadex_backend.modules.cliente.repository.ClienteRepository;
 import com.sistemabarberia.fadex_backend.modules.venta.dto.request.VentaRequestDTO;
@@ -29,7 +31,7 @@ public class VentaServiceImpl implements IVentaService {
     private final VentaRepository ventaRepository;
     private final DetalleVentaRepository detalleVentaRepository;
     private final HistorialVentaRepository historialVentaRepository;
-
+    private final BarberoRepository barberoRepository;
     private final ClienteRepository clienteRepository;
 
     private final VentaMapper ventaMapper;
@@ -42,7 +44,16 @@ public class VentaServiceImpl implements IVentaService {
 
         Cliente cliente = clienteRepository.findById(dto.getClienteId())
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado"));
+
+        Barbero barbero = null;
+
+        if(dto.getBarberoId() != null){
+            barbero = barberoRepository.findById(dto.getBarberoId())
+                    .orElseThrow(() ->
+                            new ResourceNotFoundException("Barbero no encontrado"));
+        }
         Venta venta = new Venta();
+        venta.setBarbero(barbero);
         venta.setCliente(cliente);
         venta.setFecha(dto.getFecha());
         venta.setTipoComprobante(dto.getTipoComprobante());

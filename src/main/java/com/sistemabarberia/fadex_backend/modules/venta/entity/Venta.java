@@ -34,10 +34,6 @@ public class Venta {
     @JoinColumn(name = "id_barbero")
     private Barbero barbero;
 
-    @ManyToOne
-    @JoinColumn(name = "id_periodo")
-    private PeriodoPago periodoPago;
-
     @Column(name = "fecha")
     private LocalDateTime fecha;
 
@@ -45,8 +41,6 @@ public class Venta {
     @Column(name = "tipo_comprobante")
     private TipoComprobante tipoComprobante;
 
-    @Column(name = "total")
-    private BigDecimal total;
 
     @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DetalleVenta> detalles;

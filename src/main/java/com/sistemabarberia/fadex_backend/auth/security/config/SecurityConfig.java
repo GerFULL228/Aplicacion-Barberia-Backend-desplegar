@@ -54,16 +54,28 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
 
-                        // ─────────────────────────────────────────────
-                        // AUTH PUBLICO
-                        // ─────────────────────────────────────────────
-                        .requestMatchers(
-                                "/api/v1/auth/**",
-                                "/swagger-ui/**",
-                                "/v3/api-docs/**",
-                                "/uploads/**"
-                        ).permitAll()
+                                // ─────────────────────────────────────────────
+// AUTH PUBLICO
+// ─────────────────────────────────────────────
+                                .requestMatchers(
+                                        "/api/v1/auth/login",
+                                        "/api/v1/auth/refresh",
+                                        "/api/v1/auth/logout",
+                                        "/api/v1/auth/forgot-password",
+                                        "/api/v1/auth/reset-password",
+                                        "/api/v1/auth/google",
+                                        "/api/v1/auth/qr-login",
+                                        "/swagger-ui/**",
+                                        "/v3/api-docs/**",
+                                        "/uploads/**"
+                                ).permitAll()
 
+// ─────────────────────────────────────────────
+// CHANGE PASSWORD (requiere JWT)
+// ─────────────────────────────────────────────
+                                .requestMatchers(HttpMethod.PATCH,
+                                        "/api/v1/auth/change-password"
+                                ).hasAnyRole("admin", "barbero", "cliente")
                         // ─────────────────────────────────────────────
                         // CREACIÓN DE CLIENTES (PÚBLICO)
                         // ─────────────────────────────────────────────
@@ -188,6 +200,11 @@ public class SecurityConfig {
                         // ─────────────────────────────────────────────
                         // DEFAULT
                         // ─────────────────────────────────────────────
+                        // ─────────────────────────────────────────────
+                        // PLANILLAS (ACCESO PARA TODOS LOS ROLES)
+                        // ─────────────────────────────────────────────
+                                .requestMatchers("/api/v1/planillas/**")
+                                .hasAnyRole("admin", "barbero", "cliente")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
