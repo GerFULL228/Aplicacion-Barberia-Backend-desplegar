@@ -1,6 +1,8 @@
 package com.sistemabarberia.fadex_backend.modules.reclamo.service;
 
+import com.sistemabarberia.fadex_backend.modules.reclamo.dto.ReclamoEmailDTO;
+
 public interface IReclamoEmailService {
-    void enviarConfirmacionCliente(String email, String nombreCliente, String numeroReclamo);
-    void enviarCambioEstado(String email, String nombreCliente, String numeroReclamo, String estado);
+    void enviarConfirmacionCliente(String email, ReclamoEmailDTO reclamo);
+    void enviarCambioEstado(String email, ReclamoEmailDTO reclamo);
 }

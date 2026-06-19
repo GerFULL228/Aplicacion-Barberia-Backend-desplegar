@@ -8,6 +8,7 @@ import com.sistemabarberia.fadex_backend.commons.response.PageResponse;
 import com.sistemabarberia.fadex_backend.commons.storage.FileStorageService;
 import com.sistemabarberia.fadex_backend.modules.cliente.entity.Cliente;
 import com.sistemabarberia.fadex_backend.modules.cliente.repository.ClienteRepository;
+import com.sistemabarberia.fadex_backend.modules.reclamo.dto.ReclamoEmailDTO;
 import com.sistemabarberia.fadex_backend.modules.reclamo.dto.ReclamoFiltro;
 import com.sistemabarberia.fadex_backend.modules.reclamo.dto.ReclamoResumen;
 import com.sistemabarberia.fadex_backend.modules.reclamo.dto.request.ReclamoPublicoRequest;
@@ -18,6 +19,7 @@ import com.sistemabarberia.fadex_backend.modules.reclamo.dto.response.ReclamoRes
 import com.sistemabarberia.fadex_backend.modules.reclamo.entity.Reclamo;
 import com.sistemabarberia.fadex_backend.modules.reclamo.entity.ReclamoAdjunto;
 import com.sistemabarberia.fadex_backend.modules.reclamo.entity.enums.EstadoReclamo;
+import com.sistemabarberia.fadex_backend.modules.reclamo.mapper.ReclamoMapper;
 import com.sistemabarberia.fadex_backend.modules.reclamo.repository.ReclamoAdjuntoRepository;
 import com.sistemabarberia.fadex_backend.modules.reclamo.repository.ReclamoRepository;
 import com.sistemabarberia.fadex_backend.modules.reclamo.service.IReclamoEmailService;
@@ -54,6 +56,7 @@ public class ReclamoService implements IReclamoService {
     private final ReservaRepository reservaRepository;
     private final VentaRepository ventaRepository;
     private final IReclamoEmailService emailService;
+    private final ReclamoMapper reclamoMapper;
     private final FileStorageService fileStorageService;
 
     @Override
@@ -82,7 +85,7 @@ public class ReclamoService implements IReclamoService {
         reclamo = reclamoRepository.save(reclamo);
         guardarAdjuntos(reclamo, archivos);
         enviarCorreoConfirmacion(reclamo);
-        return mapToResponse(reclamo);
+        return reclamoMapper.toResponse(reclamo);
     }
 
     @Override
@@ -93,13 +96,6 @@ public class ReclamoService implements IReclamoService {
         }
         Venta venta = obtenerVenta(request.getIdVenta());
         Reserva reserva = obtenerReserva(request.getIdReserva());
-//        por el momento no esta mapeado el dni
-//        if (venta != null && venta.getCliente() != null && !venta.getCliente().getNumeroDocumento().equals(request.getNumeroDocumento())) {
-//            throw new BusinessException("La venta no pertenece al documento indicado.", HttpStatus.BAD_REQUEST);
-//        }
-//        if (reserva != null && reserva.getCliente() != null && !reserva.getCliente().getNumeroDocumento().equals(request.getNumeroDocumento())) {
-//            throw new BusinessException("La reserva no pertenece al documento indicado.", HttpStatus.BAD_REQUEST);
-//        }
         Reclamo reclamo = Reclamo.builder()
                 .numeroReclamo(generarNumeroReclamo()).esPublico(true).usuarioResponsable(null).cliente(null).venta(venta).reserva(reserva)
                 .nombreCliente(request.getNombres().trim() + " " + request.getApellidos().trim()).correoCliente(request.getEmail()).telefonoCliente(request.getTelefono())
@@ -109,20 +105,20 @@ public class ReclamoService implements IReclamoService {
         reclamo = reclamoRepository.save(reclamo);
         guardarAdjuntos(reclamo, archivos);
         enviarCorreoConfirmacion(reclamo);
-        return mapToResponse(reclamo);
+        return reclamoMapper.toResponse(reclamo);
     }
 
     @Override
     @Transactional(readOnly = true)
     public ReclamoResponse obtenerReclamoPorId(Long id) {
         Reclamo reclamo = reclamoRepository.findByIdReclamo(id).orElseThrow(() -> new ResourceNotFoundException("Reclamo no encontrado"));
-        return mapToResponseDetalle(reclamo);
+        return reclamoMapper.toDetalleResponse(reclamo);
     }
 
     @Override
     @Transactional(readOnly = true)
     public PageResponse<ReclamoResponse> listarReclamoFiltros(ReclamoFiltro filtro, Pageable pageable) {
-        Page<ReclamoResponse> page = reclamoRepository.findAll(ReclamoSpecification.filtrar(filtro), pageable).map(this::mapToResponse);
+        Page<ReclamoResponse> page = reclamoRepository.findAll(ReclamoSpecification.filtrar(filtro), pageable).map(reclamoMapper::toResponse);
         return PageResponse.of(page);
     }
 
@@ -151,10 +147,20 @@ public class ReclamoService implements IReclamoService {
             reclamo.setFechaResolucion(LocalDateTime.now());
         }
         reclamo = reclamoRepository.save(reclamo);
+
         if (reclamo.getCorreoCliente() != null && !reclamo.getCorreoCliente().isBlank()) {
-            emailService.enviarCambioEstado(reclamo.getCorreoCliente(), reclamo.getNombreCliente(), reclamo.getNumeroReclamo(), reclamo.getEstadoReclamo().name());
+            ReclamoEmailDTO dto = ReclamoEmailDTO.builder()
+                    .nombreCliente(reclamo.getNombreCliente())
+                    .numeroReclamo(reclamo.getNumeroReclamo())
+                    .tipoReclamacion(reclamo.getTipoReclamacion() != null ? reclamo.getTipoReclamacion().name() : null)
+                    .tipoProblema(reclamo.getTipoProblema() != null ? reclamo.getTipoProblema().name() : null)
+                    .estado(reclamo.getEstadoReclamo().name())
+                    .fechaReclamo(reclamo.getFechaReclamo())
+                    .build();
+
+            emailService.enviarCambioEstado(reclamo.getCorreoCliente(), dto);
         }
-        return mapToResponse(reclamo);
+        return reclamoMapper.toResponse(reclamo);
     }
 
     @Override
@@ -179,7 +185,6 @@ public class ReclamoService implements IReclamoService {
         reclamoRepository.delete(reclamo);
     }
 
-    //helpers
     private String generarNumeroReclamo() {
         LocalDate fecha = LocalDate.now();
         long correlativo = reclamoRepository.nextSecuenciaReclamo();
@@ -195,21 +200,6 @@ public class ReclamoService implements IReclamoService {
                 .montoReclamado(reclamo.getMontoReclamado()).montoCompensado(reclamo.getMontoCompensado()).fechaOcurrencia(reclamo.getFechaOcurrencia())
                 .fechaReclamo(reclamo.getFechaReclamo()).fechaResolucion(reclamo.getFechaResolucion()).esPublico(reclamo.isEsPublico()).adjuntos(null).build();
     }
-
-    private ReclamoResponse mapToResponseDetalle(Reclamo reclamo) {
-        List<ReclamoAdjuntoResponse> adjuntos =
-                reclamo.getAdjuntos() == null ? Collections.emptyList() : reclamo.getAdjuntos()
-                        .stream().map(a -> ReclamoAdjuntoResponse.builder().idAdjunto(a.getIdAdjunto()).tipoAdjunto(a.getTipoAdjunto())
-                                .nombreOriginal(a.getNombreOriginal()).urlArchivo(a.getUrlArchivo()).fechaSubida(a.getFechaSubida()).build()).toList();
-        return ReclamoResponse.builder()
-                .idReclamo(reclamo.getIdReclamo()).numeroReclamo(reclamo.getNumeroReclamo()).nombreCliente(reclamo.getNombreCliente())
-                .correoCliente(reclamo.getCorreoCliente()).telefonoCliente(reclamo.getTelefonoCliente()).tipoReclamacion(reclamo.getTipoReclamacion())
-                .tipoProblema(reclamo.getTipoProblema()).causaReclamo(reclamo.getCausaReclamo()).estadoReclamo(reclamo.getEstadoReclamo())
-                .solucionReclamo(reclamo.getSolucionReclamo()).descripcion(reclamo.getDescripcion()).notasInternas(reclamo.getNotasInternas())
-                .montoReclamado(reclamo.getMontoReclamado()).montoCompensado(reclamo.getMontoCompensado()).fechaOcurrencia(reclamo.getFechaOcurrencia())
-                .fechaReclamo(reclamo.getFechaReclamo()).fechaResolucion(reclamo.getFechaResolucion()).esPublico(reclamo.isEsPublico()).adjuntos(adjuntos).build();
-    }
-
     private void guardarAdjuntos(Reclamo reclamo, List<MultipartFile> archivos) {
         if (archivos == null || archivos.isEmpty()) { return;}
         for (MultipartFile archivo : archivos) {
@@ -239,7 +229,11 @@ public class ReclamoService implements IReclamoService {
         return usuarioRepository.findById(idUsuario).orElseThrow(() -> new ResourceNotFoundException("Usuario responsable no encontrado"));
     }
     private void enviarCorreoConfirmacion(Reclamo reclamo) {
-        if (reclamo.getCorreoCliente() == null || reclamo.getCorreoCliente().isBlank()) {return;}
-        emailService.enviarConfirmacionCliente(reclamo.getCorreoCliente(), reclamo.getNombreCliente(), reclamo.getNumeroReclamo());
+        if (reclamo.getCorreoCliente() == null || reclamo.getCorreoCliente().isBlank()) return;
+        ReclamoEmailDTO dto = ReclamoEmailDTO.builder().nombreCliente(reclamo.getNombreCliente()).numeroReclamo(reclamo.getNumeroReclamo())
+                .tipoReclamacion(reclamo.getTipoReclamacion() != null ? reclamo.getTipoReclamacion().name() : null)
+                .tipoProblema(reclamo.getTipoProblema() != null ? reclamo.getTipoProblema().name() : null)
+                .estado(reclamo.getEstadoReclamo().name()).fechaReclamo(reclamo.getFechaReclamo()).build();
+        emailService.enviarConfirmacionCliente(reclamo.getCorreoCliente(), dto);
     }
 }

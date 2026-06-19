@@ -1,5 +1,6 @@
 package com.sistemabarberia.fadex_backend.modules.reclamo.service.impl;
 
+import com.sistemabarberia.fadex_backend.modules.reclamo.dto.ReclamoEmailDTO;
 import com.sistemabarberia.fadex_backend.modules.reclamo.service.IReclamoEmailService;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import java.time.format.DateTimeFormatter;
 
 @Service
 @RequiredArgsConstructor
@@ -19,13 +21,16 @@ public class ReclamoEmailService implements IReclamoEmailService {
     private String remitente;
 
     @Override
-    public void enviarConfirmacionCliente(String email, String nombreCliente, String numeroReclamo) {
-        enviarCorreo(email, "FadeX | Reclamo registrado - " + numeroReclamo, generarHtmlConfirmacion(nombreCliente, numeroReclamo));
+    public void enviarConfirmacionCliente(String email, ReclamoEmailDTO reclamo) {
+        enviarCorreo(email, "FadeX | Reclamo registrado - " + reclamo.numeroReclamo(), generarHtmlConfirmacion(reclamo));
     }
 
+
+
+
     @Override
-    public void enviarCambioEstado(String email, String nombreCliente, String numeroReclamo, String estado) {
-        enviarCorreo(email, "FadeX | Actualización de reclamo - " + numeroReclamo, generarHtmlCambioEstado(nombreCliente, numeroReclamo, estado));
+    public void enviarCambioEstado(String email, ReclamoEmailDTO reclamo) {
+        enviarCorreo(email, "FadeX | Actualización de reclamo - " + reclamo.numeroReclamo(), generarHtmlCambioEstado(reclamo));
     }
 
     private void enviarCorreo(String destinatario, String asunto, String html) {
@@ -44,18 +49,22 @@ public class ReclamoEmailService implements IReclamoEmailService {
         }
     }
 
-    private String generarHtmlConfirmacion(String nombreCliente, String numeroReclamo) {
+    private String generarHtmlConfirmacion(ReclamoEmailDTO reclamo) {
+        String fecha = reclamo.fechaReclamo() != null
+                ? reclamo.fechaReclamo().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
+                : "";
+
         return plantillaBase(
                 "Reclamo Registrado",
                 """
                 <p style="font-size:16px;">
                     Hola <strong>%s</strong>,
                 </p>
-
+    
                 <p style="font-size:15px;color:#444;line-height:1.8;">
                     Hemos recibido tu reclamo correctamente.
                 </p>
-
+    
                 <div style="
                     background:#faf7eb;
                     border-left:5px solid #D4AF37;
@@ -63,41 +72,57 @@ public class ReclamoEmailService implements IReclamoEmailService {
                     margin:25px 0;
                     border-radius:6px;
                 ">
-                    <strong>Número de reclamo:</strong>
-                    <p style="
-                        margin:0;
-                        font-size:18px;
-                        font-weight:bold;
-                        color:#111111;
-                         ">
-                          %s
+                    <p style="margin:0; font-size:18px; font-weight:bold; color:#111111;">
+                        %s
+                    </p>
+    
+                    <p style="margin-top:14px;">
+                        <strong>Tipo de reclamación:</strong> %s
+                    </p>
+    
+                    <p style="margin-top:6px;">
+                        <strong>Tipo de problema:</strong> %s
+                    </p>
+    
+                    <p style="margin-top:6px;">
+                        <strong>Fecha de registro:</strong> %s
+                    </p>
+    
+                    <p style="margin-top:6px;">
+                        <strong>Estado actual:</strong> %s
                     </p>
                 </div>
-
+    
                 <p style="color:#555;line-height:1.8;">
                     Nuestro equipo revisará tu caso y se pondrá en contacto contigo
                     a la brevedad posible.
                 </p>
-
+    
                 <p style="color:#555;line-height:1.8;">
                     Gracias por confiar en FadeX.
                 </p>
                 """
-                        .formatted(nombreCliente, numeroReclamo));
+                        .formatted(reclamo.nombreCliente(), reclamo.numeroReclamo(), valorOrDefault(reclamo.tipoReclamacion()),
+                                valorOrDefault(reclamo.tipoProblema()), fecha, reclamo.estado().replace("_", " "))
+        );
     }
 
-    private String generarHtmlCambioEstado(String nombreCliente, String numeroReclamo, String estado) {
+    private String generarHtmlCambioEstado(ReclamoEmailDTO reclamo) {
+        String fecha = reclamo.fechaReclamo() != null
+                ? reclamo.fechaReclamo().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
+                : "";
+
         return plantillaBase(
                 "Actualización de Reclamo",
                 """
                 <p style="font-size:16px;">
                     Hola <strong>%s</strong>,
                 </p>
-
+    
                 <p style="font-size:15px;color:#444;line-height:1.8;">
                     El estado de tu reclamo ha sido actualizado.
                 </p>
-
+    
                 <div style="
                     background:#faf7eb;
                     border-left:5px solid #D4AF37;
@@ -108,18 +133,30 @@ public class ReclamoEmailService implements IReclamoEmailService {
                     <p style="margin:0;">
                         <strong>Número:</strong> %s
                     </p>
-
+    
                     <p style="margin-top:10px;">
-                        <strong>Estado actual:</strong>
-                        %s
+                        <strong>Tipo de reclamación:</strong> %s
+                    </p>
+    
+                    <p style="margin-top:6px;">
+                        <strong>Tipo de problema:</strong> %s
+                    </p>
+    
+                    <p style="margin-top:6px;">
+                        <strong>Fecha de registro:</strong> %s
+                    </p>
+    
+                    <p style="margin-top:10px;">
+                        <strong>Estado actual:</strong> %s
                     </p>
                 </div>
-
+    
                 <p style="color:#555;line-height:1.8;">
                     Puedes comunicarte con nosotros si necesitas más información.
                 </p>
                 """
-                        .formatted(nombreCliente, numeroReclamo, estado.replace("_", " "))
+                        .formatted(reclamo.nombreCliente(), reclamo.numeroReclamo(), valorOrDefault(reclamo.tipoReclamacion()),
+                                valorOrDefault(reclamo.tipoProblema()), fecha, reclamo.estado().replace("_", " "))
         );
     }
 
@@ -229,4 +266,9 @@ public class ReclamoEmailService implements IReclamoEmailService {
             """
                 .formatted(titulo, contenido);
     }
+
+private String valorOrDefault(String valor) {
+    return valor != null ? valor.replace("_", " ") : "No especificado";
+}
+
 }

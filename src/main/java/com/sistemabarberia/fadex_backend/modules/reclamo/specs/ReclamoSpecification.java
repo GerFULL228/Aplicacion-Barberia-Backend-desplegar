@@ -26,10 +26,6 @@ public class ReclamoSpecification {
                 predicates.add(cb.equal(root.get("tipoProblema"), filtro.getTipoProblema()));
             }
 
-            if (filtro.getCausa() != null) {
-                predicates.add(cb.equal(root.get("causaReclamo"), filtro.getCausa()));
-            }
-
             if (filtro.getEsPublico() != null) {
                 predicates.add(cb.equal(root.get("esPublico"), filtro.getEsPublico()));
             }
@@ -38,21 +34,25 @@ public class ReclamoSpecification {
                 predicates.add(cb.equal(root.get("usuarioResponsable").get("idUsuario"), filtro.getIdResponsable())
                 );
             }
+            if(filtro.getTipoReclamacion() != null){
+                predicates.add(cb.equal(root.get("tipoReclamacion"), filtro.getTipoReclamacion()));
+            }
+
+            if(filtro.getCausaReclamo() != null){
+                predicates.add(cb.equal(root.get("causaReclamo"), filtro.getCausaReclamo()));
+            }
 
             if (StringUtils.hasText(filtro.getNumeroDocumentoCliente())) {
                 predicates.add(cb.like(root.get("numeroDocumentoCliente"), "%" + filtro.getNumeroDocumentoCliente() + "%"));
             }
 
             if (filtro.getFechaInicio() != null) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("fechaReclamo"), filtro.getFechaInicio().atStartOfDay())
-                );
+                predicates.add(cb.greaterThanOrEqualTo(root.get("fechaReclamo"), filtro.getFechaInicio().atStartOfDay()));
             }
 
             if (filtro.getFechaFin() != null) {
-                predicates.add(cb.lessThanOrEqualTo(root.get("fechaReclamo"), filtro.getFechaFin().atTime(23,59,59))
-                );
+                predicates.add(cb.lessThanOrEqualTo(root.get("fechaReclamo"), filtro.getFechaFin().atTime(23,59,59)));
             }
-
             return cb.and(predicates.toArray(new Predicate[0]));
         };
     }

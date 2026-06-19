@@ -14,5 +14,6 @@ public class ReclamoAdjuntoResponse {
     private TipoAdjuntoReclamo tipoAdjunto;
     private String nombreOriginal;
     private String urlArchivo;
+    private String mimeType;
     private LocalDateTime fechaSubida;
 }
