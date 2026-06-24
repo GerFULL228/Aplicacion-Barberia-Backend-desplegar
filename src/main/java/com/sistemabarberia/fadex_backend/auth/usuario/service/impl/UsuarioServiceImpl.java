@@ -547,6 +547,64 @@ public class UsuarioServiceImpl implements IUsuarioService {
         usuarioRepository.save(usuario);
     }
 
+    @Override
+    @Transactional
+    public void changeMyPassword(
+            String username,
+            ChangePasswordRequest request
+    ) {
+
+        Usuario usuario = usuarioRepository
+                .findByUser(username)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Usuario no encontrado"
+                        )
+                );
+
+        // Verificar contraseña actual
+        if (!passwordEncoder.matches(
+                request.currentPassword(),
+                usuario.getPassword()
+        )) {
+
+            throw new BusinessException(
+                    "La contraseña actual es incorrecta",
+                    HttpStatus.BAD_REQUEST
+            );
+        }
+
+        // Verificar confirmación
+        if (!request.newPassword().equals(
+                request.confirmPassword()
+        )) {
+
+            throw new BusinessException(
+                    "Las contraseñas no coinciden",
+                    HttpStatus.BAD_REQUEST
+            );
+        }
+
+        // Verificar que no sea la misma
+        if (passwordEncoder.matches(
+                request.newPassword(),
+                usuario.getPassword()
+        )) {
+
+            throw new BusinessException(
+                    "La nueva contraseña debe ser diferente a la actual",
+                    HttpStatus.BAD_REQUEST
+            );
+        }
+
+        usuario.setPassword(
+                passwordEncoder.encode(
+                        request.newPassword()
+                )
+        );
+
+        usuarioRepository.save(usuario);
+    }
 
 
 

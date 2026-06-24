@@ -333,4 +333,15 @@ public class BarberoServiceImpl implements IBarberoService {
                 })
                 .toList();
     }
+
+    @Override
+    public Integer obtenerIdBarberoPorUsuario(Integer idUsuario) {
+        return barberoRepository.findByPersona_Usuario_IdUsuario(idUsuario)
+                .map(Barbero::getBarberoId)
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                "Barbero no encontrado para el usuario: " + idUsuario
+                        )
+                );
+    }
 }
