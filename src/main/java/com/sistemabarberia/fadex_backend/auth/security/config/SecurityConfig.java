@@ -196,10 +196,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE,
                                 "/api/v1/reclamos/**"
                         ).hasRole("admin")
-
                         // ─────────────────────────────────────────────
                         // DEFAULT
                         // ─────────────────────────────────────────────
+                                .requestMatchers("/api/analisis/**").hasAnyRole("ADMIN")
                         // ─────────────────────────────────────────────
                         // PLANILLAS (ACCESO PARA TODOS LOS ROLES)
                         // ─────────────────────────────────────────────
