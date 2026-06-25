@@ -53,4 +53,9 @@ public interface IUsuarioService {
     void quitarRol(Integer idUsuario, Integer idRol);
 
     void asignarPin(Integer idUsuario, AsignarPinRequest request);
+
+    void changeMyPassword(
+            String username,
+            ChangePasswordRequest request
+    );
 }

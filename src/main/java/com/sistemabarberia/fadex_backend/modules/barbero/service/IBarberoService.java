@@ -49,4 +49,6 @@ public interface IBarberoService {
     void reactivarBarbero(Integer id);
 
     List<Map<String, Object>> getLista();
+
+    Integer obtenerIdBarberoPorUsuario(Integer idUsuario);
 }

@@ -1,6 +1,8 @@
 package com.sistemabarberia.fadex_backend.modules.barbero.controller;
 
 import com.sistemabarberia.fadex_backend.auth.security.service.CustomUserDetails;
+import com.sistemabarberia.fadex_backend.auth.usuario.Entity.Usuario;
+import com.sistemabarberia.fadex_backend.auth.usuario.Repository.UsuarioRepository;
 import com.sistemabarberia.fadex_backend.commons.response.ApiResponse;
 import com.sistemabarberia.fadex_backend.commons.response.PageResponse;
 import com.sistemabarberia.fadex_backend.modules.barbero.dto.request.BarberoRequestDTO;
@@ -18,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,6 +30,8 @@ import java.util.Map;
 @RequestMapping("/api/v1/barberos")
 public class BarberoController {
 
+    @Autowired
+    private UsuarioRepository usuarioRepository;
     @Autowired
     private IBarberoService barberoService;
 
@@ -174,5 +179,21 @@ public class BarberoController {
     @GetMapping("/lista")
     public ResponseEntity<ApiResponse<List<Map<String, Object>>>> lista() {
         return ResponseEntity.ok(ApiResponse.success(barberoService.getLista()));
+    }
+
+    @GetMapping("/mi-barbero")
+    public ResponseEntity<ApiResponse<Integer>> obtenerMiBarberoId(
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        Integer idUsuario = usuarioRepository.findByUser(userDetails.getUsername())
+                .map(Usuario::getIdUsuario)
+                .orElseThrow();
+
+        return ResponseEntity.ok(
+                ApiResponse.ok(
+                        "Barbero obtenido",
+                        barberoService.obtenerIdBarberoPorUsuario(idUsuario)
+                )
+        );
     }
 }

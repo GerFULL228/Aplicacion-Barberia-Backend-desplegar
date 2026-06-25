@@ -1,5 +1,5 @@
 package com.sistemabarberia.fadex_backend.auth.usuario.controller;
-
+import org.springframework.security.core.Authentication;
 import com.sistemabarberia.fadex_backend.auth.usuario.dto.request.*;
 import com.sistemabarberia.fadex_backend.auth.usuario.dto.response.PermisoResponse;
 import com.sistemabarberia.fadex_backend.auth.usuario.dto.response.RolResponse;
@@ -30,6 +30,7 @@ public class UsuarioController {
 
     private final IUsuarioService usuarioService;
     private final IPersonaService personaService;
+
 
 
     @GetMapping
@@ -74,7 +75,7 @@ public class UsuarioController {
 
 
     @PutMapping("/{id}/reset-password")
-    @PreAuthorize("hasRole('admin')")
+    @PreAuthorize("hasAnyRole('admin','barbero','cliente')")
     public ResponseEntity<ApiResponse<Void>> resetPassword(
             @PathVariable Integer id,
             @Valid @RequestBody ResetPasswordRequest request
@@ -89,7 +90,7 @@ public class UsuarioController {
 
 
     @PatchMapping("/{id}/username-update")
-    @PreAuthorize("hasRole('admin')")
+    @PreAuthorize("hasAnyRole('admin','barbero','cliente')")
     public ResponseEntity<ApiResponse<Void>> updateUsername(
             @PathVariable Integer id,
             @Valid @RequestBody UpdateUsernameRequest request
@@ -282,6 +283,24 @@ public class UsuarioController {
         return ResponseEntity.ok(ApiResponse.ok("Rol eliminado correctamente"));
     }
 
+    @PatchMapping("/me/change-password")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiResponse<Void>> changeMyPassword(
+            Authentication authentication,
+            @Valid @RequestBody ChangePasswordRequest request
+    ) {
+
+        usuarioService.changeMyPassword(
+                authentication.getName(),
+                request
+        );
+
+        return ResponseEntity.ok(
+                ApiResponse.ok(
+                        "Contraseña actualizada correctamente"
+                )
+        );
+    }
 
 
 }
