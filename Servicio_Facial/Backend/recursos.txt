@@ -9,7 +9,7 @@ py -m pip install mediapipe==0.10.14
 pip install opencv-python
 pip install python-multipart
 pip install scikit-learn joblib pandas numpy
-
+pip install httpx python-dotenv
 
 -------------------------------------------------------
 # Ambos modelos con métricas

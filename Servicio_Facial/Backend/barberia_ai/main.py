@@ -4,6 +4,14 @@ from ml_auto_retrain import AutoRetrainer
 from contextlib import asynccontextmanager
 import logging
 import uvicorn
+import os        # ← agregar
+import base64    # ← agregar
+import httpx     # ← agregar
+from dotenv import load_dotenv
+from pathlib import Path
+load_dotenv(dotenv_path=Path(__file__).parent / ".env")
+logger_key = os.getenv("OPENAI_API_KEY")
+print(f"KEY CARGADA: {logger_key[:10] if logger_key else 'NO ENCONTRADA'}")
 
 from database import get_connection
 from face_analyzer import analizar_cara
@@ -653,6 +661,41 @@ def listar_clientes():
         cursor.close()
         conn.close()
 
+@app.post("/ia/preview-corte")
+async def preview_corte(
+    foto: UploadFile = File(...),
+    nombre_corte: str = Form(...)
+):
+    if not foto.content_type.startswith("image/"):
+        raise HTTPException(status_code=400, detail="El archivo debe ser una imagen")
+
+    foto_bytes = await foto.read()
+    foto_b64 = base64.b64encode(foto_bytes).decode("utf-8")
+
+    async with httpx.AsyncClient(timeout=120) as client:
+        response = await client.post(
+            "https://api.openai.com/v1/images/edits",
+            headers={
+                "Authorization": f"Bearer {os.getenv('OPENAI_API_KEY')}",
+            },
+            data={
+                "model": "gpt-image-1",
+                "prompt": f"Modifica el cabello de esta persona aplicándole el corte de barbería '{nombre_corte}'. Mantén exactamente los mismos rasgos faciales, tono de piel y fondo. Solo cambia el cabello.",
+                "n": "1",
+                "size": "1024x1024"
+            },
+            files={
+                "image": ("foto.jpg", foto_bytes, "image/jpeg")
+            }
+        )
+
+    if response.status_code != 200:
+        raise HTTPException(status_code=500, detail=f"Error OpenAI: {response.text}")
+
+    data = response.json()
+    imagen_b64 = data["data"][0]["b64_json"]
+
+    return {"imagen_b64": imagen_b64}
 
 # ============================================
 # START SERVER
