@@ -18,11 +18,8 @@ public interface ClienteRepository extends JpaRepository<Cliente, Integer> {
 
     Page<Cliente> findByActivoTrue(Pageable pageable);
     Page<Cliente> findByActivoFalse(Pageable pageable);
-
     boolean existsByPersona_PersonaId(Integer personaId);
-
     Optional<Cliente> findByPersona_Usuario_IdUsuario(Integer usuarioId);
-
     Optional<Cliente> findByPersonaUsuario(Usuario usuario);
 
     // BÚSQUEDA POR NOMBRE
@@ -37,7 +34,6 @@ public interface ClienteRepository extends JpaRepository<Cliente, Integer> {
     Page<Cliente> buscarPorNombre(@Param("nombre") String nombre, Pageable pageable);
 
     // FILTROS POR FECHA
-
 
     /* Todos los clientes (paginado — alias semántico de findAll). */
     // Se usa directamente findAll(Pageable) de JpaRepository.

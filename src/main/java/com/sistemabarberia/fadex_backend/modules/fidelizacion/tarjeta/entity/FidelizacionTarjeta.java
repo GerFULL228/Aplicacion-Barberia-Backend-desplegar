@@ -8,7 +8,7 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 @Entity
-@Table( name = "fidelizacion_tarjeta",  uniqueConstraints = { @UniqueConstraint( name = "uq_tarjeta", columnNames = {"id_cliente", "id_categoria"} ) } )
+@Table(name = "fidelizacion_tarjeta", uniqueConstraints = {@UniqueConstraint(columnNames = {"id_cliente","id_categoria"})})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -19,7 +19,7 @@ public class FidelizacionTarjeta extends AuditableEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_tarjeta")
-    private Integer tarjetaId;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_cliente", nullable = false)
@@ -29,19 +29,19 @@ public class FidelizacionTarjeta extends AuditableEntity {
     @JoinColumn(name = "id_categoria", nullable = false)
     private Categoria categoria;
 
-    @Builder.Default
     @Column(nullable = false)
+    @Builder.Default
     private Integer progreso = 0;
 
-    @Builder.Default
     @Column(name = "giros_disponibles", nullable = false)
+    @Builder.Default
     private Integer girosDisponibles = 0;
 
-    @Builder.Default
     @Column(name = "total_giros", nullable = false)
+    @Builder.Default
     private Integer totalGiros = 0;
 
-    @Builder.Default
     @Column(name = "ciclo_activo", nullable = false)
+    @Builder.Default
     private Boolean cicloActivo = true;
 }
