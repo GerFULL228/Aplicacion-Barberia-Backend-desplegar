@@ -37,6 +37,8 @@ public interface IUsuarioService {
 
     byte[] generarQr(Integer idUsuario);
 
+    byte[] regenerarQr(Integer idUsuario);
+
     void asignarRoles(
             Integer idUsuario,
             AssignRolesRequest request
@@ -49,4 +51,11 @@ public interface IUsuarioService {
     Page<PermisoResponse> obtenerPermisosUsuario(Integer idUsuario, Pageable pageable);
 
     void quitarRol(Integer idUsuario, Integer idRol);
+
+    void asignarPin(Integer idUsuario, AsignarPinRequest request);
+
+    void changeMyPassword(
+            String username,
+            ChangePasswordRequest request
+    );
 }

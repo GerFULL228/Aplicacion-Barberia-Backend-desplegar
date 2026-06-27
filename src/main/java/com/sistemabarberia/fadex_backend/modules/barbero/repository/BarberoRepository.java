@@ -107,4 +107,8 @@ public interface BarberoRepository extends JpaRepository<Barbero, Integer> {
       AND DATE(r.fecha) = CURRENT_DATE
 """, nativeQuery = true)
     long countReservasHoyByBarbero(@Param("idBarbero") Integer idBarbero);
+
+
+    @Query("SELECT b FROM Barbero b WHERE b.persona.usuario.idUsuario = :idUsuario")
+    Optional<Barbero> findByUsuarioId(@Param("idUsuario") Integer idUsuario);
 }

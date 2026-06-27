@@ -393,4 +393,23 @@ public class ReservaService {
                 .build();
     }
 
+    public List<ReservaPendienteDTO> obtenerReservasPendientesDePago() {
+        List<Reserva> reservasSinPago = reservaRepository.findReservasSinPago();
+
+        return reservasSinPago.stream().map(r -> {
+            String nombreServicio = r.getServicio() != null ? r.getServicio().getNombre() : "Servicio general";
+
+            return ReservaPendienteDTO.builder()
+                    .id(r.getId())
+                    .clienteId(r.getCliente().getClienteId())
+                    .clienteNombre(r.getCliente().getPersona().getNombre())
+                    .clienteApellido(r.getCliente().getPersona().getApellido())
+                    .barberoId(r.getBarbero().getBarberoId())
+                    .barberoNombre(r.getBarbero().getPersona().getNombre())
+                    .montoTotal(r.getTotal())
+                    .servicios(List.of(nombreServicio))
+                    .build();
+        }).collect(Collectors.toList());
+    }
+
 }

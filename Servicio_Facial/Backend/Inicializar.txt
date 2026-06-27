@@ -1,0 +1,1 @@
+En el archivo backend poner py main.py o Python main.py nada mas
