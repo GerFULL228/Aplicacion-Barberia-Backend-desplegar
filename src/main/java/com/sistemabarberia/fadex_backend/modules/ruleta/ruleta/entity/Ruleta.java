@@ -19,7 +19,7 @@ public class Ruleta extends AuditableEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_ruleta")
-    private Integer ruletaId;
+    private Long ruletaId;
 
     @Column(nullable = false, length = 100)
     private String nombre;

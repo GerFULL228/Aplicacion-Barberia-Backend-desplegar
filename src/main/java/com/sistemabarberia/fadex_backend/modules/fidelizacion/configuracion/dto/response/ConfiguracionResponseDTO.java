@@ -9,14 +9,14 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ConfiguracionResponseDTO {
-    private Integer configuracionId;
-    private Integer categoriaId;
+    private Long configuracionId;
+    private Long categoriaId;
     private String categoriaNombre;
     private Boolean activa;
     private Integer meta;
     private Boolean mostrarSiempre;
     private Boolean crearTarjetaAutomatica;
-    private Integer ruletaId;
+    private Long ruletaId;
     private String ruletaNombre;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

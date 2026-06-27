@@ -8,8 +8,8 @@ import lombok.*;
 @AllArgsConstructor
 public class ConfiguracionFiltro {
     private Boolean activa;
-    private Integer categoriaId;
-    private Integer ruletaId;
+    private Long categoriaId;
+    private Long ruletaId;
     private String categoriaNombre;
     private String ruletaNombre;
     private Integer metaDesde;

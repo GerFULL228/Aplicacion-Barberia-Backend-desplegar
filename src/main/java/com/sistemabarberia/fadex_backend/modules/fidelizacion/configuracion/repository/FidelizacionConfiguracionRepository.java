@@ -8,9 +8,8 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface FidelizacionConfiguracionRepository extends JpaRepository<FidelizacionConfiguracion,Integer>, JpaSpecificationExecutor<FidelizacionConfiguracion> {
-    Optional<FidelizacionConfiguracion> findByCategoriaCategoriaIdAndActivaTrue(Integer categoriaId);
-    Optional<FidelizacionConfiguracion> findByCategoriaCategoriaId(Integer categoriaId);
-    boolean existsByCategoriaCategoriaId(Integer categoriaId);
-
+public interface FidelizacionConfiguracionRepository extends JpaRepository<FidelizacionConfiguracion, Long>, JpaSpecificationExecutor<FidelizacionConfiguracion> {
+    Optional<FidelizacionConfiguracion> findByCategoria_IdAndActivaTrue(Long categoriaId);
+    Optional<FidelizacionConfiguracion> findByCategoria_Id(Long categoriaId);
+    boolean existsByCategoria_Id(Long categoriaId);
 }

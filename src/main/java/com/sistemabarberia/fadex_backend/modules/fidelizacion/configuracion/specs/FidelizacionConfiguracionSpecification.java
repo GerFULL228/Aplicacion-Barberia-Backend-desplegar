@@ -9,36 +9,39 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FidelizacionConfiguracionSpecification {
-    public static Specification<FidelizacionConfiguracion> conFiltros(ConfiguracionFiltro filtro){
+    private FidelizacionConfiguracionSpecification(){}
+    public static Specification<FidelizacionConfiguracion> conFiltros(ConfiguracionFiltro filtro) {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
-            if(filtro.getActiva() != null){
+            if (filtro.getActiva() != null) {
                 predicates.add(cb.equal(root.get("activa"), filtro.getActiva()));
             }
 
-            if(filtro.getCategoriaId() != null){
-                predicates.add(cb.equal(root.get("categoria").get("categoriaId"), filtro.getCategoriaId()));
+            if (filtro.getCategoriaId() != null) {
+                predicates.add(cb.equal(root.get("categoria").get("id"), filtro.getCategoriaId()));
             }
 
-            if(filtro.getRuletaId() != null){
+            if (filtro.getRuletaId() != null) {
                 predicates.add(cb.equal(root.get("ruleta").get("ruletaId"), filtro.getRuletaId()));
             }
 
-            if(filtro.getCategoriaNombre() != null && !filtro.getCategoriaNombre().isBlank()){
+            if (filtro.getCategoriaNombre() != null && !filtro.getCategoriaNombre().isBlank()) {
                 predicates.add(cb.like(cb.lower(root.get("categoria").get("nombre")), "%" + filtro.getCategoriaNombre().trim().toLowerCase() + "%"));
             }
 
-            if(filtro.getMetaDesde() != null){
+            if (filtro.getRuletaNombre() != null && !filtro.getRuletaNombre().isBlank()) {
+                predicates.add(cb.like(cb.lower(root.get("ruleta").get("nombre")), "%" + filtro.getRuletaNombre().trim().toLowerCase() + "%"));
+            }
+
+            if (filtro.getMetaDesde() != null) {
                 predicates.add(cb.greaterThanOrEqualTo(root.get("meta"), filtro.getMetaDesde()));
             }
 
-            if(filtro.getMetaHasta() != null){
+            if (filtro.getMetaHasta() != null) {
                 predicates.add(cb.lessThanOrEqualTo(root.get("meta"), filtro.getMetaHasta()));
-            }
-            if(filtro.getRuletaNombre()!=null && !filtro.getRuletaNombre().isBlank()){
-                predicates.add(cb.like(cb.lower(root.get("ruleta").get("nombre")), "%" + filtro.getRuletaNombre().trim().toLowerCase() + "%"));
             }
             return cb.and(predicates.toArray(new Predicate[0]));
         };
     }
+
 }

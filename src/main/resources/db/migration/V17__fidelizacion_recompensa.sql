@@ -290,3 +290,7 @@ SELECT r.id_rol, p.id_permiso
 FROM rol r JOIN permiso p ON TRUE
 WHERE r.nombre = 'cliente' AND p.nombre IN ( 'FIDELIZACION_READ', 'RULETA_READ', 'GIRO_REALIZAR', 'RECOMPENSA_READ' ) ON CONFLICT DO NOTHING;
 
+INSERT INTO ruleta
+(nombre, descripcion, tipo, activa, incremento_por_giro)
+VALUES
+('Ruleta Principal','Ruleta de pruebas','GENERAL',true,0.02);

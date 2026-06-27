@@ -1,11 +1,9 @@
 package com.sistemabarberia.fadex_backend.modules.fidelizacion.configuracion.entity;
+import com.sistemabarberia.fadex_backend.commons.shared.AuditableEntity;
 import com.sistemabarberia.fadex_backend.modules.categoria.entity.Categoria;
-//import com.sistemabarberia.fadex_backend.modules.ruleta.ruleta.entity.Ruleta;
 import com.sistemabarberia.fadex_backend.modules.ruleta.ruleta.entity.Ruleta;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Table( name = "fidelizacion_configuracion", uniqueConstraints = { @UniqueConstraint( name = "uq_fidelizacion_configuracion_categoria",  columnNames = "id_categoria") })
@@ -15,12 +13,12 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class FidelizacionConfiguracion {
+public class FidelizacionConfiguracion extends AuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_configuracion")
-    private Integer configuracionId;
+    private Long configuracionId;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_categoria", nullable = false)
@@ -44,22 +42,4 @@ public class FidelizacionConfiguracion {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_ruleta")
     private Ruleta ruleta;
-
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-
-    @PrePersist
-    public void prePersist() {
-        LocalDateTime now = LocalDateTime.now();
-        this.createdAt = now;
-        this.updatedAt = now;
-    }
-
-    @PreUpdate
-    public void preUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
 }

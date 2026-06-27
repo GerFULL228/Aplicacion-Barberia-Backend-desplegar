@@ -11,7 +11,7 @@ import lombok.*;
 public class ConfiguracionRequestDTO {
 
     @NotNull
-    private Integer categoriaId;
+    private Long categoriaId;
 
     @NotNull
     private Boolean activa;
@@ -25,7 +25,5 @@ public class ConfiguracionRequestDTO {
 
     @NotNull
     private Boolean crearTarjetaAutomatica;
-
-    private Integer ruletaId;
-
+    private Long ruletaId;
 }
