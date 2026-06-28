@@ -27,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class FidelizacionReglaServiceImpl implements IFidelizacionReglaService {
 
-    private final FidelizacionReglaRepository repository;
+    private final FidelizacionReglaRepository reglaRepository;
     private final CategoriaRepository categoriaRepository;
     private final ServicioRepository servicioRepository;
     private final ProductoRepository productoRepository;
@@ -36,14 +36,14 @@ public class FidelizacionReglaServiceImpl implements IFidelizacionReglaService {
     @Override
     @Transactional(readOnly = true)
     public PageResponse<FidelizacionReglaResponseDTO> listarReglaConFiltros(FidelizacionReglaFiltro filtro, Pageable pageable) {
-        Page<FidelizacionRegla> page = repository.findAll(FidelizacionReglaSpecification.conFiltros(filtro),pageable);
+        Page<FidelizacionRegla> page = reglaRepository.findAll(FidelizacionReglaSpecification.conFiltros(filtro),pageable);
         return PageResponse.of(page.map(reglaMapper::toResponse));
     }
 
     @Override
     @Transactional(readOnly = true)
     public FidelizacionReglaResponseDTO obtenerReglaPorId(Long id) {
-        FidelizacionRegla regla = repository.findById(id).orElseThrow(() -> new BusinessException("Regla no encontrada", HttpStatus.NOT_FOUND));
+        FidelizacionRegla regla = reglaRepository.findById(id).orElseThrow(() -> new BusinessException("Regla no encontrada", HttpStatus.NOT_FOUND));
         return reglaMapper.toResponse(regla);
     }
 
@@ -53,24 +53,24 @@ public class FidelizacionReglaServiceImpl implements IFidelizacionReglaService {
         FidelizacionRegla regla = reglaMapper.toEntity(dto);
         regla.setCategoria(obtenerCategoria(dto.getCategoriaId()));
         asignarAlcance(regla,dto);
-        return reglaMapper.toResponse(repository.save(regla));
+        return reglaMapper.toResponse(reglaRepository.save(regla));
     }
 
     @Override
     @Transactional
     public FidelizacionReglaResponseDTO actualizarRegla(Long id, FidelizacionReglaRequestDTO dto) {
-        FidelizacionRegla regla = repository.findById(id).orElseThrow(() -> new BusinessException("Regla no encontrada", HttpStatus.NOT_FOUND));
+        FidelizacionRegla regla = reglaRepository.findById(id).orElseThrow(() -> new BusinessException("Regla no encontrada", HttpStatus.NOT_FOUND));
         reglaMapper.updateFromRequest(dto,regla);
         regla.setCategoria(obtenerCategoria(dto.getCategoriaId()));
         asignarAlcance(regla,dto);
-        return reglaMapper.toResponse(repository.save(regla));
+        return reglaMapper.toResponse(reglaRepository.save(regla));
     }
 
     @Override
     @Transactional
     public void eliminarRegla(Long id) {
-        FidelizacionRegla regla = repository.findById(id).orElseThrow(() -> new BusinessException("Regla no encontrada", HttpStatus.NOT_FOUND));
-        repository.delete(regla);
+        FidelizacionRegla regla = reglaRepository.findById(id).orElseThrow(() -> new BusinessException("Regla no encontrada", HttpStatus.NOT_FOUND));
+        reglaRepository.delete(regla);
 
     }
 

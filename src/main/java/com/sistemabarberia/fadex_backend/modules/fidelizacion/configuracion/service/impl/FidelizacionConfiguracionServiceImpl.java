@@ -31,13 +31,13 @@ public class FidelizacionConfiguracionServiceImpl implements IFidelizacionConfig
     private final FidelizacionConfiguracionRepository configuracionRepository;
     private final CategoriaRepository categoriaRepository;
     private final RuletaRepository ruletaRepository;
-    private final FidelizacionConfiguracionMapper mapper;
+    private final FidelizacionConfiguracionMapper configuracionMapper;
 
     @Override
     @Transactional(readOnly = true)
     public PageResponse<ConfiguracionResponseDTO> listarConfiguracionConFiltro(ConfiguracionFiltro filtro, Pageable pageable) {
         Page<FidelizacionConfiguracion> page = configuracionRepository.findAll(FidelizacionConfiguracionSpecification.conFiltros(filtro), pageable);
-        List<ConfiguracionResponseDTO> data = page.getContent().stream().map(mapper::toResponse).toList();
+        List<ConfiguracionResponseDTO> data = page.getContent().stream().map(configuracionMapper::toResponse).toList();
         return PageResponse.<ConfiguracionResponseDTO>builder()
                 .content(data).pageNumber(page.getNumber()).pageSize(page.getSize()).totalElements(page.getTotalElements()).totalPages(page.getTotalPages()).last(page.isLast()).build();
     }
@@ -46,7 +46,7 @@ public class FidelizacionConfiguracionServiceImpl implements IFidelizacionConfig
     @Transactional(readOnly = true)
     public ConfiguracionResponseDTO obtenerConfiguracionPorId(Long id) {
         FidelizacionConfiguracion configuracion = configuracionRepository.findById(id).orElseThrow(() -> new BusinessException("Configuración no encontrada", HttpStatus.NOT_FOUND));
-        return mapper.toResponse(configuracion);
+        return configuracionMapper.toResponse(configuracion);
     }
 
     @Override
@@ -61,7 +61,7 @@ public class FidelizacionConfiguracionServiceImpl implements IFidelizacionConfig
         }
         FidelizacionConfiguracion configuracion = FidelizacionConfiguracion.builder().categoria(categoria).activa(dto.getActiva()).meta(dto.getMeta())
                 .mostrarSiempre(dto.getMostrarSiempre()).crearTarjetaAutomatica(dto.getCrearTarjetaAutomatica()).ruleta(ruleta).build();
-        return mapper.toResponse(configuracionRepository.save(configuracion));
+        return configuracionMapper.toResponse(configuracionRepository.save(configuracion));
     }
 
     @Override
@@ -83,7 +83,7 @@ public class FidelizacionConfiguracionServiceImpl implements IFidelizacionConfig
         configuracion.setMostrarSiempre(dto.getMostrarSiempre());
         configuracion.setCrearTarjetaAutomatica(dto.getCrearTarjetaAutomatica());
         configuracion.setRuleta(ruleta);
-        return mapper.toResponse(configuracionRepository.save(configuracion));
+        return configuracionMapper.toResponse(configuracionRepository.save(configuracion));
     }
 
     @Override

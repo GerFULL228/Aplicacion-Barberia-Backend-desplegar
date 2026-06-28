@@ -31,7 +31,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class RuletaItemServiceImpl implements IRuletaItemService {
-    private final RuletaItemRepository repository;
+    private final RuletaItemRepository ruletaItemRepository;
     private final RuletaRepository ruletaRepository;
     private final ProductoRepository productoRepository;
     private final ServicioRepository servicioRepository;
@@ -43,14 +43,14 @@ public class RuletaItemServiceImpl implements IRuletaItemService {
     @Override
     @Transactional(readOnly = true)
     public PageResponse<RuletaItemResponseDTO> listarItemConFiltros(RuletaItemFiltro filtro, Pageable pageable) {
-        Page<RuletaItem> page = repository.findAll(RuletaItemSpecification.conFiltros(filtro), pageable);
+        Page<RuletaItem> page = ruletaItemRepository.findAll(RuletaItemSpecification.conFiltros(filtro), pageable);
         return PageResponse.of(page.map(ruletaItemMapper::toResponse));
     }
 
     @Override
     @Transactional(readOnly = true)
     public RuletaItemResponseDTO obtenerItemPorId(Long id) {
-        RuletaItem item = repository.findById(id).orElseThrow(() -> new BusinessException("Item de ruleta no encontrado", HttpStatus.NOT_FOUND));
+        RuletaItem item = ruletaItemRepository.findById(id).orElseThrow(() -> new BusinessException("Item de ruleta no encontrado", HttpStatus.NOT_FOUND));
         return ruletaItemMapper.toResponse(item);
     }
 
@@ -61,13 +61,13 @@ public class RuletaItemServiceImpl implements IRuletaItemService {
         item.setRuleta(ruleta);
         asignarPremio(item, dto, imagen);
         validarPremioMayor(dto, null);
-        return ruletaItemMapper.toResponse(repository.save(item));
+        return ruletaItemMapper.toResponse(ruletaItemRepository.save(item));
     }
 
     @Override
     @Transactional
     public RuletaItemResponseDTO actualizarItem(Long id, RuletaItemRequestDTO dto, MultipartFile imagen) {
-        RuletaItem item = repository.findById(id).orElseThrow(() -> new BusinessException("Item de ruleta no encontrado", HttpStatus.NOT_FOUND));
+        RuletaItem item = ruletaItemRepository.findById(id).orElseThrow(() -> new BusinessException("Item de ruleta no encontrado", HttpStatus.NOT_FOUND));
         boolean imagenPropia = item.getProducto() == null && item.getServicio() == null && item.getImagenUrl() != null;
         if (imagenPropia && (dto.getTipoPremio() == TipoPremio.PRODUCTO || dto.getTipoPremio() == TipoPremio.SERVICIO)) {
             storageService.eliminarArchivo(item.getImagenUrl());
@@ -76,18 +76,18 @@ public class RuletaItemServiceImpl implements IRuletaItemService {
         item.setRuleta(obtenerRuleta(dto.getRuletaId()));
         asignarPremio(item, dto, imagen);
         validarPremioMayor(dto, id);
-        return ruletaItemMapper.toResponse(repository.save(item));
+        return ruletaItemMapper.toResponse(ruletaItemRepository.save(item));
     }
 
     @Override
     @Transactional
     public void eliminarItem(Long id) {
-        RuletaItem item = repository.findById(id).orElseThrow(() -> new BusinessException("Item de ruleta no encontrado", HttpStatus.NOT_FOUND));
+        RuletaItem item = ruletaItemRepository.findById(id).orElseThrow(() -> new BusinessException("Item de ruleta no encontrado", HttpStatus.NOT_FOUND));
         boolean imagenPropia = item.getProducto() == null && item.getServicio() == null && item.getImagenUrl() != null;
         if (imagenPropia) {
             storageService.eliminarArchivo(item.getImagenUrl());
         }
-        repository.delete(item);
+        ruletaItemRepository.delete(item);
     }
 
     private void asignarPremio(RuletaItem item, RuletaItemRequestDTO dto, MultipartFile imagen) {
@@ -142,9 +142,9 @@ public class RuletaItemServiceImpl implements IRuletaItemService {
 
     private void validarPremioMayor(RuletaItemRequestDTO dto, Long itemId) {
         if (!Boolean.TRUE.equals(dto.getEsPremioMayor())) {return;}
-        boolean existe = repository.existsByRuletaRuletaIdAndEsPremioMayorTrue(dto.getRuletaId());
+        boolean existe = ruletaItemRepository.existsByRuletaRuletaIdAndEsPremioMayorTrue(dto.getRuletaId());
         if (itemId != null) {
-            RuletaItem actual = repository.findById(itemId).orElseThrow(() -> new BusinessException("Item no encontrado", HttpStatus.NOT_FOUND));
+            RuletaItem actual = ruletaItemRepository.findById(itemId).orElseThrow(() -> new BusinessException("Item no encontrado", HttpStatus.NOT_FOUND));
             if (Boolean.TRUE.equals(actual.getEsPremioMayor())) {return;}
         }
         if (existe) {

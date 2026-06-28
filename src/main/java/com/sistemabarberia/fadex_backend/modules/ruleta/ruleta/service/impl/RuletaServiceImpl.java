@@ -25,13 +25,13 @@ import java.util.List;
 public class RuletaServiceImpl implements IRuletaService {
 
     private final RuletaRepository ruletaRepository;
-    private final RuletaMapper mapper;
+    private final RuletaMapper ruletaMapper;
 
     @Override
     @Transactional(readOnly = true)
     public PageResponse<RuletaResponseDTO> listarRuletasConFiltro(RuletaFiltro filtro, Pageable pageable) {
         Page<Ruleta> page = ruletaRepository.findAll(RuletaSpecification.conFiltros(filtro), pageable);
-        List<RuletaResponseDTO> data = page.getContent().stream().map(mapper::toResponse).toList();
+        List<RuletaResponseDTO> data = page.getContent().stream().map(ruletaMapper::toResponse).toList();
 
         return PageResponse.<RuletaResponseDTO>builder().content(data).pageNumber(page.getNumber()).pageSize(page.getSize()).totalElements(page.getTotalElements()).totalPages(page.getTotalPages()).last(page.isLast()).build();
     }
@@ -39,14 +39,14 @@ public class RuletaServiceImpl implements IRuletaService {
     @Override
     @Transactional(readOnly = true)
     public List<RuletaResponseDTO> listarActivas() {
-        return ruletaRepository.findByActivaTrue().stream().map(mapper::toResponse).toList();
+        return ruletaRepository.findByActivaTrue().stream().map(ruletaMapper::toResponse).toList();
     }
 
     @Override
     @Transactional(readOnly = true)
     public RuletaResponseDTO obtenerRuletaPorId(Long id) {
         Ruleta ruleta = ruletaRepository.findById(id).orElseThrow(() -> new BusinessException("Ruleta no encontrada.", HttpStatus.NOT_FOUND));
-        return mapper.toResponse(ruleta);
+        return ruletaMapper.toResponse(ruleta);
     }
 
     @Override
@@ -55,7 +55,7 @@ public class RuletaServiceImpl implements IRuletaService {
             throw new BusinessException("Ya existe una ruleta con ese nombre.", HttpStatus.BAD_REQUEST);
         }
         Ruleta ruleta = Ruleta.builder().nombre(dto.getNombre()).descripcion(dto.getDescripcion()).tipo(dto.getTipo()).activa(dto.getActiva()).incrementoPorGiro(dto.getIncrementoPorGiro()).build();
-        return mapper.toResponse(ruletaRepository.save(ruleta));
+        return ruletaMapper.toResponse(ruletaRepository.save(ruleta));
     }
 
     @Override
@@ -69,7 +69,7 @@ public class RuletaServiceImpl implements IRuletaService {
         ruleta.setTipo(dto.getTipo());
         ruleta.setActiva(dto.getActiva());
         ruleta.setIncrementoPorGiro(dto.getIncrementoPorGiro());
-        return mapper.toResponse(ruletaRepository.save(ruleta));
+        return ruletaMapper.toResponse(ruletaRepository.save(ruleta));
     }
 
     @Override

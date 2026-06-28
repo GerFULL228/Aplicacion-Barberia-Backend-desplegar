@@ -25,57 +25,57 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class FidelizacionTarjetaServiceImpl implements IFidelizacionTarjetaService {
 
-    private final FidelizacionTarjetaRepository repository;
+    private final FidelizacionTarjetaRepository tarjetaRepository;
     private final ClienteRepository clienteRepository;
     private final CategoriaRepository categoriaRepository;
-    private final FidelizacionTarjetaMapper mapper;
+    private final FidelizacionTarjetaMapper tarjetaMapper;
 
     @Override
     @Transactional(readOnly = true)
     public PageResponse<FidelizacionTarjetaResponseDTO> listarTarjetas(FidelizacionTarjetaFiltro filtro, Pageable pageable) {
-        Page<FidelizacionTarjeta> page = repository.findAll(FidelizacionTarjetaSpecification.conFiltros(filtro), pageable);
-        return PageResponse.of(page.map(mapper::toResponse));
+        Page<FidelizacionTarjeta> page = tarjetaRepository.findAll(FidelizacionTarjetaSpecification.conFiltros(filtro), pageable);
+        return PageResponse.of(page.map(tarjetaMapper::toResponse));
     }
 
     @Override
     @Transactional(readOnly = true)
     public FidelizacionTarjetaResponseDTO obtenerTarjetaPorId(Long id) {
-        FidelizacionTarjeta tarjeta = repository.findById(id).orElseThrow(() -> new BusinessException("Tarjeta no encontrada", HttpStatus.NOT_FOUND));
-        return mapper.toResponse(tarjeta);
+        FidelizacionTarjeta tarjeta = tarjetaRepository.findById(id).orElseThrow(() -> new BusinessException("Tarjeta no encontrada", HttpStatus.NOT_FOUND));
+        return tarjetaMapper.toResponse(tarjeta);
     }
 
     @Override
     @Transactional
     public FidelizacionTarjetaResponseDTO crearTarjeta(FidelizacionTarjetaRequestDTO dto) {
-        if (repository.existsByClienteIdAndCategoriaId(dto.getClienteId(), dto.getCategoriaId())) {
+        if (tarjetaRepository.existsByClienteIdAndCategoriaId(dto.getClienteId(), dto.getCategoriaId())) {
             throw new BusinessException("El cliente ya posee una tarjeta para esta categoría.", HttpStatus.BAD_REQUEST);
         }
-        FidelizacionTarjeta tarjeta = mapper.toEntity(dto);
+        FidelizacionTarjeta tarjeta = tarjetaMapper.toEntity(dto);
         tarjeta.setCliente(obtenerCliente(dto.getClienteId()));
         tarjeta.setCategoria(obtenerCategoria(dto.getCategoriaId()));
-        return mapper.toResponse(repository.save(tarjeta));
+        return tarjetaMapper.toResponse(tarjetaRepository.save(tarjeta));
     }
 
     @Override
     @Transactional
     public FidelizacionTarjetaResponseDTO actualizarTarjeta(Long id, FidelizacionTarjetaRequestDTO dto) {
-        FidelizacionTarjeta tarjeta = repository.findById(id).orElseThrow(() -> new BusinessException("Tarjeta no encontrada", HttpStatus.NOT_FOUND));
+        FidelizacionTarjeta tarjeta = tarjetaRepository.findById(id).orElseThrow(() -> new BusinessException("Tarjeta no encontrada", HttpStatus.NOT_FOUND));
         if (!tarjeta.getCliente().getClienteId().equals(dto.getClienteId()) || !tarjeta.getCategoria().getId().equals(dto.getCategoriaId())) {
-            if (repository.existsByClienteIdAndCategoriaId(dto.getClienteId(), dto.getCategoriaId())) {
+            if (tarjetaRepository.existsByClienteIdAndCategoriaId(dto.getClienteId(), dto.getCategoriaId())) {
                 throw new BusinessException("Ya existe una tarjeta para ese cliente y categoría.", HttpStatus.BAD_REQUEST);
             }
         }
-        mapper.updateFromRequest(dto, tarjeta);
+        tarjetaMapper.updateFromRequest(dto, tarjeta);
         tarjeta.setCliente(obtenerCliente(dto.getClienteId()));
         tarjeta.setCategoria(obtenerCategoria(dto.getCategoriaId()));
-        return mapper.toResponse(repository.save(tarjeta));
+        return tarjetaMapper.toResponse(tarjetaRepository.save(tarjeta));
     }
 
     @Override
     @Transactional
     public void eliminarTarjeta(Long id) {
-        FidelizacionTarjeta tarjeta = repository.findById(id).orElseThrow(() -> new BusinessException("Tarjeta no encontrada", HttpStatus.NOT_FOUND));
-        repository.delete(tarjeta);
+        FidelizacionTarjeta tarjeta = tarjetaRepository.findById(id).orElseThrow(() -> new BusinessException("Tarjeta no encontrada", HttpStatus.NOT_FOUND));
+        tarjetaRepository.delete(tarjeta);
     }
 
     private Cliente obtenerCliente(Long id) {

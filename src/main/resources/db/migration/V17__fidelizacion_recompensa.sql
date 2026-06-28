@@ -219,7 +219,8 @@ CREATE TABLE ruleta_giro (
     numero_giro INT NOT NULL,
     prob_final DECIMAL(6,3),
     prob_aplicada DECIMAL(6,3),
-    fecha TIMESTAMP DEFAULT NOW(),
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW(),
     CONSTRAINT fk_giro_tarjeta FOREIGN KEY (id_tarjeta) REFERENCES fidelizacion_tarjeta(id_tarjeta),
     CONSTRAINT fk_giro_cliente FOREIGN KEY (id_cliente) REFERENCES cliente(id_cliente),
     CONSTRAINT fk_giro_ruleta FOREIGN KEY (id_ruleta) REFERENCES ruleta(id_ruleta),
@@ -228,7 +229,7 @@ CREATE TABLE ruleta_giro (
 
 CREATE INDEX idx_giro_cliente ON ruleta_giro(id_cliente);
 CREATE INDEX idx_giro_tarjeta ON ruleta_giro(id_tarjeta);
-CREATE INDEX idx_giro_fecha   ON ruleta_giro(fecha);
+CREATE INDEX idx_giro_created_at ON ruleta_giro(created_at);
 
 -- ============================================================
 -- 7. RECOMPENSA_OBTENIDA
