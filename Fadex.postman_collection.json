@@ -1,10 +1,10 @@
 {
   "info": {
-    "_postman_id": "b37784f4-3bfd-4ddc-9291-4398f55a9362",
+    "_postman_id": "1ec6513d-c6c8-48ef-8ffb-ea911c7d802d",
     "name": "Fadex",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "47585629",
-    "_collection_link": "https://go.postman.co/collection/47585629-b37784f4-3bfd-4ddc-9291-4398f55a9362?source=collection_link"
+    "_collection_link": "https://go.postman.co/collection/47585629-1ec6513d-c6c8-48ef-8ffb-ea911c7d802d?source=collection_link"
   },
   "item": [
     {
@@ -2291,6 +2291,1648 @@
             }
           },
           "response": []
+        }
+      ]
+    },
+    {
+      "name": "Fidelizacion",
+      "item": [
+        {
+          "name": "movimiento",
+          "item": [
+            {
+              "name": "listarMovimientos",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{api_url_v1}}/fidelizacion/movimientos",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "fidelizacion",
+                    "movimientos"
+                  ],
+                  "query": [
+                    {
+                      "key": "clienteId",
+                      "value": "1",
+                      "type": "text",
+                      "disabled": true
+                    },
+                    {
+                      "key": "tarjetaId",
+                      "value": "1",
+                      "type": "text",
+                      "disabled": true
+                    },
+                    {
+                      "key": "origen",
+                      "value": "RESERVA",
+                      "type": "text",
+                      "disabled": true
+                    },
+                    {
+                      "key": "fechaInicio",
+                      "value": "2026-06-28T05:46:23.20822",
+                      "type": "text",
+                      "disabled": true
+                    },
+                    {
+                      "key": "fechaFin",
+                      "value": "2026-06-28T05:46:23.20822",
+                      "type": "text",
+                      "disabled": true
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "listarMovimientoId",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{api_url_v1}}/fidelizacion/movimientos/1",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "fidelizacion",
+                    "movimientos",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "crearMovimiento",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"tarjetaId\": 1,\r\n  \"clienteId\": 1,\r\n  \"origen\": \"RESERVA\",\r\n  \"idOrigen\": 25,\r\n  \"puntos\": 1,\r\n  \"descripcion\": \"Reserva confirmada\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{api_url_v1}}/fidelizacion/movimientos",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "fidelizacion",
+                    "movimientos"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "actualizarMovimiento",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"tarjetaId\": 1,\r\n  \"clienteId\": 1,\r\n  \"origen\": \"VENTA\",\r\n  \"idOrigen\": 50,\r\n  \"puntos\": 2,\r\n  \"descripcion\": \"Actualización de movimiento\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{api_url_v1}}/fidelizacion/movimientos/2",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "fidelizacion",
+                    "movimientos",
+                    "2"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "crearMovimientoId",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{api_url_v1}}/fidelizacion/movimientos/1",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "fidelizacion",
+                    "movimientos",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "configuracion",
+          "item": [
+            {
+              "name": "listarConfiguraciones",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{api_url_v1}}/fidelizacion/configuracion",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "fidelizacion",
+                    "configuracion"
+                  ],
+                  "query": [
+                    {
+                      "key": "activa",
+                      "value": "TRUE",
+                      "type": "text",
+                      "disabled": true
+                    },
+                    {
+                      "key": "categoriaId",
+                      "value": "1",
+                      "type": "text",
+                      "disabled": true
+                    },
+                    {
+                      "key": "ruletaId",
+                      "value": "1",
+                      "type": "text",
+                      "disabled": true
+                    },
+                    {
+                      "key": "categoriaNombre",
+                      "value": "Geles de afeitar",
+                      "type": "text",
+                      "disabled": true
+                    },
+                    {
+                      "key": "ruletaNombre",
+                      "value": "Ruleta Premium",
+                      "type": "text",
+                      "disabled": true
+                    },
+                    {
+                      "key": "metaDesde",
+                      "value": "2026-06-28T05:46:23.20822",
+                      "type": "text",
+                      "disabled": true
+                    },
+                    {
+                      "key": "metaHasta",
+                      "value": "2026-06-28T05:46:23.20822",
+                      "type": "text",
+                      "disabled": true
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "listarConfiguracionId",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{api_url_v1}}/fidelizacion/configuracion/1",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "fidelizacion",
+                    "configuracion",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "crearConfiguracion",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"categoriaId\": 4,\r\n    \"activa\": true,\r\n    \"meta\": 10,\r\n    \"mostrarSiempre\": true,\r\n    \"crearTarjetaAutomatica\": true,\r\n    \"ruletaId\": 1\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{api_url_v1}}/fidelizacion/configuracion",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "fidelizacion",
+                    "configuracion"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "actualizarConfiguracion",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"categoriaId\": 1,\r\n    \"activa\": false,\r\n    \"meta\": 15,\r\n    \"mostrarSiempre\": false,\r\n    \"crearTarjetaAutomatica\": true,\r\n    \"ruletaId\": 2\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{api_url_v1}}/fidelizacion/configuracion/1",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "fidelizacion",
+                    "configuracion",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "eliminarConfiguracion",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{api_url_v1}}/fidelizacion/configuracion/1",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "fidelizacion",
+                    "configuracion",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "regla",
+          "item": [
+            {
+              "name": "listarReglas",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{api_url_v1}}/fidelizacion/reglas?tipoAlcance=SERVICIO&categoriaId=1&activo=TRUE",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "fidelizacion",
+                    "reglas"
+                  ],
+                  "query": [
+                    {
+                      "key": "tipoAlcance",
+                      "value": "SERVICIO"
+                    },
+                    {
+                      "key": "categoriaId",
+                      "value": "1"
+                    },
+                    {
+                      "key": "activo",
+                      "value": "TRUE"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "listarReglasId",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{api_url_v1}}/fidelizacion/reglas",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "fidelizacion",
+                    "reglas"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "crearReglas",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"categoriaId\": 3,\r\n  \"tipoAlcance\": \"CATEGORIA\",\r\n  \"servicioId\": null,\r\n  \"productoId\": null,\r\n  \"puntos\": 1,\r\n  \"activo\": true\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{api_url_v1}}/fidelizacion/reglas",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "fidelizacion",
+                    "reglas"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "actualizarReglas",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"categoriaId\": 1,\r\n  \"tipoAlcance\": \"SERVICIO\",\r\n  \"servicioId\": 4,\r\n  \"productoId\": null,\r\n  \"puntos\": 4,\r\n  \"activo\": false\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{api_url_v1}}/fidelizacion/reglas/1",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "fidelizacion",
+                    "reglas",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "listarReglas",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{api_url_v1}}/fidelizacion/reglas/1",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "fidelizacion",
+                    "reglas",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "tarjeta",
+          "item": [
+            {
+              "name": "listarTarjetas",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{api_url_v1}}/fidelizacion/tarjetas?clienteId=1&categoriaId=2&cicloActivo=TRUE",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "fidelizacion",
+                    "tarjetas"
+                  ],
+                  "query": [
+                    {
+                      "key": "clienteId",
+                      "value": "1"
+                    },
+                    {
+                      "key": "categoriaId",
+                      "value": "2"
+                    },
+                    {
+                      "key": "cicloActivo",
+                      "value": "TRUE"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "listarTarjetaId",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{api_url_v1}}/fidelizacion/tarjetas/1",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "fidelizacion",
+                    "tarjetas",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "crearTarjeta",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"clienteId\": 1,\r\n    \"categoriaId\": 3\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{api_url_v1}}/fidelizacion/tarjetas",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "fidelizacion",
+                    "tarjetas"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "actualizarTarjeta",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"clienteId\": 1,\r\n    \"categoriaId\": 4\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{api_url_v1}}/fidelizacion/tarjetas/1",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "fidelizacion",
+                    "tarjetas",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "eliminarTarjesta",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{api_url_v1}}/fidelizacion/tarjetas/1",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "fidelizacion",
+                    "tarjetas",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Ruleta",
+      "item": [
+        {
+          "name": "Ruleta",
+          "item": [
+            {
+              "name": "listarRuletas",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{api_url_v1}}/ruletas?nombre=Ruleta Principal&tipo=GENERAL&activa=TRUE",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "ruletas"
+                  ],
+                  "query": [
+                    {
+                      "key": "nombre",
+                      "value": "Ruleta Principal",
+                      "type": "text"
+                    },
+                    {
+                      "key": "tipo",
+                      "value": "GENERAL",
+                      "type": "text"
+                    },
+                    {
+                      "key": "activa",
+                      "value": "TRUE",
+                      "type": "text"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "listarRuletaid",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{api_url_v1}}/ruletas/1",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "ruletas",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "crearRuleta",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"nombre\": \"Ruleta VIP\",\r\n  \"descripcion\": \"Ruleta para clientes VIP\",\r\n  \"tipo\": \"GENERAL\",\r\n  \"activa\": true,\r\n  \"incrementoPorGiro\": 0.02\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{api_url_v1}}/ruletas",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "ruletas"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "actualizarRuleta",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"nombre\": \"Ruleta Principales\",\r\n  \"descripcion\": \"Actualizada\",\r\n  \"tipo\": \"FIDELIZACION\",\r\n  \"activa\": true,\r\n  \"incrementoPorGiro\": 0.03\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{api_url_v1}}/ruletas/3",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "ruletas",
+                    "3"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "eliminarRuletaid",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{api_url_v1}}/ruletas/1",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "ruletas",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Categoria",
+          "item": [
+            {
+              "name": "listarCategorias",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{api_url_v1}}/ruleta/categorias?idRuleta=1&idCategoria=1",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "ruleta",
+                    "categorias"
+                  ],
+                  "query": [
+                    {
+                      "key": "idRuleta",
+                      "value": "1"
+                    },
+                    {
+                      "key": "idCategoria",
+                      "value": "1"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "listarCategoriaId",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{api_url_v1}}/ruleta/categorias/1",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "ruleta",
+                    "categorias",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "crearCategoriaId",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"idRuleta\": 1,\r\n  \"idCategoria\": 3\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{api_url_v1}}/ruleta/categorias",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "ruleta",
+                    "categorias"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "actualizarCategoria",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"idRuleta\": 2,\r\n  \"idCategoria\": 1\r\n\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{api_url_v1}}/ruleta/categorias/1",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "ruleta",
+                    "categorias",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "eliminarCategoria",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{api_url_v1}}/ruleta/categorias/1",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "ruleta",
+                    "categorias",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Giro",
+          "item": [
+            {
+              "name": "listarGiros",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{api_url_v1}}/ruleta/giros?clienteId=1&tarjetaId=2&ruletaId=2&fechaInicio=2026-06-28T05:46:23.20822&fechaFin=2026-06-28T05:46:23.20822",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "ruleta",
+                    "giros"
+                  ],
+                  "query": [
+                    {
+                      "key": "clienteId",
+                      "value": "1"
+                    },
+                    {
+                      "key": "tarjetaId",
+                      "value": "2"
+                    },
+                    {
+                      "key": "ruletaId",
+                      "value": "2"
+                    },
+                    {
+                      "key": "fechaInicio",
+                      "value": "2026-06-28T05:46:23.20822"
+                    },
+                    {
+                      "key": "fechaFin",
+                      "value": "2026-06-28T05:46:23.20822"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "listarGiroId",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{api_url_v1}}/ruleta/giros/1",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "ruleta",
+                    "giros",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "eliminarGiroId",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{api_url_v1}}/ruleta/giros/1",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "ruleta",
+                    "giros",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Item",
+          "item": [
+            {
+              "name": "listarItem",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{api_url_v1}}/ruleta/items?ruletaId=1&nombre=Cupón Sorpresa&tipoPremio=SERVICIO&activo=TRUE",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "ruleta",
+                    "items"
+                  ],
+                  "query": [
+                    {
+                      "key": "ruletaId",
+                      "value": "1"
+                    },
+                    {
+                      "key": "nombre",
+                      "value": "Cupón Sorpresa"
+                    },
+                    {
+                      "key": "tipoPremio",
+                      "value": "SERVICIO"
+                    },
+                    {
+                      "key": "activo",
+                      "value": "TRUE"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "listarItemId",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{api_url_v1}}/ruleta/items/1",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "ruleta",
+                    "items",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "crearItemId",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "data",
+                      "value": "{\n  \"ruletaId\": 1,\n  \"nombre\": \"Descuento 20%\",\n  \"descripcion\": \"Cupón de descuento\",\n  \"tipoPremio\": \"DESCUENTO\",\n  \"valor\": 20,\n  \"probabilidad\": 15.5,\n  \"esPremioMayor\": false,\n  \"stock\": 100,\n  \"ordenDisplay\": 1,\n  \"imagenUrl\": null,\n  \"productoId\": null,\n  \"servicioId\": null,\n  \"activo\": true\n}",
+                      "type": "text",
+                      "uuid": "1f094829-da7c-4749-b803-f17a036312fd",
+                      "contentType": "application/json"
+                    },
+                    {
+                      "key": "imagen",
+                      "type": "file",
+                      "uuid": "70a3949c-caa3-44a2-8667-385592378561",
+                      "contentType": "",
+                      "src": [
+                        "/C:/Users/David/Pictures/Screenshots/Captura de pantalla 2026-06-11 223536.png",
+                        "/C:/Users/David/Pictures/Saved Pictures/imgs/imgs/91ffbf1955bf725ce09e2230d4e8b76d.jpg"
+                      ]
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{api_url_v1}}/ruleta/items",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "ruleta",
+                    "items"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "actualizarItem",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "data",
+                      "value": "{\n  \"ruletaId\": 1,\n  \"nombre\": \"Descuento 30%\",\n  \"descripcion\": \"Cupón actualizado\",\n  \"tipoPremio\": \"DESCUENTO\",\n  \"valor\": 30,\n  \"probabilidad\": 10,\n  \"esPremioMayor\": false,\n  \"stock\": 80,\n  \"ordenDisplay\": 2,\n  \"imagenUrl\": null,\n  \"productoId\": null,\n  \"servicioId\": null,\n  \"activo\": true\n}",
+                      "type": "text",
+                      "uuid": "dcfb22dd-e2dd-4ab0-9c50-63fabee325f9",
+                      "contentType": "application/json"
+                    },
+                    {
+                      "key": "imagen",
+                      "type": "file",
+                      "uuid": "5fc935a3-8ef4-4e1a-b689-d915a2d493f6",
+                      "src": "/C:/Users/David/Pictures/Screenshots/Captura de pantalla 2026-06-14 130935.png"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{api_url_v1}}/ruleta/items/5",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "ruleta",
+                    "items",
+                    "5"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "eliminarItemId",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{api_url_v1}}/ruleta/items/1",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "ruleta",
+                    "items",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "recompensa",
+          "item": [
+            {
+              "name": "listarRecompensa",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{api_url_v1}}/recompensas/obtenidas",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "recompensas",
+                    "obtenidas"
+                  ],
+                  "query": [
+                    {
+                      "key": "clienteId",
+                      "value": "1",
+                      "disabled": true
+                    },
+                    {
+                      "key": "estado",
+                      "value": "PENDIENTE",
+                      "disabled": true
+                    },
+                    {
+                      "key": "itemId",
+                      "value": "3",
+                      "disabled": true
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "listarRecompensaId",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{api_url_v1}}/recompensas/obtenidas/1",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "recompensas",
+                    "obtenidas",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "crearRecompensa",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"giroId\": 1,\r\n  \"clienteId\": 1,\r\n  \"itemId\": 1,\r\n  \"observacion\": \"Premio obtenido en la ruleta.\",\r\n  \"usuarioCanjeId\": null,\r\n  \"fechaVencimiento\": \"2026-12-31T23:59:59\",\r\n  \"codigoCanje\": \"PROMO2026\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{api_url_v1}}/recompensas/obtenidas",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "recompensas",
+                    "obtenidas"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "actualizarRecompensa",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"giroId\": 1,\r\n  \"clienteId\": 1,\r\n  \"itemId\": 1,\r\n  \"observacion\": \"Premio canjeado.\",\r\n  \"usuarioCanjeId\": 2,\r\n  \"fechaVencimiento\": \"2026-12-31T23:59:59\",\r\n  \"codigoCanje\": \"PROMO20260212\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{api_url_v1}}/recompensas/obtenidas/1",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "recompensas",
+                    "obtenidas",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "eliminarRecompensa",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{api_url_v1}}/recompensas/obtenidas/1",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "recompensas",
+                    "obtenidas",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
         }
       ]
     }
