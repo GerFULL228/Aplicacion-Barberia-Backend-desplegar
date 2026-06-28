@@ -123,7 +123,8 @@ public class SecurityConfig {
                         // ─────────────────────────────────────────────
                         .requestMatchers("/api/v1/barbero/citas/**")
                         .hasAnyAuthority("ROLE_barbero", "ROLE_admin")
-
+                                .requestMatchers("/api/v1/barbero/historial/**")
+                                .hasAnyAuthority("ROLE_barbero", "ROLE_admin")
                         // ─────────────────────────────────────────────
                         // CLIENTE PRIVADO
                         // ─────────────────────────────────────────────
