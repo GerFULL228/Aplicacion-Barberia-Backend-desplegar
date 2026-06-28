@@ -208,8 +208,10 @@ public class SecurityConfig {
                         ).hasAnyRole("admin", "barbero", "cliente")
 
                          // ─────────────────────────────────────────────
+                        // ─────────────────────────────────────────────
                         // DEFAULT
                         // ─────────────────────────────────────────────
+                                .requestMatchers("/api/analisis/**").hasAnyRole("ADMIN")
                         // ─────────────────────────────────────────────
                         // PLANILLAS (ACCESO PARA TODOS LOS ROLES)
                         // ─────────────────────────────────────────────
