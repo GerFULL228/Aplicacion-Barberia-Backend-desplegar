@@ -19,5 +19,4 @@ public class FidelizacionReglaResponseDTO {
     private Boolean activo;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-
 }

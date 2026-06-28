@@ -20,36 +20,36 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/fidelizacion-movimientos")
 public class FidelizacionMovimientoController {
 
-    private final IFidelizacionMovimientoService service;
+    private final IFidelizacionMovimientoService movimientoService;
 
     @GetMapping
     @PreAuthorize("hasAuthority('FIDELIZACION_READ')")
     public ResponseEntity<ApiResponse<PageResponse<FidelizacionMovimientoResponseDTO>>> listar(@Valid @ModelAttribute FidelizacionMovimientoFiltro filtro, @PageableDefault(size = 10, page = 0) Pageable pageable) {
-        return ResponseEntity.ok(ApiResponse.ok("Movimientos obtenidos correctamente.", service.listarMovimientos(filtro, pageable)));
+        return ResponseEntity.ok(ApiResponse.ok("Movimientos obtenidos correctamente.", movimientoService.listarMovimientos(filtro, pageable)));
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('FIDELIZACION_READ')")
-    public ResponseEntity<ApiResponse<FidelizacionMovimientoResponseDTO>> obtener(@PathVariable Long id) {
-        return ResponseEntity.ok(ApiResponse.ok("Movimiento obtenido correctamente.", service.obtenerMovimientoPorId(id)));
+    public ResponseEntity<ApiResponse<FidelizacionMovimientoResponseDTO>> obtenerPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(ApiResponse.ok("Movimiento obtenido correctamente.", movimientoService.obtenerMovimientoPorId(id)));
     }
 
     @PostMapping
     @PreAuthorize("hasAuthority('FIDELIZACION_MANAGE')")
     public ResponseEntity<ApiResponse<FidelizacionMovimientoResponseDTO>> crear(@Valid @RequestBody FidelizacionMovimientoRequestDTO dto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok("Movimiento creado correctamente.", service.crearMovimiento(dto)));
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok("Movimiento creado correctamente.", movimientoService.crearMovimiento(dto)));
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('FIDELIZACION_MANAGE')")
     public ResponseEntity<ApiResponse<FidelizacionMovimientoResponseDTO>> actualizar(@PathVariable Long id, @Valid @RequestBody FidelizacionMovimientoRequestDTO dto) {
-        return ResponseEntity.ok(ApiResponse.ok("Movimiento actualizado correctamente.", service.actualizarMovimiento(id, dto)));
+        return ResponseEntity.ok(ApiResponse.ok("Movimiento actualizado correctamente.", movimientoService.actualizarMovimiento(id, dto)));
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('FIDELIZACION_MANAGE')")
     public ResponseEntity<ApiResponse<Void>> eliminar(@PathVariable Long id) {
-        service.eliminarMovimiento(id);
+        movimientoService.eliminarMovimiento(id);
         return ResponseEntity.ok(ApiResponse.ok("Movimiento eliminado correctamente."));
     }
 }

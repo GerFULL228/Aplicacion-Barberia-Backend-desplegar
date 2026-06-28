@@ -20,36 +20,36 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/fidelizacion-tarjetas")
 public class FidelizacionTarjetaController {
 
-    private final IFidelizacionTarjetaService service;
+    private final IFidelizacionTarjetaService tarjetaService;
 
     @GetMapping
     @PreAuthorize("hasAuthority('FIDELIZACION_READ')")
     public ResponseEntity<ApiResponse<PageResponse<FidelizacionTarjetaResponseDTO>>> listar(@Valid @ModelAttribute FidelizacionTarjetaFiltro filtro, @PageableDefault(size = 10, page = 0) Pageable pageable) {
-        return ResponseEntity.ok(ApiResponse.ok("Tarjetas obtenidas correctamente.", service.listarTarjetas(filtro, pageable)));
+        return ResponseEntity.ok(ApiResponse.ok("Tarjetas obtenidas correctamente.", tarjetaService.listarTarjetas(filtro, pageable)));
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('FIDELIZACION_READ')")
-    public ResponseEntity<ApiResponse<FidelizacionTarjetaResponseDTO>> obtener(@PathVariable Long id) {
-        return ResponseEntity.ok(ApiResponse.ok("Tarjeta obtenida correctamente.", service.obtenerTarjetaPorId(id)));
+    public ResponseEntity<ApiResponse<FidelizacionTarjetaResponseDTO>> obtenerPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(ApiResponse.ok("Tarjeta obtenida correctamente.", tarjetaService.obtenerTarjetaPorId(id)));
     }
 
     @PostMapping
     @PreAuthorize("hasAuthority('FIDELIZACION_MANAGE')")
     public ResponseEntity<ApiResponse<FidelizacionTarjetaResponseDTO>> crear(@RequestBody @Valid FidelizacionTarjetaRequestDTO dto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok("Tarjeta creada correctamente.", service.crearTarjeta(dto)));
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok("Tarjeta creada correctamente.", tarjetaService.crearTarjeta(dto)));
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('FIDELIZACION_MANAGE')")
     public ResponseEntity<ApiResponse<FidelizacionTarjetaResponseDTO>> actualizar(@PathVariable Long id, @RequestBody @Valid FidelizacionTarjetaRequestDTO dto) {
-        return ResponseEntity.ok(ApiResponse.ok("Tarjeta actualizada correctamente.", service.actualizarTarjeta(id, dto)));
+        return ResponseEntity.ok(ApiResponse.ok("Tarjeta actualizada correctamente.", tarjetaService.actualizarTarjeta(id, dto)));
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('FIDELIZACION_MANAGE')")
     public ResponseEntity<ApiResponse<Void>> eliminar(@PathVariable Long id) {
-        service.eliminarTarjeta(id);
+        tarjetaService.eliminarTarjeta(id);
         return ResponseEntity.ok(ApiResponse.ok("Tarjeta eliminada correctamente."));
     }
 }

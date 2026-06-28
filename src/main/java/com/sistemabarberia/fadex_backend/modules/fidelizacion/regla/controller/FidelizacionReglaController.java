@@ -20,36 +20,36 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/fidelizacion-reglas")
 public class FidelizacionReglaController {
 
-    private final IFidelizacionReglaService service;
+    private final IFidelizacionReglaService reglaService;
 
     @GetMapping
     @PreAuthorize("hasAuthority('FIDELIZACION_READ')")
     public ResponseEntity<ApiResponse<PageResponse<FidelizacionReglaResponseDTO>>> listar(@Valid @ModelAttribute FidelizacionReglaFiltro filtro, @PageableDefault(size = 10, page = 0) Pageable pageable) {
-        return ResponseEntity.ok(ApiResponse.ok("Reglas obtenidas correctamente.", service.listarReglaConFiltros(filtro, pageable)));
+        return ResponseEntity.ok(ApiResponse.ok("Reglas obtenidas correctamente.", reglaService.listarReglaConFiltros(filtro, pageable)));
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('FIDELIZACION_READ')")
-    public ResponseEntity<ApiResponse<FidelizacionReglaResponseDTO>> obtenerId(@PathVariable Long id) {
-        return ResponseEntity.ok(ApiResponse.ok("Regla obtenida correctamente.", service.obtenerReglaPorId(id)));
+    public ResponseEntity<ApiResponse<FidelizacionReglaResponseDTO>> obtenerPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(ApiResponse.ok("Regla obtenida correctamente.", reglaService.obtenerReglaPorId(id)));
     }
 
     @PostMapping
     @PreAuthorize("hasAuthority('FIDELIZACION_MANAGE')")
     public ResponseEntity<ApiResponse<FidelizacionReglaResponseDTO>> crear(@RequestBody @Valid FidelizacionReglaRequestDTO dto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok("Regla creada correctamente.", service.crearRegla(dto)));
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok("Regla creada correctamente.", reglaService.crearRegla(dto)));
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('FIDELIZACION_MANAGE')")
     public ResponseEntity<ApiResponse<FidelizacionReglaResponseDTO>> actualizar(@PathVariable Long id, @RequestBody @Valid FidelizacionReglaRequestDTO dto) {
-        return ResponseEntity.ok(ApiResponse.ok("Regla actualizada correctamente.", service.actualizarRegla(id, dto)));
+        return ResponseEntity.ok(ApiResponse.ok("Regla actualizada correctamente.", reglaService.actualizarRegla(id, dto)));
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('FIDELIZACION_MANAGE')")
     public ResponseEntity<ApiResponse<Void>> eliminar(@PathVariable Long id) {
-        service.eliminarRegla(id);
+        reglaService.eliminarRegla(id);
         return ResponseEntity.ok(ApiResponse.ok("Regla eliminada correctamente."));
     }
 }

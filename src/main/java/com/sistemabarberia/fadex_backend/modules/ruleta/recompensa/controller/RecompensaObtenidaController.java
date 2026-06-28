@@ -1,6 +1,7 @@
 package com.sistemabarberia.fadex_backend.modules.ruleta.recompensa.controller;
 import com.sistemabarberia.fadex_backend.commons.response.ApiResponse;
 import com.sistemabarberia.fadex_backend.commons.response.PageResponse;
+import com.sistemabarberia.fadex_backend.modules.ruleta.item.dto.RuletaItemFiltro;
 import com.sistemabarberia.fadex_backend.modules.ruleta.recompensa.dto.RecompensaObtenidaFiltro;
 import com.sistemabarberia.fadex_backend.modules.ruleta.recompensa.dto.request.RecompensaObtenidaRequestDTO;
 import com.sistemabarberia.fadex_backend.modules.ruleta.recompensa.dto.response.RecompensaObtenidaResponseDTO;
@@ -19,35 +20,35 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/recompensas")
 public class RecompensaObtenidaController {
 
-    private final IRecompensaObtenidaService service;
+    private final IRecompensaObtenidaService recompensaObtenidaService;
 
     @GetMapping
     @PreAuthorize("hasAuthority('RECOMPENSA_READ')")
-    public ResponseEntity<ApiResponse<PageResponse<RecompensaObtenidaResponseDTO>>> listar(@ModelAttribute RecompensaObtenidaFiltro filtro, @PageableDefault(size = 10) Pageable pageable) {
-        return ResponseEntity.ok(ApiResponse.ok("Recompensas obtenidas correctamente.", service.listar(filtro, pageable)));
+    public ResponseEntity<ApiResponse<PageResponse<RecompensaObtenidaResponseDTO>>> listar (@Valid @ModelAttribute RecompensaObtenidaFiltro filtro, @PageableDefault(size = 10, page = 0) Pageable pageable) {
+        return ResponseEntity.ok(ApiResponse.ok("Recompensas obtenidas correctamente.", recompensaObtenidaService.listar(filtro, pageable)));
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('RECOMPENSA_READ')")
     public ResponseEntity<ApiResponse<RecompensaObtenidaResponseDTO>> obtener(@PathVariable Long id) {
-        return ResponseEntity.ok(ApiResponse.ok("Recompensa obtenida correctamente.", service.obtenerPorId(id)));
+        return ResponseEntity.ok(ApiResponse.ok("Recompensa obtenida correctamente.", recompensaObtenidaService.obtenerPorId(id)));
     }
 
     @PostMapping
     @PreAuthorize("hasAuthority('RECOMPENSA_CANJEAR')")
     public ResponseEntity<ApiResponse<RecompensaObtenidaResponseDTO>> crear(@Valid @RequestBody RecompensaObtenidaRequestDTO dto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok("Recompensa creada correctamente.", service.crear(dto)));
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok("Recompensa creada correctamente.", recompensaObtenidaService.crear(dto)));
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('RECOMPENSA_CANJEAR')")
     public ResponseEntity<ApiResponse<RecompensaObtenidaResponseDTO>> actualizar(@PathVariable Long id, @Valid @RequestBody RecompensaObtenidaRequestDTO dto) {
-        return ResponseEntity.ok(ApiResponse.ok("Recompensa actualizada correctamente.", service.actualizar(id, dto)));
+        return ResponseEntity.ok(ApiResponse.ok("Recompensa actualizada correctamente.", recompensaObtenidaService.actualizar(id, dto)));
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('RECOMPENSA_CANJEAR')")
     public ResponseEntity<ApiResponse<Void>> eliminar(@PathVariable Long id) {
-        service.eliminar(id);return ResponseEntity.ok(ApiResponse.ok("Recompensa eliminada correctamente."));
+        recompensaObtenidaService.eliminar(id);return ResponseEntity.ok(ApiResponse.ok("Recompensa eliminada correctamente."));
     }
 }
