@@ -47,11 +47,11 @@ public class FidelizacionTarjetaServiceImpl implements IFidelizacionTarjetaServi
     @Override
     @Transactional
     public FidelizacionTarjetaResponseDTO crearTarjeta(FidelizacionTarjetaRequestDTO dto) {
-        if (tarjetaRepository.existsByClienteIdAndCategoriaId(dto.getClienteId(), dto.getCategoriaId())) {
+        if (tarjetaRepository.existsByClienteClienteIdAndCategoriaId(dto.getClienteId().intValue(), dto.getCategoriaId())) {
             throw new BusinessException("El cliente ya posee una tarjeta para esta categoría.", HttpStatus.BAD_REQUEST);
         }
         FidelizacionTarjeta tarjeta = tarjetaMapper.toEntity(dto);
-        tarjeta.setCliente(obtenerCliente(dto.getClienteId()));
+        tarjeta.setCliente(obtenerCliente(dto.getClienteId().intValue()));
         tarjeta.setCategoria(obtenerCategoria(dto.getCategoriaId()));
         return tarjetaMapper.toResponse(tarjetaRepository.save(tarjeta));
     }
@@ -61,12 +61,12 @@ public class FidelizacionTarjetaServiceImpl implements IFidelizacionTarjetaServi
     public FidelizacionTarjetaResponseDTO actualizarTarjeta(Long id, FidelizacionTarjetaRequestDTO dto) {
         FidelizacionTarjeta tarjeta = tarjetaRepository.findById(id).orElseThrow(() -> new BusinessException("Tarjeta no encontrada", HttpStatus.NOT_FOUND));
         if (!tarjeta.getCliente().getClienteId().equals(dto.getClienteId()) || !tarjeta.getCategoria().getId().equals(dto.getCategoriaId())) {
-            if (tarjetaRepository.existsByClienteIdAndCategoriaId(dto.getClienteId(), dto.getCategoriaId())) {
+            if (tarjetaRepository.existsByClienteClienteIdAndCategoriaId(dto.getClienteId().intValue(), dto.getCategoriaId())){
                 throw new BusinessException("Ya existe una tarjeta para ese cliente y categoría.", HttpStatus.BAD_REQUEST);
             }
         }
         tarjetaMapper.updateFromRequest(dto, tarjeta);
-        tarjeta.setCliente(obtenerCliente(dto.getClienteId()));
+        tarjeta.setCliente(obtenerCliente(dto.getClienteId().intValue()));
         tarjeta.setCategoria(obtenerCategoria(dto.getCategoriaId()));
         return tarjetaMapper.toResponse(tarjetaRepository.save(tarjeta));
     }
@@ -78,8 +78,8 @@ public class FidelizacionTarjetaServiceImpl implements IFidelizacionTarjetaServi
         tarjetaRepository.delete(tarjeta);
     }
 
-    private Cliente obtenerCliente(Long id) {
-        return clienteRepository.findById(id.intValue()).orElseThrow(() -> new BusinessException("Cliente no encontrado", HttpStatus.NOT_FOUND));
+    private Cliente obtenerCliente(Integer id) {
+        return clienteRepository.findById(id).orElseThrow(() -> new BusinessException("Cliente no encontrado", HttpStatus.NOT_FOUND));
     }
 
     private Categoria obtenerCategoria(Long id) {

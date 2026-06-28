@@ -8,9 +8,13 @@ import java.util.List;
 import java.util.Optional;
 
 public interface RuletaCategoriaRepository extends JpaRepository<RuletaCategoria, Long>, JpaSpecificationExecutor<RuletaCategoria> {
+    List<RuletaCategoria> findByRuletaRuletaId(Long ruletaId);
+    List<RuletaCategoria> findByCategoriaId(Long categoriaId);
+    Optional<RuletaCategoria> findByRuletaRuletaIdAndCategoriaId(Long ruletaId, Long categoriaId);
+    boolean existsByRuletaRuletaIdAndCategoriaId(Long ruletaId, Long categoriaId);
 
-    List<RuletaCategoria> findByRuletaIdRuleta(Long idRuleta);
-    List<RuletaCategoria> findByCategoriaIdCategoria(Long idCategoria);
-    Optional<RuletaCategoria> findByRuletaIdRuletaAndCategoriaIdCategoria(Long idRuleta, Long idCategoria);
-    boolean existsByRuletaIdRuletaAndCategoriaIdCategoria(Long idRuleta, Long idCategoria);
+    List<RuletaCategoria> findByRuleta_RuletaId(Long ruletaId);
+    List<RuletaCategoria> findByCategoria_Id(Long categoriaId);
+    Optional<RuletaCategoria> findByRuleta_RuletaIdAndCategoria_Id(Long ruletaId, Long categoriaId);
+    boolean existsByRuleta_RuletaIdAndCategoria_Id(Long ruletaId, Long categoriaId);
 }

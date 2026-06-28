@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/fidelizacion-reglas")
+@RequestMapping("/api/v1/fidelizacion/reglas")
 public class FidelizacionReglaController {
 
     private final IFidelizacionReglaService reglaService;

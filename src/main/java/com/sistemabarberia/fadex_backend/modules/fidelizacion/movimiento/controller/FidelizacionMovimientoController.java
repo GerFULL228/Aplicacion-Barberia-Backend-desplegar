@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/fidelizacion-movimientos")
+@RequestMapping("/api/v1/fidelizacion/movimientos")
 public class FidelizacionMovimientoController {
 
     private final IFidelizacionMovimientoService movimientoService;

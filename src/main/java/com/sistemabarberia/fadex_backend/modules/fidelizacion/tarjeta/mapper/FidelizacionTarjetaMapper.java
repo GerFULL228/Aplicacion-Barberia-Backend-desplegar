@@ -9,14 +9,33 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface FidelizacionTarjetaMapper {
+
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "cliente", ignore = true)
     @Mapping(target = "categoria", ignore = true)
+
+    @Mapping(target = "progreso", ignore = true)
+    @Mapping(target = "girosDisponibles", ignore = true)
+    @Mapping(target = "totalGiros", ignore = true)
+    @Mapping(target = "cicloActivo", ignore = true)
+
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
     FidelizacionTarjeta toEntity(FidelizacionTarjetaRequestDTO dto);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+
+    @Mapping(target = "id", ignore = true)
     @Mapping(target = "cliente", ignore = true)
     @Mapping(target = "categoria", ignore = true)
+
+    @Mapping(target = "progreso", ignore = true)
+    @Mapping(target = "girosDisponibles", ignore = true)
+    @Mapping(target = "totalGiros", ignore = true)
+    @Mapping(target = "cicloActivo", ignore = true)
+
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
     void updateFromRequest(FidelizacionTarjetaRequestDTO dto, @MappingTarget FidelizacionTarjeta entity);
 
     @Mapping(target = "clienteId", source = "cliente.clienteId")

@@ -9,7 +9,11 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface RecompensaObtenidaMapper {
+
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "fechaCanje", ignore = true)
     @Mapping(target = "giro", ignore = true)
     @Mapping(target = "cliente", ignore = true)
     @Mapping(target = "item", ignore = true)
@@ -19,6 +23,10 @@ public interface RecompensaObtenidaMapper {
     RecompensaObtenida toEntity(RecompensaObtenidaRequestDTO dto);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "fechaCanje", ignore = true)
     @Mapping(target = "giro", ignore = true)
     @Mapping(target = "cliente", ignore = true)
     @Mapping(target = "item", ignore = true)
@@ -30,7 +38,7 @@ public interface RecompensaObtenidaMapper {
     @Mapping(target = "giroId", source = "giro.id")
     @Mapping(target = "clienteId", source = "cliente.clienteId")
     @Mapping(target = "clienteNombre", source = "cliente.persona.nombre")
-    @Mapping(target = "itemId", source = "item.id")
+    @Mapping(target = "itemId", source = "item.itemId")
     @Mapping(target = "itemNombre", source = "item.nombre")
     @Mapping(target = "usuarioCanjeId", source = "usuarioCanje.idUsuario")
     RecompensaObtenidaResponseDTO toResponse(RecompensaObtenida entity);

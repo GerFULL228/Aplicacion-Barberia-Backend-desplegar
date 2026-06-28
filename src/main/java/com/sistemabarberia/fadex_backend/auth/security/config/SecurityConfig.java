@@ -201,10 +201,12 @@ public class SecurityConfig {
                                 "/api/v1/fidelizacion-movimientos/**",
                                 "/api/v1/fidelizacion-tarjetas/**",
                                 "/api/v1/ruletas/**",
+                                "/api/v1/ruleta-categorias",
                                 "/api/v1/ruleta-items/**",
                                 "/api/v1/ruleta-giros/**",
                                 "/api/v1/recompensas/**"
                         ).hasAnyRole("admin", "barbero", "cliente")
+
                          // ─────────────────────────────────────────────
                         // DEFAULT
                         // ─────────────────────────────────────────────

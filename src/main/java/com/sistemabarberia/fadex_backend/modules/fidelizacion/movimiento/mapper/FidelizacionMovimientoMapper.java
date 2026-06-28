@@ -9,13 +9,17 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface FidelizacionMovimientoMapper {
-
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "tarjeta", ignore = true)
     @Mapping(target = "cliente", ignore = true)
     FidelizacionMovimiento toEntity(FidelizacionMovimientoRequestDTO dto);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "tarjeta", ignore = true)
     @Mapping(target = "cliente", ignore = true)
     void updateFromRequest(FidelizacionMovimientoRequestDTO dto, @MappingTarget FidelizacionMovimiento entity);

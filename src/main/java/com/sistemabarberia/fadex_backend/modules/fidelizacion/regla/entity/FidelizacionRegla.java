@@ -8,6 +8,8 @@ import com.sistemabarberia.fadex_backend.modules.fidelizacion.regla.entity.enums
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Getter
 @Setter
@@ -28,6 +30,7 @@ public class FidelizacionRegla extends AuditableEntity {
     private Categoria categoria;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "tipo_alcance", nullable = false)
     private TipoAlcanceFidelizacion tipoAlcance;
 

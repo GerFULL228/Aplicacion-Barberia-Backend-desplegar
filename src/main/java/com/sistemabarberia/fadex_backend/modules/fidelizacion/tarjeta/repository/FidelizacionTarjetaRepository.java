@@ -10,6 +10,6 @@ import java.util.Optional;
 
 public interface FidelizacionTarjetaRepository extends JpaRepository<FidelizacionTarjeta, Long> {
     Page<FidelizacionTarjeta> findAll(Specification<FidelizacionTarjeta> spec, Pageable pageable);
-    Optional<FidelizacionTarjeta> findByClienteIdAndCategoriaId(Long clienteId, Long categoriaId);
-    boolean existsByClienteIdAndCategoriaId(Long clienteId, Long categoriaId);
+    Optional<FidelizacionTarjeta> findByClienteClienteIdAndCategoriaId(Integer clienteId, Long categoriaId);
+    boolean existsByClienteClienteIdAndCategoriaId(Integer clienteId, Long categoriaId);
 }

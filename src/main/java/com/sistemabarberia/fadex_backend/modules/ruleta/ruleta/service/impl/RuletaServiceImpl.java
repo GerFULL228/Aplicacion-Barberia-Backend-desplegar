@@ -32,7 +32,6 @@ public class RuletaServiceImpl implements IRuletaService {
     public PageResponse<RuletaResponseDTO> listarRuletasConFiltro(RuletaFiltro filtro, Pageable pageable) {
         Page<Ruleta> page = ruletaRepository.findAll(RuletaSpecification.conFiltros(filtro), pageable);
         List<RuletaResponseDTO> data = page.getContent().stream().map(ruletaMapper::toResponse).toList();
-
         return PageResponse.<RuletaResponseDTO>builder().content(data).pageNumber(page.getNumber()).pageSize(page.getSize()).totalElements(page.getTotalElements()).totalPages(page.getTotalPages()).last(page.isLast()).build();
     }
 

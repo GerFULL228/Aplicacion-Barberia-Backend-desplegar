@@ -294,4 +294,64 @@ WHERE r.nombre = 'cliente' AND p.nombre IN ( 'FIDELIZACION_READ', 'RULETA_READ',
 INSERT INTO ruleta
 (nombre, descripcion, tipo, activa, incremento_por_giro)
 VALUES
-('Ruleta Principal','Ruleta de pruebas','GENERAL',true,0.02);
+('Ruleta Principal','Ruleta general de fidelización','GENERAL',true,0.0200),
+('Ruleta Premium','Clientes Premium','PREMIUM',true,0.0500),
+('Ruleta Productos','Premios por compras','PRODUCTOS',true,0.0300),
+('Ruleta Servicios','Premios por servicios','SERVICIOS',true,0.0250);
+
+INSERT INTO fidelizacion_configuracion
+(id_categoria,meta,mostrar_siempre,crear_tarjeta_automatica,id_ruleta)
+VALUES
+(1,5,true,true,1),
+(2,8,true,true,2),
+(3,10,false,true,3);
+
+INSERT INTO ruleta_categoria
+(id_ruleta,id_categoria)
+VALUES
+(1,1),
+(1,2),
+(2,3),
+(3,4);
+
+INSERT INTO ruleta_item
+(id_ruleta,nombre,descripcion,tipo_premio,valor,
+probabilidad,es_premio_mayor,stock,orden_display,activo)
+VALUES
+
+(1,'5% Descuento','Descuento para cualquier servicio',
+'DESCUENTO',5,40,false,NULL,1,true),
+
+(1,'10% Descuento','Descuento especial',
+'DESCUENTO',10,25,false,NULL,2,true),
+
+(1,'Corte Gratis','Servicio gratuito',
+'SERVICIO',0,10,true,20,3,true),
+
+(1,'Cupón Sorpresa','Cupón promocional',
+'CUPON',0,25,false,NULL,4,true);
+
+INSERT INTO fidelizacion_tarjeta
+(id_cliente,id_categoria,progreso,giros_disponibles,total_giros)
+VALUES
+(1,1,3,0,0),
+(2,1,5,1,1),
+(1,2,7,2,3);
+
+INSERT INTO fidelizacion_movimiento
+(id_tarjeta,id_cliente,origen,id_origen,puntos,descripcion)
+VALUES
+(1,1,'RESERVA',1,1,'Primer corte'),
+(1,1,'RESERVA',2,1,'Segundo corte'),
+(2,2,'VENTA',5,2,'Compra de productos');
+
+INSERT INTO ruleta_giro
+(id_tarjeta,id_cliente,id_ruleta,id_item,
+numero_giro,prob_final,prob_aplicada)
+VALUES
+(2,2,1,3,1,10.00,14.50);
+
+INSERT INTO recompensa_obtenida
+(id_giro,id_cliente,id_item,estado,codigo_canje)
+VALUES
+(1,2,3,'PENDIENTE','FAD-000001');

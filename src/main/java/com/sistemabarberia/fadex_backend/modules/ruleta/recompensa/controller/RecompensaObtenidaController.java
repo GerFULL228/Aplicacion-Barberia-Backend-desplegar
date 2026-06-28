@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/recompensas")
+@RequestMapping("/api/v1/recompensas/obtenidas")
 public class RecompensaObtenidaController {
 
     private final IRecompensaObtenidaService recompensaObtenidaService;

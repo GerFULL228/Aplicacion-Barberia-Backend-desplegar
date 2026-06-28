@@ -9,9 +9,24 @@ import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface RuletaItemMapper {
-    RuletaItem toEntity(RuletaItemRequestDTO dto);
-    void updateFromRequest(RuletaItemRequestDTO dto, @MappingTarget RuletaItem entity);
-    @Mapping(source = "ruleta.ruletaId",target = "ruletaId")
+
+        @Mapping(target = "itemId", ignore = true)
+        @Mapping(target = "ruleta", ignore = true)
+        @Mapping(target = "producto", ignore = true)
+        @Mapping(target = "servicio", ignore = true)
+        @Mapping(target = "createdAt", ignore = true)
+        @Mapping(target = "updatedAt", ignore = true)
+        RuletaItem toEntity(RuletaItemRequestDTO dto);
+
+        @Mapping(target = "itemId", ignore = true)
+        @Mapping(target = "ruleta", ignore = true)
+        @Mapping(target = "producto", ignore = true)
+        @Mapping(target = "servicio", ignore = true)
+        @Mapping(target = "createdAt", ignore = true)
+        @Mapping(target = "updatedAt", ignore = true)
+        void updateFromRequest(RuletaItemRequestDTO dto, @MappingTarget RuletaItem entity);
+
+    @Mapping(source = "ruleta.ruletaId", target = "ruletaId")
     @Mapping(source = "producto.id", target = "productoId")
     @Mapping(source = "servicio.servicioId", target = "servicioId")
     RuletaItemResponseDTO toResponse(RuletaItem entity);

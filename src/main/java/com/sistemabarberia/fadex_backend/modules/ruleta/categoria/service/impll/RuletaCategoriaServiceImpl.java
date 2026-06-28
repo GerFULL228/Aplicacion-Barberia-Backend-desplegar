@@ -1,19 +1,24 @@
 package com.sistemabarberia.fadex_backend.modules.ruleta.categoria.service.impll;
 
+import com.sistemabarberia.fadex_backend.commons.exception.BusinessException;
+import com.sistemabarberia.fadex_backend.commons.response.PageResponse;
 import com.sistemabarberia.fadex_backend.modules.categoria.entity.Categoria;
 import com.sistemabarberia.fadex_backend.modules.categoria.repository.CategoriaRepository;
+import com.sistemabarberia.fadex_backend.modules.ruleta.categoria.dto.RuletaCategoriaFiltro;
 import com.sistemabarberia.fadex_backend.modules.ruleta.categoria.dto.request.RuletaCategoriaRequestDTO;
 import com.sistemabarberia.fadex_backend.modules.ruleta.categoria.dto.response.RuletaCategoriaResponseDTO;
 import com.sistemabarberia.fadex_backend.modules.ruleta.categoria.entity.RuletaCategoria;
 import com.sistemabarberia.fadex_backend.modules.ruleta.categoria.mapper.RuletaCategoriaMapper;
 import com.sistemabarberia.fadex_backend.modules.ruleta.categoria.repository.RuletaCategoriaRepository;
 import com.sistemabarberia.fadex_backend.modules.ruleta.categoria.service.IRuletaCategoriaService;
+import com.sistemabarberia.fadex_backend.modules.ruleta.categoria.specs.RuletaCategoriaSpecs;
 import com.sistemabarberia.fadex_backend.modules.ruleta.ruleta.entity.Ruleta;
 import com.sistemabarberia.fadex_backend.modules.ruleta.ruleta.repository.RuletaRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,8 +34,8 @@ public class RuletaCategoriaServiceImpl implements IRuletaCategoriaService {
 
     @Override
     public RuletaCategoriaResponseDTO crearCategoria(RuletaCategoriaRequestDTO request) {
-        Ruleta ruleta = ruletaRepository.findById(request.getIdRuleta()).orElseThrow(() -> new EntityNotFoundException("Ruleta no encontrada"));
-        Categoria categoria = categoriaRepository.findById(request.getIdCategoria()).orElseThrow(() -> new EntityNotFoundException("Categoría no encontrada"));
+        Ruleta ruleta = ruletaRepository.findById(request.getIdRuleta()).orElseThrow(() -> new BusinessException("Ruleta no encontrada.", HttpStatus.NOT_FOUND));
+        Categoria categoria = categoriaRepository.findById(request.getIdCategoria()).orElseThrow(() -> new BusinessException("Categoría no encontrada", HttpStatus.NOT_FOUND));
         RuletaCategoria entity = new RuletaCategoria();
         entity.setRuleta(ruleta);
         entity.setCategoria(categoria);
@@ -38,10 +43,10 @@ public class RuletaCategoriaServiceImpl implements IRuletaCategoriaService {
     }
 
     @Override
-    public RuletaCategoriaResponseDTO actualizarCategoria(Integer id, RuletaCategoriaRequestDTO request) {
-        RuletaCategoria entity = ruletaCategoriaRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Relación no encontrada"));
-        Ruleta ruleta = ruletaRepository.findById(request.getIdRuleta()).orElseThrow(() -> new EntityNotFoundException("Ruleta no encontrada"));
-        Categoria categoria = categoriaRepository.findById(request.getIdCategoria()).orElseThrow(() -> new EntityNotFoundException("Categoría no encontrada"));
+    public RuletaCategoriaResponseDTO actualizarCategoria(Long id, RuletaCategoriaRequestDTO request) {
+        RuletaCategoria entity = ruletaCategoriaRepository.findById(id).orElseThrow(() -> new BusinessException("Relación no encontrada", HttpStatus.NOT_FOUND));
+        Ruleta ruleta = ruletaRepository.findById(request.getIdRuleta()).orElseThrow(() -> new BusinessException("Ruleta no encontrada.", HttpStatus.NOT_FOUND));
+        Categoria categoria = categoriaRepository.findById(request.getIdCategoria()).orElseThrow(() ->  new BusinessException("Categoría no encontrada", HttpStatus.NOT_FOUND));
         entity.setRuleta(ruleta);
         entity.setCategoria(categoria);
         return ruletaCategoriaMapper.toResponse(ruletaCategoriaRepository.save(entity));
@@ -49,21 +54,21 @@ public class RuletaCategoriaServiceImpl implements IRuletaCategoriaService {
 
     @Override
     @Transactional(readOnly = true)
-    public RuletaCategoriaResponseDTO obtenerCategoriaPorId(Integer id) {
-        return ruletaCategoriaMapper.toResponse(ruletaCategoriaRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Relación no encontrada")));
+    public RuletaCategoriaResponseDTO obtenerCategoriaPorId(Long id) {
+        RuletaCategoria entity = ruletaCategoriaRepository.findById(id).orElseThrow(() -> new BusinessException("Relación no encontrada.", HttpStatus.NOT_FOUND));
+        return ruletaCategoriaMapper.toResponse(entity);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<RuletaCategoriaResponseDTO> listarCategoria(Pageable pageable) {
-        return ruletaCategoriaRepository.findAll(pageable).map(ruletaCategoriaMapper::toResponse);
+    public PageResponse<RuletaCategoriaResponseDTO> listarCategoriaConFiltros(RuletaCategoriaFiltro filtro, Pageable pageable) {
+        Page<RuletaCategoria> page = ruletaCategoriaRepository.findAll(RuletaCategoriaSpecs.filter(filtro), pageable);
+        return PageResponse.of(page.map(ruletaCategoriaMapper::toResponse));
     }
 
     @Override
-    public void eliminarCategoria(Integer id) {
-        if (!ruletaCategoriaRepository.existsById(id)) {
-            throw new EntityNotFoundException("Relación no encontrada");
-        }
-        ruletaCategoriaRepository.deleteById(id);
+    public void eliminarCategoria(Long id) {
+        RuletaCategoria entity = ruletaCategoriaRepository.findById(id).orElseThrow(() -> new BusinessException("Relación no encontrada.", HttpStatus.NOT_FOUND));
+        ruletaCategoriaRepository.delete(entity);
     }
 }

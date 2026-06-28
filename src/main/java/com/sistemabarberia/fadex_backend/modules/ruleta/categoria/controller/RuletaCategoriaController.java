@@ -2,7 +2,6 @@ package com.sistemabarberia.fadex_backend.modules.ruleta.categoria.controller;
 
 import com.sistemabarberia.fadex_backend.commons.response.ApiResponse;
 import com.sistemabarberia.fadex_backend.commons.response.PageResponse;
-import com.sistemabarberia.fadex_backend.modules.categoria.dto.CategoriaFiltro;
 import com.sistemabarberia.fadex_backend.modules.ruleta.categoria.dto.RuletaCategoriaFiltro;
 import com.sistemabarberia.fadex_backend.modules.ruleta.categoria.dto.request.RuletaCategoriaRequestDTO;
 import com.sistemabarberia.fadex_backend.modules.ruleta.categoria.dto.response.RuletaCategoriaResponseDTO;
@@ -18,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/ruleta-categorias")
+@RequestMapping("/api/v1/ruleta/categorias")
 public class RuletaCategoriaController {
 
     private final IRuletaCategoriaService ruletaCategoriaService;

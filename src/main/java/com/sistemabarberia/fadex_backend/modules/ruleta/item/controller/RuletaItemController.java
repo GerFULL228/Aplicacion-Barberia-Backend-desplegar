@@ -20,7 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/ruleta-items")
+@RequestMapping("/api/v1/ruleta/items")
 public class RuletaItemController {
 
     private final IRuletaItemService ruletaItemService;

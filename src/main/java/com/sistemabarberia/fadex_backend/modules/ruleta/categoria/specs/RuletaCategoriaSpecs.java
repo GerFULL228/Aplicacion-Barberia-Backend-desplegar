@@ -10,11 +10,11 @@ public class RuletaCategoriaSpecs {
             var predicate = cb.conjunction();
 
             if (filter.getIdRuleta() != null) {
-                predicate.getExpressions().add(cb.equal(root.get("ruleta").get("idRuleta"), filter.getIdRuleta()));
+                predicate.getExpressions().add(cb.equal(root.get("ruleta").get("ruletaId"), filter.getIdRuleta()));
             }
 
             if (filter.getIdCategoria() != null) {
-                predicate.getExpressions().add(cb.equal(root.get("categoria").get("idCategoria"), filter.getIdCategoria()));
+                predicate.getExpressions().add(cb.equal(root.get("categoria").get("id"), filter.getIdCategoria()));
             }
 
             return predicate;

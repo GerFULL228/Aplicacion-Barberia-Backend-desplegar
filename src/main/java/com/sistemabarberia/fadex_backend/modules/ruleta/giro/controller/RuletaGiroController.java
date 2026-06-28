@@ -6,7 +6,6 @@ import com.sistemabarberia.fadex_backend.modules.ruleta.giro.dto.RuletaGiroFiltr
 import com.sistemabarberia.fadex_backend.modules.ruleta.giro.dto.request.RuletaGiroRequestDTO;
 import com.sistemabarberia.fadex_backend.modules.ruleta.giro.dto.response.RuletaGiroResponseDTO;
 import com.sistemabarberia.fadex_backend.modules.ruleta.giro.service.IRuletaGiroService;
-import com.sistemabarberia.fadex_backend.modules.ruleta.ruleta.dto.response.RuletaResponseDTO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -18,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/ruleta-giros")
+@RequestMapping("/api/v1/ruleta/giros")
 public class RuletaGiroController {
 
     private final IRuletaGiroService giroService;
