@@ -87,7 +87,7 @@ public class ReservaService {
         if (request.esGratis()) {
             recompensaService.canjearCorteGratis(cliente.getClienteId());
         }
-        Reserva reserva = crearReservaInterna(cliente, servicio, barbero, request.fecha(), request.horaInicio(), tipo, EstadoReserva.CONFIRMADA);
+        Reserva reserva = crearReservaInterna(cliente, servicio, barbero, request.fecha(), request.horaInicio(), tipo, EstadoReserva.PENDIENTE_PAGO);
         //Reserva reserva = crearReservaInterna(cliente, servicio, barbero, request.fecha(), request.horaInicio(), TipoReserva.RESERVA_VIRTUAL, EstadoReserva.CONFIRMADA);
         return reservaMapper.toDto(reserva);
     }
@@ -105,6 +105,12 @@ public class ReservaService {
         Reserva reserva = new Reserva();
         reserva.setCliente(cliente);
         reserva.setBarbero(barbero);
+
+        LocalDate fechaActual = LocalDate.now();
+
+        if (fechaActual.isAfter(fecha)) {
+            throw new BusinessException("la fecha no puede ser antigua", HttpStatus.FORBIDDEN);
+        }
         reserva.setFecha(fecha);
         reserva.setServicio(servicio);
         reserva.setHoraInicio(horaInicio);
@@ -304,6 +310,15 @@ public class ReservaService {
         }
 
         reserva.setEstadoReserva(EstadoReserva.CANCELADA);
+        return reservaMapper.toDto(reservaRepository.save(reserva));
+    }
+    @Transactional
+    public ReservaDTO PagarReserva(Long reservaId) {
+        Reserva reserva = buscarOFallar(reservaId);
+
+
+
+        reserva.setEstadoReserva(EstadoReserva.CONFIRMADA);
         return reservaMapper.toDto(reservaRepository.save(reserva));
     }
 
