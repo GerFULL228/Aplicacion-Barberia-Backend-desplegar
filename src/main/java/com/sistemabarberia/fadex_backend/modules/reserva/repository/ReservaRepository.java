@@ -271,6 +271,7 @@ AND (:metodoPago IS NULL OR p.metodo::TEXT = :metodoPago)
             @Param("hasta") LocalDate hasta,
             Pageable pageable
     );
+
     @Query(value = """
     SELECT r.* FROM reservas r
     LEFT JOIN cliente c ON c.id_cliente = r.id_cliente
@@ -285,13 +286,14 @@ AND (:metodoPago IS NULL OR p.metodo::TEXT = :metodoPago)
       AND (:hasta IS NULL OR r.fecha <= CAST(:hasta AS date))
       AND (:clienteNombre IS NULL OR
            LOWER(cp.nombre::text) LIKE LOWER(CONCAT('%', :clienteNombre, '%')) OR
-           LOWER(cp.apellido::text) LIKE LOWER(CONCAT('%', :clienteNombre, '%')))
+           LOWER(cp.apellido::text) LIKE LOWER(CONCAT('%', :clienteNombre, '%')) OR
+           LOWER(CONCAT(cp.nombre, ' ', cp.apellido)::text) LIKE LOWER(CONCAT('%', :clienteNombre, '%')))
     ORDER BY r.fecha DESC, r.hora_inicio DESC
 """, nativeQuery = true)
     List<Reserva> findHistorialByBarberoUsername(
             @Param("username") String username,
-            @Param("desde") LocalDate desde,
-            @Param("hasta") LocalDate hasta,
+            @Param("desde") String desde,
+            @Param("hasta") String hasta,
             @Param("clienteNombre") String clienteNombre
     );
 }

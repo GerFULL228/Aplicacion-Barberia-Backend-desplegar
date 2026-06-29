@@ -18,7 +18,7 @@ public class BarberoHistorialServiceImpl implements BarberoHistorialService {
     private final ReservaRepository reservaRepository;
 
     @Override
-    public List<HistorialCorteDTO> getHistorial(String username, LocalDate desde, LocalDate hasta, String clienteNombre) {
+    public List<HistorialCorteDTO> getHistorial(String username, String desde, String hasta, String clienteNombre) {
         List<Reserva> reservas = reservaRepository.findHistorialByBarberoUsername(
                 username, desde, hasta,
                 (clienteNombre != null && !clienteNombre.isBlank()) ? clienteNombre : null

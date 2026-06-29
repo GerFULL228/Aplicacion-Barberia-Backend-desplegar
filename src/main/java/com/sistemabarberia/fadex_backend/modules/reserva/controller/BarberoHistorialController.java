@@ -27,8 +27,8 @@ public class BarberoHistorialController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<HistorialCorteDTO>>> getHistorial(
             @AuthenticationPrincipal UserDetails userDetails,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta,
+            @RequestParam(required = false) String desde,
+            @RequestParam(required = false) String hasta,
             @RequestParam(required = false) String clienteNombre
     ) {
         List<HistorialCorteDTO> historial = barberoHistorialService.getHistorial(

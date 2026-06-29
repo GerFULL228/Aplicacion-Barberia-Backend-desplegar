@@ -4,5 +4,5 @@ import com.sistemabarberia.fadex_backend.modules.reserva.dto.Response.HistorialC
 import java.time.LocalDate;
 import java.util.List;
 public interface BarberoHistorialService {
-    List<HistorialCorteDTO> getHistorial(String username, LocalDate desde, LocalDate hasta, String clienteNombre);
+    List<HistorialCorteDTO> getHistorial(String username, String desde, String hasta, String clienteNombre);
 }
