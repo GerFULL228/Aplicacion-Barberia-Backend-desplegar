@@ -9,6 +9,7 @@ import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;
 import java.util.List;
+
 public class CategoriaSpecification {
     public static Specification<Categoria> conFiltros(CategoriaFiltro filtro) {
         return (root, query, cb) -> {

@@ -12,5 +12,6 @@ public record ReclamoEmailDTO(
         String tipoProblema,
         String estado,
         String solucionReclamo,
+        String detalleSolucion,
         LocalDateTime fechaReclamo
 ) {}

@@ -25,9 +25,6 @@ public class ReclamoEmailService implements IReclamoEmailService {
         enviarCorreo(email, "FadeX | Reclamo registrado - " + reclamo.numeroReclamo(), generarHtmlConfirmacion(reclamo));
     }
 
-
-
-
     @Override
     public void enviarCambioEstado(String email, ReclamoEmailDTO reclamo) {
         enviarCorreo(email, "FadeX | Actualización de reclamo - " + reclamo.numeroReclamo(), generarHtmlCambioEstado(reclamo));
@@ -102,16 +99,12 @@ public class ReclamoEmailService implements IReclamoEmailService {
                     Gracias por confiar en FadeX.
                 </p>
                 """
-                        .formatted(reclamo.nombreCliente(), reclamo.numeroReclamo(), valorOrDefault(reclamo.tipoReclamacion()),
-                                valorOrDefault(reclamo.tipoProblema()), fecha, reclamo.estado().replace("_", " "))
+                        .formatted(reclamo.nombreCliente(), reclamo.numeroReclamo(), valorOrDefault(reclamo.tipoReclamacion()), valorOrDefault(reclamo.tipoProblema()), fecha, valorOrDefault(reclamo.estado()))
         );
     }
 
     private String generarHtmlCambioEstado(ReclamoEmailDTO reclamo) {
-        String fecha = reclamo.fechaReclamo() != null
-                ? reclamo.fechaReclamo().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
-                : "";
-
+        String fecha = reclamo.fechaReclamo() != null ? reclamo.fechaReclamo().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) : "";
         return plantillaBase(
                 "Actualización de Reclamo",
                 """
@@ -149,14 +142,27 @@ public class ReclamoEmailService implements IReclamoEmailService {
                     <p style="margin-top:10px;">
                         <strong>Estado actual:</strong> %s
                     </p>
+                    
+                    <p style="margin-top:10px;">
+                        <strong>Solución aplicada:</strong> %s
+                    </p>
+                    
+                    <p style="
+                        margin-top:10px;
+                        padding:12px;
+                        background:#f8f8f8;
+                        border-radius:6px;
+                        line-height:1.7;">
+                         %s
+                    </p>
+                    
                 </div>
     
                 <p style="color:#555;line-height:1.8;">
                     Puedes comunicarte con nosotros si necesitas más información.
                 </p>
                 """
-                        .formatted(reclamo.nombreCliente(), reclamo.numeroReclamo(), valorOrDefault(reclamo.tipoReclamacion()),
-                                valorOrDefault(reclamo.tipoProblema()), fecha, reclamo.estado().replace("_", " "))
+                        .formatted(reclamo.nombreCliente(), reclamo.numeroReclamo(), valorOrDefault(reclamo.tipoReclamacion()), valorOrDefault(reclamo.tipoProblema()), fecha, valorOrDefault(reclamo.estado()), valorOrDefault(reclamo.solucionReclamo()), detalleOrDefault(reclamo.detalleSolucion()))
         );
     }
 
@@ -266,9 +272,11 @@ public class ReclamoEmailService implements IReclamoEmailService {
             """
                 .formatted(titulo, contenido);
     }
+    private String valorOrDefault(String valor) {
+        return (valor == null || valor.isBlank()) ? "No especificado" : valor.replace("_", " ");
+    }
 
-private String valorOrDefault(String valor) {
-    return valor != null ? valor.replace("_", " ") : "No especificado";
-}
-
+    private String detalleOrDefault(String detalle) {
+        return (detalle == null || detalle.isBlank()) ? "No se registró un detalle de la solución." : detalle;
+    }
 }

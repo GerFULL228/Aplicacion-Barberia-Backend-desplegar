@@ -17,6 +17,7 @@ public class ReclamoFiltro {
     private String numeroReclamo;
     private EstadoReclamo estado;
     private TipoProblema tipoProblema;
+    private String nombreCliente;
     private TipoReclamacion tipoReclamacion;
     private CausaReclamo causaReclamo;
     private Boolean esPublico;

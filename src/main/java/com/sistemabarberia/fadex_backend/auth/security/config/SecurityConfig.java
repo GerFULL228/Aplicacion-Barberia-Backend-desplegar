@@ -152,7 +152,6 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET,
                                 "/api/v1/recompensas/**"
                         ).hasAnyRole("admin", "barbero")
-
                         // ─────────────────────────────────────────────
                         // PAGOS
                         // ─────────────────────────────────────────────
@@ -171,7 +170,6 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE,
                                 "/api/v1/pagos/**"
                         ).hasRole("admin")
-
                         // ─────────────────────────────────────────────
                         // RECLAMOS
                         // ─────────────────────────────────────────────
@@ -196,19 +194,31 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE,
                                 "/api/v1/reclamos/**"
                         ).hasRole("admin")
+                        .requestMatchers(
+                                "/api/v1/fidelizacion/**",
+                                "/api/v1/fidelizacion-configuracion/**",
+                                "/api/v1/fidelizacion-reglas/**",
+                                "/api/v1/fidelizacion-movimientos/**",
+                                "/api/v1/fidelizacion-tarjetas/**",
+                                "/api/v1/ruletas/**",
+                                "/api/v1/ruleta-categorias",
+                                "/api/v1/ruleta-items/**",
+                                "/api/v1/ruleta-giros/**",
+                                "/api/v1/recompensas/**"
+                        ).hasAnyRole("admin", "barbero", "cliente")
 
+                         // ─────────────────────────────────────────────
                         // ─────────────────────────────────────────────
                         // DEFAULT
                         // ─────────────────────────────────────────────
+                                .requestMatchers("/api/analisis/**").hasAnyRole("ADMIN")
                         // ─────────────────────────────────────────────
                         // PLANILLAS (ACCESO PARA TODOS LOS ROLES)
                         // ─────────────────────────────────────────────
-                                .requestMatchers("/api/v1/planillas/**")
-                                .hasAnyRole("admin", "barbero", "cliente")
+                        .requestMatchers("/api/v1/planillas/**")
+                        .hasAnyRole("admin", "barbero", "cliente")
                         .anyRequest().authenticated()
-                )
-                .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
-
+                ).addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 

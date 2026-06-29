@@ -16,5 +16,6 @@ public class ReclamoSolucionRequest {
     private EstadoReclamo estadoReclamo;
     private SolucionReclamo solucionReclamo;
     private String notasInternas;
+    private String detalleSolucion;
     private BigDecimal montoCompensado;
 }

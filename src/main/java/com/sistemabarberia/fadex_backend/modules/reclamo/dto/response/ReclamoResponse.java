@@ -23,6 +23,7 @@ public class ReclamoResponse {
     private EstadoReclamo estadoReclamo;
     private SolucionReclamo solucionReclamo;
     private String descripcion;
+    private String detalleSolucion;
     private String notasInternas;
     private BigDecimal montoReclamado;
     private BigDecimal montoCompensado;

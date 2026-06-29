@@ -14,11 +14,10 @@ public class ReclamoMapper {
     public ReclamoResponse toResponse(Reclamo reclamo) {
         return ReclamoResponse.builder()
                 .idReclamo(reclamo.getIdReclamo()).numeroReclamo(reclamo.getNumeroReclamo()).nombreCliente(reclamo.getNombreCliente()).correoCliente(reclamo.getCorreoCliente())
-                .telefonoCliente(reclamo.getTelefonoCliente()).tipoReclamacion(reclamo.getTipoReclamacion()).tipoProblema(reclamo.getTipoProblema())
-                .causaReclamo(reclamo.getCausaReclamo()).estadoReclamo(reclamo.getEstadoReclamo()).solucionReclamo(reclamo.getSolucionReclamo()).descripcion(reclamo.getDescripcion())
-                .notasInternas(reclamo.getNotasInternas()).montoReclamado(reclamo.getMontoReclamado()).montoCompensado(reclamo.getMontoCompensado())
-                .fechaOcurrencia(reclamo.getFechaOcurrencia()).fechaReclamo(reclamo.getFechaReclamo()).fechaResolucion(reclamo.getFechaResolucion())
-                .esPublico(reclamo.isEsPublico()).adjuntos(null).build();
+                .telefonoCliente(reclamo.getTelefonoCliente()).tipoReclamacion(reclamo.getTipoReclamacion()).tipoProblema(reclamo.getTipoProblema()).causaReclamo(reclamo.getCausaReclamo())
+                .estadoReclamo(reclamo.getEstadoReclamo()).detalleSolucion(reclamo.getDetalleSolucion()).solucionReclamo(reclamo.getSolucionReclamo()).descripcion(reclamo.getDescripcion())
+                .notasInternas(reclamo.getNotasInternas()).montoReclamado(reclamo.getMontoReclamado()).montoCompensado(reclamo.getMontoCompensado()).fechaOcurrencia(reclamo.getFechaOcurrencia())
+                .fechaReclamo(reclamo.getFechaReclamo()).fechaResolucion(reclamo.getFechaResolucion()).esPublico(reclamo.isEsPublico()).adjuntos(null).build();
     }
 
     public ReclamoResponse toDetalleResponse(Reclamo reclamo) {
@@ -27,8 +26,8 @@ public class ReclamoMapper {
 
         return ReclamoResponse.builder()
                 .idReclamo(reclamo.getIdReclamo()).numeroReclamo(reclamo.getNumeroReclamo()).nombreCliente(reclamo.getNombreCliente()).correoCliente(reclamo.getCorreoCliente())
-                .telefonoCliente(reclamo.getTelefonoCliente()).tipoReclamacion(reclamo.getTipoReclamacion()).tipoProblema(reclamo.getTipoProblema())
-                .causaReclamo(reclamo.getCausaReclamo()).estadoReclamo(reclamo.getEstadoReclamo()).solucionReclamo(reclamo.getSolucionReclamo()).descripcion(reclamo.getDescripcion())
+                .telefonoCliente(reclamo.getTelefonoCliente()).tipoReclamacion(reclamo.getTipoReclamacion()).tipoProblema(reclamo.getTipoProblema()).causaReclamo(reclamo.getCausaReclamo())
+                .estadoReclamo(reclamo.getEstadoReclamo()).detalleSolucion(reclamo.getDetalleSolucion()).solucionReclamo(reclamo.getSolucionReclamo()).descripcion(reclamo.getDescripcion())
                 .notasInternas(reclamo.getNotasInternas()).montoReclamado(reclamo.getMontoReclamado()).montoCompensado(reclamo.getMontoCompensado()).fechaOcurrencia(reclamo.getFechaOcurrencia())
                 .fechaReclamo(reclamo.getFechaReclamo()).fechaResolucion(reclamo.getFechaResolucion()).esPublico(reclamo.isEsPublico()).adjuntos(adjuntos).build();
     }

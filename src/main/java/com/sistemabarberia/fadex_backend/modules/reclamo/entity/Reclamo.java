@@ -96,6 +96,9 @@ public class Reclamo {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String descripcion;
 
+    @Column(name = "detalle_solucion", columnDefinition = "TEXT")
+    private String detalleSolucion;
+
     @Column(name = "notas_internas", columnDefinition = "TEXT")
     private String notasInternas;
 

@@ -46,6 +46,10 @@ public class ReclamoSpecification {
                 predicates.add(cb.like(root.get("numeroDocumentoCliente"), "%" + filtro.getNumeroDocumentoCliente() + "%"));
             }
 
+            if (StringUtils.hasText(filtro.getNombreCliente())) {
+                predicates.add(cb.like(cb.lower(root.get("nombreCliente")), "%" + filtro.getNombreCliente().trim().toLowerCase() + "%"));
+            }
+
             if (filtro.getFechaInicio() != null) {
                 predicates.add(cb.greaterThanOrEqualTo(root.get("fechaReclamo"), filtro.getFechaInicio().atStartOfDay()));
             }
