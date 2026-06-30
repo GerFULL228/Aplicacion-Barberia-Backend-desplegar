@@ -44,15 +44,16 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .headers(headers -> headers
 
-                .contentSecurityPolicy(csp -> csp
-                        .policyDirectives(
-                                "default-src 'self'; " +
-                                        "script-src 'self'; " +
-                                        "style-src 'self' 'unsafe-inline'; " +
-                                        "img-src 'self' data: https:; " +
-                                        "font-src 'self' data:;"
-                        )
-                )
+               .contentSecurityPolicy(csp -> csp
+    .policyDirectives(
+        "default-src 'self'; " +
+        "script-src 'self'; " +
+        "style-src 'self' 'unsafe-inline'; " +
+        "img-src 'self' data: https:; " +
+        "font-src 'self' data:; " +
+        "frame-ancestors 'none';"
+    )
+)
 
                 .frameOptions(frame -> frame.deny())
 
