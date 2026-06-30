@@ -42,6 +42,24 @@ public class SecurityConfig {
 
         http
                 .cors(Customizer.withDefaults())
+                .headers(headers -> headers
+
+                .contentSecurityPolicy(csp -> csp
+                        .policyDirectives(
+                                "default-src 'self'; " +
+                                        "script-src 'self'; " +
+                                        "style-src 'self' 'unsafe-inline'; " +
+                                        "img-src 'self' data: https:; " +
+                                        "font-src 'self' data:;"
+                        )
+                )
+
+                .frameOptions(frame -> frame.deny())
+
+                .referrerPolicy(referrer -> referrer.policy(
+                        org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN
+                ))
+        )
                 .exceptionHandling(exception ->
                         exception
                                 .authenticationEntryPoint(jwtAuthenticationEntryPoint)
