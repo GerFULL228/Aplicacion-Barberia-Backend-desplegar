@@ -30,7 +30,7 @@ public class ProductoController {
         ProductoResponse producto = productoService.obtenerProductoPublicadoPorId(id);
         return ResponseEntity.ok(ApiResponse.ok("Producto obtenido correctamente", producto));
     }
-    @GetMapping("publicados")
+    @GetMapping("/publicados")
     public ResponseEntity<ApiResponse<PageResponse<ProductoResponse>>> obtenerProductosPublicos(@Valid @ModelAttribute ProductoFiltro filtro, @PageableDefault(size = 10, page = 0) Pageable pageable) {
         PageResponse<ProductoResponse> productos = productoService.listarProductosPublicos(filtro, pageable);
         return ResponseEntity.ok(ApiResponse.ok("Productos obtenidos correctamente", productos));
