@@ -31,9 +31,13 @@ public class VentaController {
             @RequestParam(required = false) String fechaInicio,
             @RequestParam(required = false) String fechaFin
     ) {
-
         return ResponseEntity.ok(ApiResponse.ok("Ventas listadas correctamente",
                 ventaService.buscarConFiltros(cliente, numeroCorrelativo, tipoComprobante, fechaInicio, fechaFin)));
+    }
+
+    @GetMapping("/barbero/{barberoId}")
+    public ResponseEntity<ApiResponse<List<VentaResponseDTO>>> listarMisVentas(@PathVariable Integer barberoId) {
+        return ResponseEntity.ok(ApiResponse.ok("Ventas del barbero listadas", ventaService.listarPorBarbero(barberoId)));
     }
 
     @GetMapping("/{id}")
