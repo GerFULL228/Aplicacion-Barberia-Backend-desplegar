@@ -1,6 +1,7 @@
 package com.sistemabarberia.fadex_backend.modules.fidelizacion.regla.service;
 
 import com.sistemabarberia.fadex_backend.commons.response.PageResponse;
+import com.sistemabarberia.fadex_backend.modules.categoria.entity.Categoria;
 import com.sistemabarberia.fadex_backend.modules.fidelizacion.regla.dto.FidelizacionReglaFiltro;
 import com.sistemabarberia.fadex_backend.modules.fidelizacion.regla.dto.request.FidelizacionReglaRequestDTO;
 import com.sistemabarberia.fadex_backend.modules.fidelizacion.regla.dto.response.FidelizacionReglaResponseDTO;
@@ -12,4 +13,5 @@ public interface IFidelizacionReglaService {
     FidelizacionReglaResponseDTO crearRegla(FidelizacionReglaRequestDTO dto);
     FidelizacionReglaResponseDTO actualizarRegla(Long id,FidelizacionReglaRequestDTO dto);
     void eliminarRegla(Long id);
+    void crearReglaPorDefecto(Categoria categoria);
 }

@@ -1,4 +1,4 @@
-package com.sistemabarberia.fadex_backend.modules.ruleta.categoria.service.impll;
+package com.sistemabarberia.fadex_backend.modules.ruleta.categoria.service.impl;
 
 import com.sistemabarberia.fadex_backend.commons.exception.BusinessException;
 import com.sistemabarberia.fadex_backend.commons.response.PageResponse;
@@ -14,7 +14,6 @@ import com.sistemabarberia.fadex_backend.modules.ruleta.categoria.service.IRulet
 import com.sistemabarberia.fadex_backend.modules.ruleta.categoria.specs.RuletaCategoriaSpecs;
 import com.sistemabarberia.fadex_backend.modules.ruleta.ruleta.entity.Ruleta;
 import com.sistemabarberia.fadex_backend.modules.ruleta.ruleta.repository.RuletaRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

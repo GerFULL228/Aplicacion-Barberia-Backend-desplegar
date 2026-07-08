@@ -8,6 +8,7 @@ import com.sistemabarberia.fadex_backend.modules.fidelizacion.regla.dto.Fideliza
 import com.sistemabarberia.fadex_backend.modules.fidelizacion.regla.dto.request.FidelizacionReglaRequestDTO;
 import com.sistemabarberia.fadex_backend.modules.fidelizacion.regla.dto.response.FidelizacionReglaResponseDTO;
 import com.sistemabarberia.fadex_backend.modules.fidelizacion.regla.entity.FidelizacionRegla;
+import com.sistemabarberia.fadex_backend.modules.fidelizacion.regla.entity.enums.TipoAlcanceFidelizacion;
 import com.sistemabarberia.fadex_backend.modules.fidelizacion.regla.mapper.FidelizacionReglaMapper;
 import com.sistemabarberia.fadex_backend.modules.fidelizacion.regla.repository.FidelizacionReglaRepository;
 import com.sistemabarberia.fadex_backend.modules.fidelizacion.regla.service.IFidelizacionReglaService;
@@ -72,6 +73,14 @@ public class FidelizacionReglaServiceImpl implements IFidelizacionReglaService {
         FidelizacionRegla regla = reglaRepository.findById(id).orElseThrow(() -> new BusinessException("Regla no encontrada", HttpStatus.NOT_FOUND));
         reglaRepository.delete(regla);
 
+    }
+
+    @Override
+    @Transactional
+    public void crearReglaPorDefecto(Categoria categoria) {
+        if (reglaRepository.existsByCategoriaIdAndTipoAlcanceAndActivoTrue(categoria.getId(), TipoAlcanceFidelizacion.CATEGORIA)) {return;}
+        FidelizacionRegla regla = FidelizacionRegla.builder().categoria(categoria).tipoAlcance(TipoAlcanceFidelizacion.CATEGORIA).puntos(1).activo(true).build();
+        reglaRepository.save(regla);
     }
 
     private Categoria obtenerCategoria(Long id){

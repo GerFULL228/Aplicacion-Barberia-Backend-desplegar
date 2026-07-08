@@ -14,21 +14,17 @@ import com.sistemabarberia.fadex_backend.auth.rol.Entity.Rol;
 import com.sistemabarberia.fadex_backend.auth.rol.Entity.RolRepository;
 import com.sistemabarberia.fadex_backend.auth.security.jwt.JwtProperties;
 import com.sistemabarberia.fadex_backend.auth.security.jwt.JwtService;
-import com.sistemabarberia.fadex_backend.auth.security.service.CustomUserDetailService;
 import com.sistemabarberia.fadex_backend.auth.security.service.CustomUserDetails;
 import com.sistemabarberia.fadex_backend.auth.usuario.Entity.Usuario;
 import com.sistemabarberia.fadex_backend.auth.usuario.Repository.UsuarioRepository;
 import com.sistemabarberia.fadex_backend.auth.authentication.dto.request.RegisterRequest;
 import com.sistemabarberia.fadex_backend.auth.usuario.dto.response.UsuarioResponse;
 import com.sistemabarberia.fadex_backend.commons.exception.BusinessException;
+import com.sistemabarberia.fadex_backend.modules.fidelizacion.engine.service.IFidelizacionEngine;
 import com.sistemabarberia.fadex_backend.modules.persona.entity.Persona;
 import com.sistemabarberia.fadex_backend.modules.persona.repository.PersonaRepository;
 import com.sistemabarberia.fadex_backend.modules.cliente.entity.Cliente;
 import com.sistemabarberia.fadex_backend.modules.cliente.repository.ClienteRepository;
-import com.sistemabarberia.fadex_backend.modules.persona.entity.Persona;
-import com.sistemabarberia.fadex_backend.modules.persona.repository.PersonaRepository;
-import com.sistemabarberia.fadex_backend.modules.recompensa.entity.Recompensa;
-import com.sistemabarberia.fadex_backend.modules.recompensa.repository.RecompensaRepository;
 
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
@@ -45,7 +41,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -68,9 +63,8 @@ public class AuthService {
     private final RolRepository rolRepository;
     private final PasswordEncoder passwordEncoder;
     private final PersonaRepository personaRepository;
-
+    private final IFidelizacionEngine fidelizacionEngine;
     private final ClienteRepository clienteRepository;
-    private final RecompensaRepository recompensaRepository;
 
     @Value("${spring.security.oauth2.client.registration.google.client-id}")
     private String googleClientId;
@@ -246,13 +240,7 @@ public class AuthService {
                         .build();
                 Cliente guardado = clienteRepository.save(cliente);
 
-                Recompensa recompensa = Recompensa.builder()
-                        .cliente(guardado)
-                        .cortesAcumulados(0)
-                        .cortesGratis(0)
-                        .fechaActualizacion(LocalDateTime.now())
-                        .build();
-                recompensaRepository.save(recompensa);
+                fidelizacionEngine.registrarCliente(guardado);
             }
 
             UserDetails userDetails = userDetailsService.loadUserByUsername(usuario.getUser());

@@ -19,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
@@ -154,6 +155,20 @@ public class ProductoService implements IProductoService {
             }
         }
         productoRepository.delete(producto);
+    }
+
+    @Override
+    @Transactional
+    public void descontarStockPremio(Long productoId, int cantidad) {
+        Producto producto = productoRepository.findById(productoId).orElseThrow(() -> new BusinessException("Producto no encontrado", HttpStatus.NOT_FOUND));
+        if (cantidad <= 0) {
+            throw new BusinessException("La cantidad debe ser mayor a cero.", HttpStatus.BAD_REQUEST);
+        }
+        if (producto.getStock() < cantidad) {
+            throw new BusinessException("Stock insuficiente para entregar el premio.", HttpStatus.BAD_REQUEST);
+        }
+        producto.setStock(producto.getStock() - cantidad);
+        productoRepository.save(producto);
     }
 
     private void validarArchivoImagen(MultipartFile file) {

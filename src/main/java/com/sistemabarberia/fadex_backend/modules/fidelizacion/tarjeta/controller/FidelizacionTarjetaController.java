@@ -15,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/fidelizacion/tarjetas")
@@ -51,5 +53,17 @@ public class FidelizacionTarjetaController {
     public ResponseEntity<ApiResponse<Void>> eliminar(@PathVariable Long id) {
         tarjetaService.eliminarTarjeta(id);
         return ResponseEntity.ok(ApiResponse.ok("Tarjeta eliminada correctamente."));
+    }
+
+    @GetMapping("/mis-tarjetas")
+    @PreAuthorize("hasAuthority('FIDELIZACION_READ')")
+    public ResponseEntity<ApiResponse<List<FidelizacionTarjetaResponseDTO>>> obtenerMisTarjetas() {
+        return ResponseEntity.ok(ApiResponse.ok("Mis tarjetas obtenidas correctamente.", tarjetaService.obtenerMisTarjetas()));
+    }
+
+    @GetMapping("/mis-tarjetas/{id}")
+    @PreAuthorize("hasAuthority('FIDELIZACION_READ')")
+    public ResponseEntity<ApiResponse<FidelizacionTarjetaResponseDTO>> obtenerMiTarjeta(@PathVariable Long id) {
+        return ResponseEntity.ok(ApiResponse.ok("Tarjeta obtenida correctamente.", tarjetaService.obtenerMiTarjeta(id)));
     }
 }

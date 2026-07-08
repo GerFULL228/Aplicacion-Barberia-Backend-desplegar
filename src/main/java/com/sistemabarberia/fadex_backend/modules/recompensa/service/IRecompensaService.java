@@ -1,6 +1,8 @@
 package com.sistemabarberia.fadex_backend.modules.recompensa.service;
 
 import com.sistemabarberia.fadex_backend.modules.recompensa.dto.response.RecompensaResponseDTO;
+import com.sistemabarberia.fadex_backend.modules.reserva.entity.Reserva;
+import com.sistemabarberia.fadex_backend.modules.venta.entity.Venta;
 
 public interface IRecompensaService {
 

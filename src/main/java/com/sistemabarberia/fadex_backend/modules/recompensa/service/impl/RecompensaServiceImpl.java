@@ -62,16 +62,12 @@ public class RecompensaServiceImpl implements IRecompensaService {
                         "Tarjeta de recompensa no encontrada para el cliente: " + clienteId));
 
         if (recompensa.getCortesGratis() <= 0) {
-            throw new BusinessException(
-                    "El cliente no tiene cortes gratis disponibles",
-                    HttpStatus.BAD_REQUEST);
+            throw new BusinessException("El cliente no tiene cortes gratis disponibles", HttpStatus.BAD_REQUEST);
         }
 
         int filasAfectadas = recompensaRepository.canjearCorteGratis(clienteId);
         if (filasAfectadas == 0) {
-            throw new BusinessException(
-                    "No se pudo canjear el corte gratis",
-                    HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new BusinessException("No se pudo canjear el corte gratis", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

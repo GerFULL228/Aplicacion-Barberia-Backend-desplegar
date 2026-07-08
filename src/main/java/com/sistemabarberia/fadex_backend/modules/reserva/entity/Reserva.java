@@ -45,11 +45,6 @@ public class Reserva {
     private LocalDate fecha;
     private LocalTime horaInicio;
     private LocalTime horaFin;
-
     private String observacion;
-
     private BigDecimal total;
-
-
-
 }

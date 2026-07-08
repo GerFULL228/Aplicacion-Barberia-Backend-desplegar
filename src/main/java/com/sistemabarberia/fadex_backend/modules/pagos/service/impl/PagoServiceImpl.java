@@ -6,6 +6,7 @@ import com.sistemabarberia.fadex_backend.modules.barbero.entity.Barbero;
 import com.sistemabarberia.fadex_backend.modules.barbero.repository.BarberoRepository;
 import com.sistemabarberia.fadex_backend.modules.cliente.entity.Cliente;
 import com.sistemabarberia.fadex_backend.modules.cliente.repository.ClienteRepository;
+import com.sistemabarberia.fadex_backend.modules.fidelizacion.engine.service.IFidelizacionEngine;
 import com.sistemabarberia.fadex_backend.modules.pagos.dto.request.PagoRequestDTO;
 import com.sistemabarberia.fadex_backend.modules.pagos.dto.response.HistorialPagoResponseDTO;
 import com.sistemabarberia.fadex_backend.modules.pagos.dto.response.PagoResponseDTO;
@@ -16,7 +17,6 @@ import com.sistemabarberia.fadex_backend.modules.pagos.mapper.PagoMapper;
 import com.sistemabarberia.fadex_backend.modules.pagos.repository.HistorialPagoRepository;
 import com.sistemabarberia.fadex_backend.modules.pagos.repository.PagoRepository;
 import com.sistemabarberia.fadex_backend.modules.pagos.service.IPagoService;
-import com.sistemabarberia.fadex_backend.modules.recompensa.service.IRecompensaService;
 import com.sistemabarberia.fadex_backend.modules.reserva.entity.EstadoReserva;
 import com.sistemabarberia.fadex_backend.modules.reserva.entity.Reserva;
 import com.sistemabarberia.fadex_backend.modules.reserva.entity.TipoReserva;
@@ -44,7 +44,7 @@ public class PagoServiceImpl implements IPagoService {
     private final VentaRepository ventaRepository;
     private final PagoMapper pagoMapper;
     private final HistorialPagoMapper historialPagoMapper;
-    private final IRecompensaService recompensaService;
+    private final IFidelizacionEngine fidelizacionEngine;
 
     @Override
     @Transactional
@@ -105,10 +105,12 @@ public class PagoServiceImpl implements IPagoService {
         historial.setCliente(cliente);
         historial.setFecha(LocalDateTime.now());
         historialPagoRepository.save(historial);
-        if (reserva != null && reserva.getTipoReserva() != TipoReserva.RESERVA_GRATIS) {
-            recompensaService.acumularCorte(cliente.getClienteId());
+        if (reserva != null ) {
+            fidelizacionEngine.procesarServicio(reserva);
         }
-
+        if (venta != null) {
+            fidelizacionEngine.procesarVenta(venta);
+        }
         return pagoMapper.toResponse(pagoGuardado);
     }
 

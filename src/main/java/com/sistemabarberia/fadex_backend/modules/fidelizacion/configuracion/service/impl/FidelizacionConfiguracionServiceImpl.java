@@ -12,9 +12,12 @@ import com.sistemabarberia.fadex_backend.modules.fidelizacion.configuracion.mapp
 import com.sistemabarberia.fadex_backend.modules.fidelizacion.configuracion.repository.FidelizacionConfiguracionRepository;
 import com.sistemabarberia.fadex_backend.modules.fidelizacion.configuracion.service.IFidelizacionConfiguracionService;
 import com.sistemabarberia.fadex_backend.modules.fidelizacion.configuracion.specs.FidelizacionConfiguracionSpecification;
+import com.sistemabarberia.fadex_backend.modules.fidelizacion.regla.service.IFidelizacionReglaService;
+import com.sistemabarberia.fadex_backend.modules.fidelizacion.tarjeta.service.IFidelizacionTarjetaService;
 import com.sistemabarberia.fadex_backend.modules.ruleta.ruleta.entity.Ruleta;
 import com.sistemabarberia.fadex_backend.modules.ruleta.ruleta.repository.RuletaRepository;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -24,22 +27,34 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 @Transactional
 public class FidelizacionConfiguracionServiceImpl implements IFidelizacionConfiguracionService {
 
-    private final FidelizacionConfiguracionRepository configuracionRepository;
-    private final CategoriaRepository categoriaRepository;
-    private final RuletaRepository ruletaRepository;
-    private final FidelizacionConfiguracionMapper configuracionMapper;
+    @Autowired
+    private FidelizacionConfiguracionRepository configuracionRepository;
+
+    @Autowired
+    private CategoriaRepository categoriaRepository;
+
+    @Autowired
+    private RuletaRepository ruletaRepository;
+
+    @Autowired
+    private FidelizacionConfiguracionMapper configuracionMapper;
+
+    @Autowired
+    @Lazy
+    private IFidelizacionTarjetaService tarjetaService;
+
+    @Autowired
+    private IFidelizacionReglaService reglaService;
 
     @Override
     @Transactional(readOnly = true)
     public PageResponse<ConfiguracionResponseDTO> listarConfiguracionConFiltro(ConfiguracionFiltro filtro, Pageable pageable) {
         Page<FidelizacionConfiguracion> page = configuracionRepository.findAll(FidelizacionConfiguracionSpecification.conFiltros(filtro), pageable);
         List<ConfiguracionResponseDTO> data = page.getContent().stream().map(configuracionMapper::toResponse).toList();
-        return PageResponse.<ConfiguracionResponseDTO>builder()
-                .content(data).pageNumber(page.getNumber()).pageSize(page.getSize()).totalElements(page.getTotalElements()).totalPages(page.getTotalPages()).last(page.isLast()).build();
+        return PageResponse.<ConfiguracionResponseDTO>builder().content(data).pageNumber(page.getNumber()).pageSize(page.getSize()).totalElements(page.getTotalElements()).totalPages(page.getTotalPages()).last(page.isLast()).build();
     }
 
     @Override
@@ -61,7 +76,13 @@ public class FidelizacionConfiguracionServiceImpl implements IFidelizacionConfig
         }
         FidelizacionConfiguracion configuracion = FidelizacionConfiguracion.builder().categoria(categoria).activa(dto.getActiva()).meta(dto.getMeta())
                 .mostrarSiempre(dto.getMostrarSiempre()).crearTarjetaAutomatica(dto.getCrearTarjetaAutomatica()).ruleta(ruleta).build();
-        return configuracionMapper.toResponse(configuracionRepository.save(configuracion));
+
+        configuracion = configuracionRepository.save(configuracion);
+        reglaService.crearReglaPorDefecto(configuracion.getCategoria());
+        if (Boolean.TRUE.equals(configuracion.getCrearTarjetaAutomatica())) {
+            tarjetaService.crearTarjetasParaCategoria(configuracion.getCategoria());
+        }
+        return configuracionMapper.toResponse(configuracion);
     }
 
     @Override
@@ -78,17 +99,28 @@ public class FidelizacionConfiguracionServiceImpl implements IFidelizacionConfig
         if (dto.getRuletaId() != null) {
             ruleta = ruletaRepository.findById(dto.getRuletaId()).orElseThrow(() -> new BusinessException("Ruleta no encontrada.", HttpStatus.NOT_FOUND));
         }
+        boolean antes = Boolean.TRUE.equals(configuracion.getCrearTarjetaAutomatica());
         configuracion.setActiva(dto.getActiva());
         configuracion.setMeta(dto.getMeta());
         configuracion.setMostrarSiempre(dto.getMostrarSiempre());
-        configuracion.setCrearTarjetaAutomatica(dto.getCrearTarjetaAutomatica());
         configuracion.setRuleta(ruleta);
-        return configuracionMapper.toResponse(configuracionRepository.save(configuracion));
+        configuracion.setCrearTarjetaAutomatica(dto.getCrearTarjetaAutomatica());
+        configuracion = configuracionRepository.save(configuracion);
+        if (!antes && Boolean.TRUE.equals(configuracion.getCrearTarjetaAutomatica())) {
+            tarjetaService.crearTarjetasParaCategoria(configuracion.getCategoria());
+        }
+        return configuracionMapper.toResponse(configuracion);
     }
 
     @Override
     public void eliminarConfiguracion(Long id) {
         FidelizacionConfiguracion configuracion = configuracionRepository.findById(id).orElseThrow(() -> new BusinessException("Configuración no encontrada.", HttpStatus.NOT_FOUND));
         configuracionRepository.delete(configuracion);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public FidelizacionConfiguracion obtenerConfiguracionActiva(Long categoriaId) {
+        return configuracionRepository.findByCategoria_IdAndActivaTrue(categoriaId).orElseThrow(() -> new BusinessException("No existe una configuración activa para la categoría.", HttpStatus.NOT_FOUND));
     }
 }

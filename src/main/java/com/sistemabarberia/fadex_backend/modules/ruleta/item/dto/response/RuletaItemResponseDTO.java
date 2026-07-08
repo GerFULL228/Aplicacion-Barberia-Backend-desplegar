@@ -20,6 +20,7 @@ public class RuletaItemResponseDTO {
     private BigDecimal probabilidad;
     private Boolean esPremioMayor;
     private Integer stock;
+    private Integer cantidadProducto;
     private Integer ordenDisplay;
     private String imagenUrl;
     private Long productoId;

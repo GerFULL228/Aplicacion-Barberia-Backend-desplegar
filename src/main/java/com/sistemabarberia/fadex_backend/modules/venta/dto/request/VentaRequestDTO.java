@@ -27,4 +27,6 @@ public class VentaRequestDTO {
 
     @NotEmpty(message = "Debe tener al menos un detalle")
     private List<DetalleVentaRequestDTO> detalles;
+
+    private List<Long> recompensasAplicadas;
 }
