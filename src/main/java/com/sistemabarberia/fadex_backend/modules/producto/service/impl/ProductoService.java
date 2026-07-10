@@ -37,6 +37,7 @@ public class ProductoService implements IProductoService {
     private static final List<String> TIPOS_IMAGEN = List.of("image/jpeg", "image/png", "image/webp");
 
     @Override
+    @Transactional(readOnly = true)
     public ProductoResponse obtenerProductoPublicadoPorId(Long id) {
         Producto producto = productoRepository.findById(id).orElseThrow(() -> new BusinessException("Producto no encontrado", HttpStatus.NOT_FOUND));
         if (!producto.isEstado() || !producto.isPublicado()) {
@@ -46,6 +47,7 @@ public class ProductoService implements IProductoService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PageResponse<ProductoResponse> listarProductosPublicos(ProductoFiltro filtro, Pageable pageable) {
         filtro.setEstado(true);
         filtro.setPublicado(true);
@@ -58,6 +60,7 @@ public class ProductoService implements IProductoService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PageResponse<ProductoResponse> listarProductoFiltros(ProductoFiltro filtro, Pageable pageable) {
         List<Long> categoriasIds = null;
         if (filtro != null && filtro.getIdCategoria() != null) {
@@ -68,12 +71,14 @@ public class ProductoService implements IProductoService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ProductoResponse obtenerProductoPorId(Long id) {
         Producto producto = productoRepository.findById(id).orElseThrow(() -> new BusinessException("Producto no encontrado", HttpStatus.NOT_FOUND));
         return productoMapper.toResponse(producto);
     }
 
     @Override
+    @Transactional
     public ProductoResponse crearProducto(ProductoRequest request, List<MultipartFile> archivos)  {
         Categoria categoria = obtenerCategoriaProducto(request.getIdCategoria());
         String nombre = validarNombreProducto(request.getNombre());
@@ -100,6 +105,7 @@ public class ProductoService implements IProductoService {
     }
 
     @Override
+    @Transactional
     public ProductoResponse actualizarProducto(Long id, ProductoRequest request, List<MultipartFile> archivos) {
         Producto producto = productoRepository.findById(id).orElseThrow(() ->new BusinessException("Producto no encontrado",HttpStatus.NOT_FOUND));
         Categoria categoria = obtenerCategoriaProducto(request.getIdCategoria());
@@ -131,6 +137,7 @@ public class ProductoService implements IProductoService {
     }
 
     @Override
+    @Transactional
     public ProductoResponse  cambiarEstadoProducto(Long id, boolean nuevoEstado) {
         Producto producto = productoRepository.findById(id).orElseThrow(() -> new BusinessException("Producto no encontrado", HttpStatus.NOT_FOUND));
         producto.setEstado(nuevoEstado);
@@ -139,6 +146,7 @@ public class ProductoService implements IProductoService {
     }
 
     @Override
+    @Transactional
     public ProductoResponse cambiarPublicacion(Long id, boolean publicado) {
         Producto producto = productoRepository.findById(id).orElseThrow(() -> new BusinessException("Producto no encontrado", HttpStatus.NOT_FOUND));
         producto.setPublicado(publicado);
@@ -147,6 +155,7 @@ public class ProductoService implements IProductoService {
     }
 
     @Override
+    @Transactional
     public void eliminarProducto(Long id) {
         Producto producto = productoRepository.findById(id).orElseThrow(() -> new BusinessException("Producto no encontrado", HttpStatus.NOT_FOUND));
         if (producto.getUrlsMultimedia() != null) {

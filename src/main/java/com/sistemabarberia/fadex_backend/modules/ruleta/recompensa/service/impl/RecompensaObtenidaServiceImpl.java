@@ -12,6 +12,7 @@ import com.sistemabarberia.fadex_backend.modules.producto.entity.Producto;
 import com.sistemabarberia.fadex_backend.modules.producto.service.IProductoService;
 import com.sistemabarberia.fadex_backend.modules.reserva.entity.Reserva;
 import com.sistemabarberia.fadex_backend.modules.reserva.repository.ReservaRepository;
+import com.sistemabarberia.fadex_backend.modules.ruleta.item.entity.enums.TipoPremio;
 import com.sistemabarberia.fadex_backend.modules.ruleta.recompensa.dto.RecompensaObtenidaFiltro;
 import com.sistemabarberia.fadex_backend.modules.ruleta.recompensa.dto.request.RecompensaObtenidaRequestDTO;
 import com.sistemabarberia.fadex_backend.modules.ruleta.recompensa.dto.response.RecompensaObtenidaResponseDTO;
@@ -37,7 +38,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -107,6 +107,9 @@ public class RecompensaObtenidaServiceImpl implements IRecompensaObtenidaService
     @Override
     @Transactional
     public RecompensaObtenida crearDesdeGiro(RuletaGiro giro, Cliente cliente, RuletaItem item) {
+        if (item.getTipoPremio() == TipoPremio.SIN_PREMIO) {
+            throw new BusinessException("No se puede crear una recompensa para un item SIN_PREMIO.", HttpStatus.BAD_REQUEST);
+        }
         RecompensaObtenida recompensa = RecompensaObtenida.builder()
                 .giro(giro)
                 .cliente(cliente)
@@ -220,7 +223,7 @@ public class RecompensaObtenidaServiceImpl implements IRecompensaObtenidaService
                     if (item.getProducto() == null) {
                         throw new BusinessException("La recompensa no tiene un producto asociado.", HttpStatus.BAD_REQUEST);
                     }
-                    productoService.descontarStockPremio(item.getProducto().getId(), 1);
+                    productoService.descontarStockPremio(item.getProducto().getId(), item.getCantidadProducto());
                 }
                 case SERVICIO -> {
                     if (item.getServicio() == null) {
@@ -233,16 +236,18 @@ public class RecompensaObtenidaServiceImpl implements IRecompensaObtenidaService
                 }
                 case CUPON ->{
                     if (item.getProducto() != null) {
-                        productoService.descontarStockPremio(item.getProducto().getId(), 1);
+                        productoService.descontarStockPremio(item.getProducto().getId(), item.getCantidadProducto());
                     }
 
                     if (item.getServicio() != null) {
                         if (!reserva.getServicio().getServicioId().equals(item.getServicio().getServicioId())) {
-                            throw new BusinessException("" +
-                                    "Este cupón solo aplica al servicio " + item.getServicio().getNombre(), HttpStatus.BAD_REQUEST);
+                            throw new BusinessException("" + "Este cupón solo aplica al servicio " + item.getServicio().getNombre(), HttpStatus.BAD_REQUEST);
                         }
                         reserva.setTotal(BigDecimal.ZERO);
                     }
+                }
+                case SIN_PREMIO -> {
+                    throw new BusinessException("Una recompensa SIN_PREMIO no puede ser canjeada.", HttpStatus.BAD_REQUEST);
                 }
             }
             recompensa.setEstado(EstadoRecompensa.CANJEADO);

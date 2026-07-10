@@ -59,9 +59,7 @@ public class RuletaEngineServiceImpl implements IRuletaEngineService {
         if (premio.getTipoPremio() != TipoPremio.SIN_PREMIO) {
             recompensa = recompensaService.crearDesdeGiro(giro, tarjeta.getCliente(), premio);
         }
-
         tarjetaService.consumirGiro(tarjeta);
-
         return recompensa;
     }
 
