@@ -17,5 +17,6 @@ public record ReservaDTO(
         LocalTime horaFin,
         TipoReserva tipoReserva,
         BigDecimal total,
-         EstadoReserva estadoReserva
+        EstadoReserva estadoReserva,
+        Boolean recordatorioEnviado
 ) {}
