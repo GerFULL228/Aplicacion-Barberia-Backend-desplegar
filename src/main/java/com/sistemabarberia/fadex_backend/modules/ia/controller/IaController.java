@@ -64,4 +64,13 @@ public class IaController {
         return ResponseEntity.ok(ApiResponse.ok("Features actualizadas correctamente",
                 haircutFeaturesService.actualizar(idCorte, dto)));
     }
+
+    @GetMapping("/cortes/recomendados/{idCliente}")
+    public ResponseEntity<?> obtenerCortesRecomendados(
+            @PathVariable Integer idCliente,
+            @RequestParam(defaultValue = "1") Integer pagina,
+            @RequestParam(name = "por_pagina", defaultValue = "10") Integer porPagina
+    ) {
+        return ResponseEntity.ok(iaClienteService.obtenerCortesRecomendados(idCliente, pagina, porPagina));
+    }
 }
