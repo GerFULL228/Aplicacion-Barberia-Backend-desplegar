@@ -24,6 +24,7 @@ public interface VentaMapper {
     @Mapping(source = "tipoComprobante", target = "tipoComprobante")
     @Mapping(target = "detalles", expression = "java(mapDetalles(venta.getDetalles()))")
     @Mapping(target = "clienteNombre", expression = "java(obtenerNombreCompleto(venta.getCliente()))")
+    @Mapping(target = "metodoPago", ignore = true)
     VentaResponseDTO toResponse(Venta venta);
 
     List<VentaResponseDTO> toResponseList(List<Venta> ventas);

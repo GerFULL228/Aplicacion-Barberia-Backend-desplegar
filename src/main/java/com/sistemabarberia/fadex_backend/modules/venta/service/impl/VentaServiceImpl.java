@@ -6,9 +6,12 @@ import com.sistemabarberia.fadex_backend.modules.barbero.repository.BarberoRepos
 import com.sistemabarberia.fadex_backend.modules.cliente.entity.Cliente;
 import com.sistemabarberia.fadex_backend.modules.cliente.repository.ClienteRepository;
 import com.sistemabarberia.fadex_backend.modules.fidelizacion.engine.service.IFidelizacionEngine;
+import com.sistemabarberia.fadex_backend.modules.producto.entity.Producto;
 import com.sistemabarberia.fadex_backend.modules.producto.repository.ProductoRepository;
-import com.sistemabarberia.fadex_backend.modules.ruleta.recompensa.repository.RecompensaObtenidaRepository;
 import com.sistemabarberia.fadex_backend.modules.ruleta.recompensa.service.IRecompensaObtenidaService;
+import com.sistemabarberia.fadex_backend.modules.pagos.entity.Pago;
+import com.sistemabarberia.fadex_backend.modules.pagos.entity.TipoPago;
+import com.sistemabarberia.fadex_backend.modules.pagos.repository.PagoRepository;
 import com.sistemabarberia.fadex_backend.modules.venta.dto.request.VentaRequestDTO;
 import com.sistemabarberia.fadex_backend.modules.venta.dto.request.DetalleVentaRequestDTO;
 import com.sistemabarberia.fadex_backend.modules.venta.dto.response.*;
@@ -18,14 +21,21 @@ import com.sistemabarberia.fadex_backend.modules.venta.mapper.DetalleVentaMapper
 import com.sistemabarberia.fadex_backend.modules.venta.mapper.HistorialVentaMapper;
 import com.sistemabarberia.fadex_backend.modules.venta.repository.*;
 import com.sistemabarberia.fadex_backend.modules.venta.service.IVentaService;
+
+import com.sistemabarberia.fadex_backend.modules.reserva.repository.ReservaRepository;
+import com.sistemabarberia.fadex_backend.modules.reserva.entity.Reserva;
+import com.sistemabarberia.fadex_backend.modules.reserva.entity.EstadoReserva;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,6 +48,9 @@ public class VentaServiceImpl implements IVentaService {
     private final HistorialVentaRepository historialVentaRepository;
     private final BarberoRepository barberoRepository;
     private final ClienteRepository clienteRepository;
+    private final ProductoRepository productoRepository;
+    private final PagoRepository pagoRepository;
+    private final ReservaRepository reservaRepository;
 
     private final VentaMapper ventaMapper;
     private final DetalleVentaMapper detalleVentaMapper;
@@ -48,35 +61,109 @@ public class VentaServiceImpl implements IVentaService {
     @Override
     @Transactional
     public VentaResponseDTO crear(VentaRequestDTO dto) {
-        Cliente cliente = clienteRepository.findById(dto.getClienteId()).orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado"));
+
+        Cliente cliente;
         Barbero barbero = null;
-        if(dto.getBarberoId() != null){
-            barbero = barberoRepository.findById(dto.getBarberoId()).orElseThrow(() -> new ResourceNotFoundException("Barbero no encontrado"));
+        Reserva reservaVinculada = null;
+        List<DetalleVenta> detalles = new ArrayList<>();
+
+        if (dto.getBarberoId() != null) {
+            barbero = barberoRepository.findById(dto.getBarberoId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Barbero no encontrado"));
         }
+
         Venta venta = new Venta();
         venta.setBarbero(barbero);
-        venta.setCliente(cliente);
-        venta.setFecha(dto.getFecha());
+        venta.setFecha(dto.getFecha() != null ? dto.getFecha() : LocalDateTime.now());
         venta.setTipoComprobante(dto.getTipoComprobante());
-        String nuevoCorrelativo = generarCorrelativo(venta.getFecha());
-        venta.setNumeroCorrelativo(nuevoCorrelativo);
-        List<DetalleVenta> detalles = dto.getDetalles().stream().map(detDto -> {
-            DetalleVenta detalle = detalleVentaMapper.toEntity(detDto);
-            detalle.setVenta(venta);
-            return detalle;
-        }).toList();
+        venta.setNumeroCorrelativo(generarCorrelativo(venta.getFecha()));
+
+        if (dto.getReservaId() != null) {
+            reservaVinculada = reservaRepository.findById(dto.getReservaId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Reserva no encontrada"));
+
+            cliente = reservaVinculada.getCliente();
+
+            DetalleVenta detalleServicio = new DetalleVenta();
+            detalleServicio.setVenta(venta);
+            detalleServicio.setServicio(reservaVinculada.getServicio());
+            detalleServicio.setCantidad(1);
+            detalleServicio.setPrecioUnitario(reservaVinculada.getTotal());
+            detalles.add(detalleServicio);
+            reservaVinculada.setEstadoReserva(EstadoReserva.FINALIZADA);
+            reservaRepository.save(reservaVinculada);
+
+        } else {
+            if (dto.getClienteId() == null) {
+                throw new IllegalArgumentException("El cliente es obligatorio para ventas libres.");
+            }
+            cliente = clienteRepository.findById(dto.getClienteId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado"));
+        }
+
+        venta.setCliente(cliente);
+        if (dto.getDetalles() != null && !dto.getDetalles().isEmpty()) {
+            for (DetalleVentaRequestDTO detDto : dto.getDetalles()) {
+                if (detDto.getProductoId() != null) {
+                    DetalleVenta detalleProd = detalleVentaMapper.toEntity(detDto);
+                    detalleProd.setVenta(venta);
+
+                    Producto producto = productoRepository.findById(Long.valueOf(detDto.getProductoId()))
+                            .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado"));
+
+                    if (producto.getStock() < detDto.getCantidad()) {
+                        throw new IllegalArgumentException("Stock insuficiente para: " + producto.getNombre());
+                    }
+
+                    producto.setStock(producto.getStock() - detDto.getCantidad());
+                    productoRepository.save(producto);
+                    detalleProd.setProducto(producto);
+
+                    detalles.add(detalleProd);
+                }
+            }
+        }
+
         venta.setDetalles(detalles);
         Venta ventaGuardada = ventaRepository.save(venta);
         ventaGuardada = ventaRepository.findByIdWithDetalles(ventaGuardada.getVentaId());
+
+        // Recompensas (módulo migrado a tablas nuevas): se aplican antes de calcular el
+        // monto total por si el servicio ajusta precios/descuentos sobre los detalles.
         if (dto.getRecompensasAplicadas() != null && !dto.getRecompensasAplicadas().isEmpty()) {
             recompensaObtenidaService.aplicarRecompensas(dto.getRecompensasAplicadas(), ventaGuardada);
         }
+
+        BigDecimal montoTotal = ventaGuardada.getDetalles().stream()
+                .map(detalle -> detalle.getPrecioUnitario().multiply(BigDecimal.valueOf(detalle.getCantidad())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        Pago pago = new Pago();
+        pago.setCliente(cliente);
+        pago.setBarbero(barbero);
+        pago.setVenta(ventaGuardada);
+        pago.setMonto(montoTotal);
+        pago.setMetodo(dto.getMetodoPago());
+        pago.setFecha(LocalDateTime.now());
+        pago.setTipo(TipoPago.VENTA);
+
+        if (reservaVinculada != null) {
+            pago.setReserva(reservaVinculada);
+        }
+
+        pagoRepository.save(pago);
+
         HistorialVenta historial = new HistorialVenta();
         historial.setVenta(ventaGuardada);
         historial.setFecha(LocalDateTime.now());
         historialVentaRepository.save(historial);
+
         fidelizacionEngine.procesarVenta(ventaGuardada); //agregar a fidelizacion enginep para acumular puntos por venta
-        return ventaMapper.toResponse(ventaGuardada);
+
+        VentaResponseDTO response = ventaMapper.toResponse(ventaGuardada);
+        response.setMetodoPago(dto.getMetodoPago());
+
+        return response;
     }
 
     @Override
@@ -117,7 +204,14 @@ public class VentaServiceImpl implements IVentaService {
                 hasFechaInicio, valFechaInicio,
                 hasFechaFin, valFechaFin
         );
-        return ventaMapper.toResponseList(ventas);
+
+        List<VentaResponseDTO> dtoList = ventaMapper.toResponseList(ventas);
+        dtoList.forEach(dto -> {
+            pagoRepository.findFirstByVenta_VentaId(dto.getVentaId())
+                    .ifPresent(pago -> dto.setMetodoPago(pago.getMetodo()));
+        });
+
+        return dtoList;
     }
 
     @Override
@@ -135,15 +229,26 @@ public class VentaServiceImpl implements IVentaService {
     @Override
     @Transactional(readOnly = true)
     public VentaResponseDTO obtenerPorId(Integer id) {
-        Venta venta = Optional.ofNullable(ventaRepository.findByIdWithDetalles(id)).orElseThrow(() -> new ResourceNotFoundException("Venta no encontrada"));
-        return ventaMapper.toResponse(venta);
+        Venta venta = Optional.ofNullable(
+                ventaRepository.findByIdWithDetalles(id)
+        ).orElseThrow(() -> new ResourceNotFoundException("Venta no encontrada"));
+
+        VentaResponseDTO dto = ventaMapper.toResponse(venta);
+
+        pagoRepository.findFirstByVenta_VentaId(dto.getVentaId())
+                .ifPresent(pago -> dto.setMetodoPago(pago.getMetodo()));
+
+        return dto;
     }
 
     @Override
     @Transactional
     public VentaResponseDTO actualizar(Integer id, VentaRequestDTO dto) {
-        Venta venta = ventaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Venta no encontrada"));
-        Cliente cliente = clienteRepository.findById(dto.getClienteId()).orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado"));
+        Venta venta = ventaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Venta no encontrada"));
+        Cliente cliente = clienteRepository.findById(dto.getClienteId())
+                .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado"));
+
         venta.setCliente(cliente);
         venta.setFecha(dto.getFecha());
         venta.setTipoComprobante(dto.getTipoComprobante());
@@ -160,10 +265,20 @@ public class VentaServiceImpl implements IVentaService {
         historial.setVenta(ventaActualizada);
         historial.setFecha(LocalDateTime.now());
         historialVentaRepository.save(historial);
-        return ventaMapper.toResponse(ventaActualizada);
+
+        VentaResponseDTO response = ventaMapper.toResponse(ventaActualizada);
+
+        pagoRepository.findFirstByVenta_VentaId(ventaActualizada.getVentaId()).ifPresent(pago -> {
+            pago.setMetodo(dto.getMetodoPago());
+            pagoRepository.save(pago);
+            response.setMetodoPago(pago.getMetodo());
+        });
+
+        return response;
     }
 
     @Override
+    @Transactional
     public void eliminar(Integer id) {
         if (!ventaRepository.existsById(id)) {
             throw new ResourceNotFoundException("Venta no encontrada");
@@ -199,5 +314,17 @@ public class VentaServiceImpl implements IVentaService {
             }
         }
         return prefijo + String.format("%04d", siguienteNumero);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<VentaResponseDTO> listarPorBarbero(Integer barberoId) {
+        List<Venta> ventas = ventaRepository.findByBarbero_BarberoIdOrderByFechaDesc(barberoId);
+        List<VentaResponseDTO> dtoList = ventaMapper.toResponseList(ventas);
+        dtoList.forEach(dto -> {
+            pagoRepository.findFirstByVenta_VentaId(dto.getVentaId())
+                    .ifPresent(pago -> dto.setMetodoPago(pago.getMetodo()));
+        });
+        return dtoList;
     }
 }

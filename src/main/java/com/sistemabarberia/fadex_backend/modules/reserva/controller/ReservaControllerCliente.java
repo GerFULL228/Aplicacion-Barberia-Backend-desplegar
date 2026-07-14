@@ -5,15 +5,18 @@ import com.sistemabarberia.fadex_backend.commons.response.ApiResponse;
 import com.sistemabarberia.fadex_backend.commons.response.PageResponse;
 import com.sistemabarberia.fadex_backend.modules.cliente.repository.ClienteRepository;
 import com.sistemabarberia.fadex_backend.modules.reserva.dto.Request.ReservaRequest;
+import com.sistemabarberia.fadex_backend.modules.reserva.dto.Response.HistorialClienteResponseDTO;
 import com.sistemabarberia.fadex_backend.modules.reserva.dto.Response.ReservaDTO;
 
 import com.sistemabarberia.fadex_backend.modules.reserva.dto.Response.ReservaPendienteDTO;
+import com.sistemabarberia.fadex_backend.modules.reserva.entity.EstadoReserva;
 import com.sistemabarberia.fadex_backend.modules.reserva.service.ReservaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,6 +24,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -54,6 +58,24 @@ public class ReservaControllerCliente {
                 ApiResponse.ok("Reservas obtenidas correctamente", result)
         );
     }
+    @PreAuthorize("hasAuthority('RESERVA_READ_SELF')")
+    @GetMapping("/historial")
+    public ResponseEntity<ApiResponse<PageResponse<HistorialClienteResponseDTO>>> obtenerHistorialCliente(
+            @RequestParam(required = false) EstadoReserva estado,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<HistorialClienteResponseDTO> result = reservaService.getHistorialCliente(
+                userDetails.getUsuario(), estado, desde, hasta, pageable
+        );
+        return ResponseEntity.ok(
+                ApiResponse.ok("Historial obtenido correctamente", result)
+        );
+    }
 
     @GetMapping("/cliente/pendientes-pago")
     public ResponseEntity<ApiResponse<List<ReservaPendienteDTO>>> obtenerPendientesPago() {
@@ -62,4 +84,22 @@ public class ReservaControllerCliente {
                 ApiResponse.ok("Reservas pendientes obtenidas correctamente", pendientes)
         );
     }
+
+    @PatchMapping("/{id}/cancelar")
+    public ResponseEntity<ApiResponse<ReservaDTO>> cancelar(
+            @PathVariable Long id) {
+        return ResponseEntity.ok(ApiResponse.ok("Reserva cancelada correctamente",
+                        reservaService.cancelarReserva(id)
+                )
+        );
+    }
+    @PatchMapping("/{id}/pagar")
+    public ResponseEntity<ApiResponse<ReservaDTO>> pagar(
+            @PathVariable Long id) {
+        return ResponseEntity.ok(ApiResponse.ok("Reserva pagada exitosamente",
+                        reservaService.PagarReserva(id)
+                )
+        );
+    }
+
 }

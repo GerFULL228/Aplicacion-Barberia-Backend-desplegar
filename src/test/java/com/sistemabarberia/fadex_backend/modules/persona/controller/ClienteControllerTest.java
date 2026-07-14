@@ -2,11 +2,12 @@ package com.sistemabarberia.fadex_backend.modules.persona.controller;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sistemabarberia.fadex_backend.auth.security.filter.JwtAuthenticationFilter;
 import com.sistemabarberia.fadex_backend.modules.cliente.controller.ClienteController;
 import com.sistemabarberia.fadex_backend.modules.cliente.dto.request.ClienteRequestDTO;
 import com.sistemabarberia.fadex_backend.modules.cliente.dto.response.ClienteResponseDTO;
 import com.sistemabarberia.fadex_backend.modules.cliente.service.IClienteService;
-import com.sistemabarberia.fadex_backend.modules.seguridad.security.JwtFilter;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -32,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(value = ClienteController.class,
         excludeFilters =@ComponentScan.Filter(
                 type = FilterType.ASSIGNABLE_TYPE,
-                classes = JwtFilter.class
+                classes = JwtAuthenticationFilter.class
         )
 )
 @AutoConfigureMockMvc(addFilters = false)

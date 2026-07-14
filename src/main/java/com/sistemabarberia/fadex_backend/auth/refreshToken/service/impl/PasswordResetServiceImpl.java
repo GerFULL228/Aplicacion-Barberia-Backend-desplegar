@@ -6,10 +6,12 @@ import com.sistemabarberia.fadex_backend.auth.refreshToken.service.PasswordReset
 import com.sistemabarberia.fadex_backend.auth.security.service.CustomUserDetails;
 import com.sistemabarberia.fadex_backend.auth.usuario.Entity.Usuario;
 import com.sistemabarberia.fadex_backend.auth.usuario.Repository.UsuarioRepository;
+import com.sistemabarberia.fadex_backend.commons.exception.BusinessException;
 import com.sistemabarberia.fadex_backend.modules.persona.entity.Persona;
 import com.sistemabarberia.fadex_backend.modules.persona.repository.PersonaRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import jakarta.mail.MessagingException;
@@ -71,27 +73,24 @@ public class PasswordResetServiceImpl implements PasswordResetService {
     @Transactional
     public void resetPassword(String token, String nuevaPassword) {
 
-        // Buscar el token
         PasswordResetToken resetToken = tokenRepository.findByToken(token)
-                .orElseThrow(() -> new RuntimeException("Token inválido"));
+                .orElseThrow(() -> new BusinessException("Este enlace ya fue utilizado o no es válido", HttpStatus.BAD_REQUEST));
 
-        // Verificar expiración
         if (resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
             tokenRepository.delete(resetToken);
-            throw new RuntimeException("El token ha expirado, solicita uno nuevo");
+            throw new BusinessException("El enlace ha expirado, solicita uno nuevo", HttpStatus.BAD_REQUEST);
         }
 
-        // Buscar usuario y cambiar contraseña
+        // ← ELIMINAR PRIMERO, antes de cambiar la contraseña
+        tokenRepository.delete(resetToken);
+        tokenRepository.flush(); // forzar el DELETE antes de seguir
+
         Persona persona = personaRepository.findByEmail(resetToken.getEmail())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         Usuario usuario = persona.getUsuario();
-
         usuario.setPassword(passwordEncoder.encode(nuevaPassword));
         usuarioRepository.save(usuario);
-
-        // Eliminar token (ya fue usado, no puede reutilizarse)
-        tokenRepository.delete(resetToken);
     }
 
     private void enviarCorreo(String correo, String token) {

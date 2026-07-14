@@ -13,43 +13,46 @@ import org.springframework.web.client.RestTemplate;
 
 public class OpenAIService {
 
-    @Value("${openai.api.key}")
+    @Value("${gemini.api.key}")
     private String apiKey;
 
-    @Value("${openai.api.url}")
+    @Value("${gemini.api.url}")
     private String apiUrl;
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @jakarta.annotation.PostConstruct
     public void init() {
-        System.out.println(" OPENAI CONFIG ");
+        System.out.println(" GEMINI CONFIG ");
         System.out.println("URL: " + apiUrl);
         System.out.println("KEY: " + (apiKey != null ? apiKey.substring(0, 10) + "..." : "NULL"));
     }
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public String consultarOpenAI(String prompt) {
         RestTemplate restTemplate = new RestTemplate();
 
-        String requestBody = """
-        {
-            "model": "gpt-4o-mini",
-            "input": "%s"
-        }
-        """.formatted(prompt
+        String promptEscapado = prompt
                 .replace("\\", "\\\\")
                 .replace("\"", "\\\"")
                 .replace("\n", "\\n")
-                .replace("\r", ""));
+                .replace("\r", "");
+
+        String requestBody = """
+        {
+            "contents": [{
+                "parts": [{"text": "%s"}]
+            }]
+        }
+        """.formatted(promptEscapado);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(apiKey);
 
         HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
 
         try {
             ResponseEntity<String> response = restTemplate.exchange(
-                    apiUrl,
+                    apiUrl + "?key=" + apiKey,
                     HttpMethod.POST,
                     entity,
                     String.class
@@ -57,14 +60,20 @@ public class OpenAIService {
 
             JsonNode root = objectMapper.readTree(response.getBody());
             String textoIA = root
-                    .path("output").get(0)
-                    .path("content").get(0)
+                    .path("candidates").get(0)
+                    .path("content")
+                    .path("parts").get(0)
                     .path("text").asText();
+
+            textoIA = textoIA.trim();
+            if (textoIA.startsWith("```")) {
+                textoIA = textoIA.replaceAll("^```(?:json)?\\s*", "").replaceAll("```\\s*$", "").trim();
+            }
 
             return textoIA;
 
         } catch (HttpStatusCodeException e) {
-            return "{\"error\": \"ERROR OPENAI: " + e.getStatusCode() + "\"}";
+            return "{\"error\": \"ERROR GEMINI: " + e.getStatusCode() + " - " + e.getResponseBodyAsString() + "\"}";
         } catch (Exception e) {
             return "{\"error\": \"ERROR GENERAL: " + e.getMessage() + "\"}";
         }

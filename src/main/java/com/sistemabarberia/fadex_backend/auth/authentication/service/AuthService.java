@@ -168,7 +168,7 @@ public class AuthService {
                 .orElseThrow(() -> new BusinessException("Rol cliente no encontrado", HttpStatus.NOT_FOUND));
 
         Usuario usuario = new Usuario();
-        usuario.setUser(request.getCorreo()); // username = correo
+        usuario.setUser(request.getCorreo());
         usuario.setPassword(passwordEncoder.encode(request.getPassword()));
         usuario.setRoles(new HashSet<>(Set.of(rolCliente)));
 

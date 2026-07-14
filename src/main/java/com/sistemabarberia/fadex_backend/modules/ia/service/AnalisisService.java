@@ -27,7 +27,7 @@ public class AnalisisService {
     public String analizarClientesEnRiesgo() throws Exception {
 
         List<Reserva> reservas = reservaRepository.findAll();
-        Map<String, Object> datosAnalisis = new LinkedHashMap<>();
+        Map<String, Map<String, Object>> datosAnalisis = new LinkedHashMap<>();
         LocalDate hoy = LocalDate.now();
 
         for (Reserva r : reservas) {
@@ -38,50 +38,89 @@ public class AnalisisService {
 
             datosAnalisis.computeIfAbsent(nombre, k -> {
                 Map<String, Object> info = new LinkedHashMap<>();
-                info.put("visitas", new ArrayList<String>());
+                info.put("visitas", new ArrayList<LocalDate>());
                 return info;
             });
 
+            Map<String, Object> info = datosAnalisis.get(nombre);
             @SuppressWarnings("unchecked")
-            Map<String, Object> info = (Map<String, Object>) datosAnalisis.get(nombre);
-            @SuppressWarnings("unchecked")
-            List<String> visitas = (List<String>) info.get("visitas");
-            if (r.getFecha() != null) visitas.add(r.getFecha().toString());
+            List<LocalDate> visitas = (List<LocalDate>) info.get("visitas");
+            if (r.getFecha() != null) visitas.add(r.getFecha());
         }
 
+        // Construir datos ya calculados para el prompt
+        List<Map<String, Object>> clientesCalculados = new ArrayList<>();
 
-        for (Map.Entry<String, Object> entry : datosAnalisis.entrySet()) {
+        for (Map.Entry<String, Map<String, Object>> entry : datosAnalisis.entrySet()) {
+            Map<String, Object> info = entry.getValue();
             @SuppressWarnings("unchecked")
-            Map<String, Object> info = (Map<String, Object>) entry.getValue();
-            @SuppressWarnings("unchecked")
-            List<String> visitas = (List<String>) info.get("visitas");
+            List<LocalDate> visitas = (List<LocalDate>) info.get("visitas");
 
-            info.put("totalVisitas", visitas.size());
+            // Solo contar visitas pasadas
+            List<LocalDate> visitasPasadas = visitas.stream()
+                    .filter(f -> !f.isAfter(hoy))
+                    .collect(java.util.stream.Collectors.toList());
 
-            visitas.stream()
-                    .map(LocalDate::parse)
+            // Última visita pasada
+            LocalDate ultimaVisita = visitasPasadas.stream()
                     .max(Comparator.naturalOrder())
-                    .ifPresent(ultima -> {
-                        info.put("ultimaVisita", ultima.toString());
-                        info.put("diasSinVisita", hoy.toEpochDay() - ultima.toEpochDay());
-                    });
+                    .orElse(null);
+
+            long diasSinVisita = ultimaVisita != null
+                    ? hoy.toEpochDay() - ultimaVisita.toEpochDay()
+                    : -1;
+
+            // Clasificar en Java directamente
+            String nivelRiesgo;
+            String razon;
+
+            if (visitasPasadas.size() == 0) {
+                continue;
+            }
+
+            if (diasSinVisita < 0) {
+                continue;
+            }
+
+            if (visitasPasadas.size() == 1 && diasSinVisita > 30) {
+                nivelRiesgo = "alto";
+                razon = "Cliente nuevo sin fidelizar y lleva más de 30 días sin visita";
+            } else if (visitasPasadas.size() == 1) {
+                nivelRiesgo = "alto";
+                razon = "Cliente nuevo, solo ha visitado una vez, no fidelizado";
+            } else if (diasSinVisita > 30) {
+                nivelRiesgo = "alto";
+                razon = "Lleva más de 30 días sin visita";
+            } else if (diasSinVisita >= 20) {
+                nivelRiesgo = "medio";
+                razon = "Entre 20 y 30 días sin visita";
+            } else {
+                nivelRiesgo = "bajo";
+                razon = "Visitas recientes, cliente activo";
+            }
+
+            Map<String, Object> cliente = new LinkedHashMap<>();
+            cliente.put("nombreCliente", entry.getKey());
+            cliente.put("razon", razon);
+            cliente.put("nivelRiesgo", nivelRiesgo);
+            cliente.put("diasSinVisita", diasSinVisita);
+            cliente.put("totalVisitas", visitasPasadas.size());
+            clientesCalculados.add(cliente);
         }
 
-        String historialJson = objectMapper.writeValueAsString(datosAnalisis);
+        String historialJson = objectMapper.writeValueAsString(clientesCalculados);
 
         String prompt = """
                 Eres un experto en fidelización de clientes para barberías.
-                Analiza el siguiente historial de visitas y determina cuáles están en riesgo de no volver.
-
-                Reglas de clasificación:
-                - Más de 30 días sin visita: riesgo alto
-                - Entre 20 y 30 días sin visita: riesgo medio
-                - Menos de 20 días sin visita: riesgo bajo
-                - Solo 1 visita en total: riesgo alto (no fidelizado)
-
-                Responde ÚNICAMENTE con un JSON válido, sin texto adicional, sin bloques de código markdown:
+                Los siguientes clientes ya tienen calculado su nivel de riesgo, días sin visita y total de visitas pasadas.
+                Tu tarea es:
+                1. Redactar una razón más natural y descriptiva en español para cada cliente
+                2. Escribir un resumen general del estado de fidelización
+                3. Respetar el nivelRiesgo ya asignado, no lo cambies
+                
+                Devuelve SOLAMENTE este JSON sin markdown ni texto extra:
                 {
-                  "resumen": "descripción breve del estado general de los clientes",
+                  "resumen": "...",
                   "clientesEnRiesgo": [
                     {
                       "nombreCliente": "...",
@@ -92,8 +131,8 @@ public class AnalisisService {
                     }
                   ]
                 }
-
-                Historial de clientes:
+                
+                Datos de clientes:
                 %s
                 """.formatted(historialJson);
 

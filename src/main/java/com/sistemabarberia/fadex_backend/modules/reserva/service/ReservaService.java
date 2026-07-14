@@ -78,10 +78,11 @@ public class ReservaService {
         LocalTime horaFin = request.horaInicio().plusMinutes(servicio.getDuracion());
         validarConflicto(barbero, request.fecha(), request.horaInicio(), horaFin);
         TipoReserva tipo = request.esGratis() ? TipoReserva.RESERVA_GRATIS : TipoReserva.RESERVA_VIRTUAL;
-        Reserva reserva = crearReservaInterna(cliente, servicio, barbero, request.fecha(), request.horaInicio(), tipo, EstadoReserva.CONFIRMADA);
+        Reserva reserva = crearReservaInterna(cliente, servicio, barbero, request.fecha(), request.horaInicio(), tipo, EstadoReserva.PENDIENTE_PAGO);
         if (request.recompensasAplicadas() != null && !request.recompensasAplicadas().isEmpty()) {
             reserva = recompensaObtenidaService.aplicarRecompensas(reserva, cliente.getClienteId(), request.recompensasAplicadas());
         }
+
         return reservaMapper.toDto(reserva);
     }
 
@@ -90,6 +91,12 @@ public class ReservaService {
         Reserva reserva = new Reserva();
         reserva.setCliente(cliente);
         reserva.setBarbero(barbero);
+
+        LocalDate fechaActual = LocalDate.now();
+
+        if (fechaActual.isAfter(fecha)) {
+            throw new BusinessException("la fecha no puede ser antigua", HttpStatus.FORBIDDEN);
+        }
         reserva.setFecha(fecha);
         reserva.setServicio(servicio);
         reserva.setHoraInicio(horaInicio);
@@ -192,6 +199,15 @@ public class ReservaService {
         reserva.setEstadoReserva(EstadoReserva.CANCELADA);
         return reservaMapper.toDto(reservaRepository.save(reserva));
     }
+    @Transactional
+    public ReservaDTO PagarReserva(Long reservaId) {
+        Reserva reserva = buscarOFallar(reservaId);
+
+
+
+        reserva.setEstadoReserva(EstadoReserva.CONFIRMADA);
+        return reservaMapper.toDto(reservaRepository.save(reserva));
+    }
 
     @Transactional(readOnly = true)
     public List<CitaBarberoResponseDTO> obtenerCitasHoy() {
@@ -246,5 +262,45 @@ public class ReservaService {
                     .clienteApellido(r.getCliente().getPersona().getApellido()).barberoId(r.getBarbero().getBarberoId()).barberoNombre(r.getBarbero().getPersona().getNombre())
                     .montoTotal(r.getTotal()).servicios(List.of(nombreServicio)).build();
         }).collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public Page<HistorialClienteResponseDTO> getHistorialCliente(
+            Usuario usuario,
+            EstadoReserva estado,
+            LocalDate desde,
+            LocalDate hasta,
+            Pageable pageable) {
+
+        Cliente cliente = clienteRepository
+                .findByPersona_Usuario_IdUsuario(usuario.getIdUsuario())
+                .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado para el usuario actual"));
+
+        Page<Reserva> reservasPage = reservaRepository.findHistorialByClienteFiltros(
+                cliente.getClienteId(), estado, desde, hasta, pageable
+        );
+
+        return reservasPage.map(r -> {
+            String nombreBarbero = (r.getBarbero() != null && r.getBarbero().getPersona() != null)
+                    ? r.getBarbero().getPersona().getNombre() + " " + r.getBarbero().getPersona().getApellido()
+                    : "Sin asignar";
+
+            String nombreServicio = (r.getServicio() != null)
+                    ? r.getServicio().getNombre()
+                    : "Sin servicio";
+
+            return HistorialClienteResponseDTO.builder()
+                    .id(r.getId())
+                    .fecha(r.getFecha())
+                    .horaInicio(r.getHoraInicio())
+                    .horaFin(r.getHoraFin())
+                    .estadoReserva(r.getEstadoReserva())
+                    .tipoReserva(r.getTipoReserva())
+                    .nombreBarbero(nombreBarbero)
+                    .nombreServicio(nombreServicio)
+                    .total(r.getTotal())
+                    .observacion(r.getObservacion())
+                    .build();
+        });
     }
 }

@@ -4,6 +4,14 @@ from ml_auto_retrain import AutoRetrainer
 from contextlib import asynccontextmanager
 import logging
 import uvicorn
+import os        # ← agregar
+import base64    # ← agregar
+import httpx     # ← agregar
+from dotenv import load_dotenv
+from pathlib import Path
+load_dotenv(dotenv_path=Path(__file__).parent / ".env")
+logger_key = os.getenv("OPENAI_API_KEY")
+print(f"KEY CARGADA: {logger_key[:10] if logger_key else 'NO ENCONTRADA'}")
 
 from database import get_connection
 from face_analyzer import analizar_cara
@@ -150,20 +158,15 @@ SHAPE_WEIGHTS = {
 }
 
 
-def obtener_cortes(cursor, face_shape_id: int, genero_cliente: str, id_cliente: int):
+def obtener_cortes(cursor, face_shape_id: int, genero_cliente: str, id_cliente: int,
+                    pagina: int = 1, por_pagina: int = 10):
     """
-    Recomienda los 5 mejores cortes para una forma facial dada.
+    Devuelve los cortes recomendados para una forma facial, ordenados de
+    mayor a menor score (los más recomendados primero), paginados.
 
-    CORRECCIONES aplicadas:
-      - Tabla: cortes  (no haircuts)
-      - PK:    id_corte (no id)
-      - Columnas de ia.haircut_features referenciadas por id_corte
-      - Schema ia. añadido donde corresponde
-      - FKs en ia.haircut_scores: id_cliente, id_corte (no client_id, haircut_id)
+    Retorna: (lista_de_cortes, total_cortes)
     """
 
-    # ── Nombre de la forma facial ────────────────────────────
-    # FIX Bug 5: prefijo ia. en face_shapes
     cursor.execute(
         "SELECT nombre FROM ia.face_shapes WHERE id = %s",
         (face_shape_id,)
@@ -172,85 +175,74 @@ def obtener_cortes(cursor, face_shape_id: int, genero_cliente: str, id_cliente: 
     forma_nombre = row[0] if row else "Ovalada"
     pesos = SHAPE_WEIGHTS.get(forma_nombre, SHAPE_WEIGHTS["Ovalada"])
 
-    # ── Filtro de género ────────────────────────────────────
     if genero_cliente in ("Hombre", "Mujer"):
         genero_filter = (genero_cliente, "Unisex")
     else:
         genero_filter = ("Hombre", "Mujer", "Unisex")
 
     placeholders = ",".join(["%s"] * len(genero_filter))
+    offset = (pagina - 1) * por_pagina
 
-    # FIX Bug 2: tabla cortes (no haircuts), id_corte (no id)
-    # FIX Bug 5: ia.haircut_features (no haircut_features)
     if forma_nombre == "Ovalada":
-        cursor.execute(
-            f"""
-            SELECT
-                c.id_corte,
-                c.nombre,
-                c.descripcion,
-                c.imagen_url,
-                c.dificultad,
-                (6 - hf.maintenance_level) AS score
-            FROM ia.haircut_features hf
-            JOIN cortes c ON c.id_corte = hf.id_corte
-            WHERE c.genero_objetivo IN ({placeholders})
-            ORDER BY hf.maintenance_level ASC
-            LIMIT 5
-            """,
-            genero_filter
-        )
+        score_expr = "(6 - hf.maintenance_level)"
+        orden = "score DESC"
     else:
         score_expr = " + ".join([
             f"COALESCE(hf.{feature}, 0) * {peso}"
             for feature, peso in pesos.items()
             if peso > 0
         ]) or "0"
+        orden = "score DESC, hf.maintenance_level ASC"
 
-        cursor.execute(
-            f"""
-            SELECT
-                c.id_corte,
-                c.nombre,
-                c.descripcion,
-                c.imagen_url,
-                c.dificultad,
-                ({score_expr}) AS score
-            FROM ia.haircut_features hf
-            JOIN cortes c ON c.id_corte = hf.id_corte
-            WHERE c.genero_objetivo IN ({placeholders})
-            ORDER BY score DESC, hf.maintenance_level ASC
-            LIMIT 5
-            """,
-            genero_filter
-        )
+    # COUNT(*) OVER() trae el total de resultados sin filtrar por LIMIT,
+    # en la misma consulta — evita un segundo round-trip a la BD.
+    cursor.execute(
+        f"""
+        SELECT
+            c.id_corte,
+            c.nombre,
+            c.descripcion,
+            c.imagen_url,
+            c.dificultad,
+            ({score_expr}) AS score,
+            COUNT(*) OVER() AS total_cortes
+        FROM ia.haircut_features hf
+        JOIN cortes c ON c.id_corte = hf.id_corte
+        WHERE c.genero_objetivo IN ({placeholders})
+        ORDER BY {orden}
+        LIMIT %s OFFSET %s
+        """,
+        genero_filter + (por_pagina, offset)
+    )
 
-    cortes = cursor.fetchall()
+    filas = cursor.fetchall()
+    total = filas[0][6] if filas else 0
 
-    # FIX Bug 3 + 5 + 6: ia.haircut_scores con id_cliente e id_corte
-    for c in cortes:
-        score_value = round(float(c[5]), 2) if c[5] is not None else 0.0
+    # Solo registramos el score de los cortes que realmente se muestran
+    # en esta página (igual que el comportamiento original con el top 5)
+    for f in filas:
+        score_value = round(float(f[5]), 2) if f[5] is not None else 0.0
         cursor.execute(
             """
             INSERT INTO ia.haircut_scores (id_cliente, id_corte, score, algorithm, model_version)
             VALUES (%s, %s, %s, %s, %s)
             """,
-            (id_cliente, c[0], score_value, "shape_weights_v1", "1.0.0")
+            (id_cliente, f[0], score_value, "shape_weights_v1", "1.0.0")
         )
 
-    return [
+    cortes = [
         {
-            "id":          c[0],
-            "nombre":      c[1],
-            "descripcion": c[2],
-            "imagen_url":  c[3],
-            "dificultad":  c[4],
-            "score":       round(float(c[5]), 2) if c[5] is not None else 0.0,
+            "id":          f[0],
+            "nombre":      f[1],
+            "descripcion": f[2],
+            "imagen_url":  f[3],
+            "dificultad":  f[4],
+            "score":       round(float(f[5]), 2) if f[5] is not None else 0.0,
         }
-        for c in cortes
+        for f in filas
     ]
 
-
+    return cortes, total
 # ============================================
 # ROOT
 # ============================================
@@ -476,11 +468,13 @@ async def analizar_y_recomendar(
         # Obtener recomendaciones
         # ──────────────────────────────────────────────
 
-        cortes = obtener_cortes(
+        cortes,total_cortes = obtener_cortes(
             cursor,
             face_shape_id,
             genero_cliente,
-            id_cliente
+            id_cliente,
+            pagina=1,
+            por_pagina=10
         )
 
         conn.commit()
@@ -502,6 +496,9 @@ async def analizar_y_recomendar(
             "puntos_grafico": resultado_ml.get("puntos_grafico", {}),
             "contorno_grafico": resultado_ml.get("contorno_grafico", []),
             "cortes_recomendados": cortes,
+            "total_cortes": total_cortes,
+            "pagina": 1,
+            "por_pagina": 10,
         }
 
     except HTTPException:
@@ -516,6 +513,69 @@ async def analizar_y_recomendar(
             detail=str(e)
         )
 
+    finally:
+        cursor.close()
+        conn.close()
+
+# ============================================
+# Endpoint nuevo para pedir más páginas sin re-analizar
+# ============================================
+
+@app.get("/cortes/recomendados/{id_cliente}")
+def obtener_cortes_paginados(id_cliente: int, pagina: int = 1, por_pagina: int = 10):
+
+    if pagina < 1 or por_pagina < 1:
+        raise HTTPException(status_code=400, detail="pagina y por_pagina deben ser mayores a 0")
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute(
+            """
+            SELECT p.genero, fm.predicted_face_shape_id
+            FROM cliente c
+            JOIN persona p ON p.id_persona = c.id_persona
+            LEFT JOIN ia.face_measurements fm ON fm.id_cliente = c.id_cliente
+            WHERE c.id_cliente = %s
+            ORDER BY fm.id DESC
+            LIMIT 1
+            """,
+            (id_cliente,)
+        )
+        row = cursor.fetchone()
+
+        if not row or row[1] is None:
+            raise HTTPException(
+                status_code=404,
+                detail="El cliente no tiene un análisis facial registrado"
+            )
+
+        genero_cliente, face_shape_id = row
+
+        cortes, total = obtener_cortes(
+            cursor, face_shape_id, genero_cliente, id_cliente, pagina, por_pagina
+        )
+        conn.commit()
+
+        total_paginas = (total + por_pagina - 1) // por_pagina
+
+        return {
+            "cliente_id": id_cliente,
+            "pagina": pagina,
+            "por_pagina": por_pagina,
+            "total_cortes": total,
+            "total_paginas": total_paginas,
+            "cortes_recomendados": cortes,
+        }
+
+    except HTTPException:
+        conn.rollback()
+        raise
+    except Exception as e:
+        conn.rollback()
+        logger.exception("Error al obtener cortes paginados")
+        raise HTTPException(status_code=500, detail=str(e))
     finally:
         cursor.close()
         conn.close()
@@ -653,6 +713,41 @@ def listar_clientes():
         cursor.close()
         conn.close()
 
+@app.post("/ia/preview-corte")
+async def preview_corte(
+    foto: UploadFile = File(...),
+    nombre_corte: str = Form(...)
+):
+    if not foto.content_type.startswith("image/"):
+        raise HTTPException(status_code=400, detail="El archivo debe ser una imagen")
+
+    foto_bytes = await foto.read()
+    foto_b64 = base64.b64encode(foto_bytes).decode("utf-8")
+
+    async with httpx.AsyncClient(timeout=120) as client:
+        response = await client.post(
+            "https://api.openai.com/v1/images/edits",
+            headers={
+                "Authorization": f"Bearer {os.getenv('OPENAI_API_KEY')}",
+            },
+            data={
+                "model": "gpt-image-1",
+                "prompt": f"Modifica el cabello de esta persona aplicándole el corte de barbería '{nombre_corte}'. Mantén exactamente los mismos rasgos faciales, tono de piel y fondo. Solo cambia el cabello.",
+                "n": "1",
+                "size": "1024x1024"
+            },
+            files={
+                "image": ("foto.jpg", foto_bytes, "image/jpeg")
+            }
+        )
+
+    if response.status_code != 200:
+        raise HTTPException(status_code=500, detail=f"Error OpenAI: {response.text}")
+
+    data = response.json()
+    imagen_b64 = data["data"][0]["b64_json"]
+
+    return {"imagen_b64": imagen_b64}
 
 # ============================================
 # START SERVER

@@ -11,6 +11,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.util.Map;
@@ -26,8 +27,6 @@ public class IaClienteService {
 
     public Map<String, Object> analizar(MultipartFile foto, Integer idCliente) throws IOException {
 
-        // Convertir el archivo a ByteArrayResource para que RestTemplate
-        // pueda enviarlo como multipart con el nombre de campo correcto
         ByteArrayResource fotoResource = new ByteArrayResource(foto.getBytes()) {
             @Override
             public String getFilename() {
@@ -63,5 +62,17 @@ public class IaClienteService {
         return restTemplate.postForObject(iaUrl + "/feedback", request, Map.class);
     }
 
+
+    public Map<String, Object> obtenerCortesRecomendados(Integer idCliente, Integer pagina, Integer porPagina) {
+
+        String url = UriComponentsBuilder
+                .fromHttpUrl(iaUrl + "/cortes/recomendados/{idCliente}")
+                .queryParam("pagina", pagina)
+                .queryParam("por_pagina", porPagina)
+                .buildAndExpand(idCliente)
+                .toUriString();
+
+        return restTemplate.getForObject(url, Map.class);
+    }
 
 }

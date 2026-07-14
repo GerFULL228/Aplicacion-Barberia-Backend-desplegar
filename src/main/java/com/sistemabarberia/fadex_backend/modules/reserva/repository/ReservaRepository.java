@@ -247,4 +247,69 @@ AND (:metodoPago IS NULL OR p.metodo::TEXT = :metodoPago)
             @Param("estado") String estado,
             @Param("metodoPago") String metodoPago
     );
+    @Query(value = """
+        SELECT r FROM Reserva r
+        LEFT JOIN FETCH r.barbero b
+        LEFT JOIN FETCH r.servicio s
+        WHERE r.cliente.clienteId = :clienteId
+          AND (:estado IS NULL OR r.estadoReserva = :estado)
+          AND (CAST(:desde AS date) IS NULL OR r.fecha >= :desde)
+          AND (CAST(:hasta AS date) IS NULL OR r.fecha <= :hasta)
+        ORDER BY r.fecha DESC, r.horaInicio DESC
+    """,
+            countQuery = """
+        SELECT COUNT(r) FROM Reserva r
+        WHERE r.cliente.clienteId = :clienteId
+          AND (:estado IS NULL OR r.estadoReserva = :estado)
+          AND (CAST(:desde AS date) IS NULL OR r.fecha >= :desde)
+          AND (CAST(:hasta AS date) IS NULL OR r.fecha <= :hasta)
+    """)
+    Page<Reserva> findHistorialByClienteFiltros(
+            @Param("clienteId") Integer clienteId,
+            @Param("estado") EstadoReserva estado,
+            @Param("desde") LocalDate desde,
+            @Param("hasta") LocalDate hasta,
+            Pageable pageable
+    );
+
+    @Query(value = """
+    SELECT r.* FROM reservas r
+    LEFT JOIN cliente c ON c.id_cliente = r.id_cliente
+    LEFT JOIN persona cp ON cp.id_persona = c.id_persona
+    LEFT JOIN cortes s ON s.id_corte = r.id_servicio
+    JOIN barbero b ON b.id_barbero = r.id_barbero
+    JOIN persona bp ON bp.id_persona = b.id_persona
+    JOIN usuario u ON u.id_usuario = bp.id_usuario
+    WHERE u.usuario = :username
+      AND r.estado_reserva = 'FINALIZADA'
+      AND (:desde IS NULL OR r.fecha >= CAST(:desde AS date))
+      AND (:hasta IS NULL OR r.fecha <= CAST(:hasta AS date))
+      AND (:clienteNombre IS NULL OR
+           LOWER(cp.nombre::text) LIKE LOWER(CONCAT('%', :clienteNombre, '%')) OR
+           LOWER(cp.apellido::text) LIKE LOWER(CONCAT('%', :clienteNombre, '%')) OR
+           LOWER(CONCAT(cp.nombre, ' ', cp.apellido)::text) LIKE LOWER(CONCAT('%', :clienteNombre, '%')))
+    ORDER BY r.fecha DESC, r.hora_inicio DESC
+""", nativeQuery = true)
+    List<Reserva> findHistorialByBarberoUsername(
+            @Param("username") String username,
+            @Param("desde") String desde,
+            @Param("hasta") String hasta,
+            @Param("clienteNombre") String clienteNombre
+    );
+
+    @Query("SELECT r FROM Reserva r " +
+            "JOIN FETCH r.cliente c " +
+            "JOIN FETCH c.persona p " +
+            "JOIN FETCH r.barbero b " +
+            "JOIN FETCH b.persona bp " +
+            "WHERE r.estadoReserva IN ('CONFIRMADA', 'PENDIENTE_PAGO') " + // Enviamos a confirmadas o pendientes de pago
+            "AND r.recordatorioEnviado = false " +
+            "AND r.fecha = :fechaActual " +
+            "AND r.horaInicio BETWEEN :horaInicioBusqueda AND :horaFinBusqueda")
+    List<Reserva> findReservasParaRecordatorio(
+            @Param("fechaActual") LocalDate fechaActual,
+            @Param("horaInicioBusqueda") LocalTime horaInicioBusqueda,
+            @Param("horaFinBusqueda") LocalTime horaFinBusqueda
+    );
+
 }
