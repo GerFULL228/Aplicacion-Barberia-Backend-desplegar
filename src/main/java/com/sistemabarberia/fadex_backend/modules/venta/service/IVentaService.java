@@ -8,20 +8,13 @@ import java.util.List;
 public interface IVentaService {
 
     VentaResponseDTO crear(VentaRequestDTO dto);
-
     List<VentaResponseDTO> buscarConFiltros(String cliente, String numeroCorrelativo, String tipoComprobante, String fechaInicio, String fechaFin);
-
     List<VentaResponseDTO> listar();
-
     List<VentaResponseDTO> listar(String cliente);
-
     VentaResponseDTO obtenerPorId(Integer id);
-
     VentaResponseDTO actualizar(Integer id, VentaRequestDTO dto);
-
     void eliminar(Integer id);
-
     List<DetalleVentaResponseDTO> listarDetalles(Integer ventaId);
-
     List<HistorialVentaResponseDTO> listarHistorial(Integer ventaId);
+    List<VentaResponseDTO> listarPorBarbero(Integer barberoId);
 }

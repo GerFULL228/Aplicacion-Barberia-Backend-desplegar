@@ -21,7 +21,5 @@ public interface IServicioService {
     ServicioResponseDTO cambiarEstadoServicio(Long id, boolean estado);
     ServicioResponseDTO cambiarPublicacion(Long id, boolean publicado);
     void eliminar(Long id);
-
-
     List<Map<String, Object>> getLista();
 }

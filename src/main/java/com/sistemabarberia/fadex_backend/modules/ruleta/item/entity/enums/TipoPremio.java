@@ -3,5 +3,6 @@ public enum TipoPremio {
     DESCUENTO,
     SERVICIO,
     PRODUCTO,
-    CUPON
+    CUPON,
+    SIN_PREMIO
 }

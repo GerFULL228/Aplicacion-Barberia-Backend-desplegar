@@ -41,6 +41,10 @@ public class FidelizacionTarjeta extends AuditableEntity {
     @Builder.Default
     private Integer totalGiros = 0;
 
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean activo = true;
+
     @Column(name = "ciclo_activo", nullable = false)
     @Builder.Default
     private Boolean cicloActivo = true;

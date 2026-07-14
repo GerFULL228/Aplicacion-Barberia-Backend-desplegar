@@ -1,9 +1,12 @@
 package com.sistemabarberia.fadex_backend.modules.ruleta.giro.service.impl;
 
+import com.sistemabarberia.fadex_backend.auth.usuario.Entity.Usuario;
+import com.sistemabarberia.fadex_backend.auth.usuario.service.UsuarioSecurityService;
 import com.sistemabarberia.fadex_backend.commons.exception.BusinessException;
 import com.sistemabarberia.fadex_backend.commons.response.PageResponse;
 import com.sistemabarberia.fadex_backend.modules.cliente.entity.Cliente;
 import com.sistemabarberia.fadex_backend.modules.cliente.repository.ClienteRepository;
+import com.sistemabarberia.fadex_backend.modules.cliente.service.IClienteService;
 import com.sistemabarberia.fadex_backend.modules.fidelizacion.tarjeta.entity.FidelizacionTarjeta;
 import com.sistemabarberia.fadex_backend.modules.fidelizacion.tarjeta.repository.FidelizacionTarjetaRepository;
 import com.sistemabarberia.fadex_backend.modules.ruleta.giro.dto.RuletaGiroFiltro;
@@ -20,10 +23,14 @@ import com.sistemabarberia.fadex_backend.modules.ruleta.ruleta.entity.Ruleta;
 import com.sistemabarberia.fadex_backend.modules.ruleta.ruleta.repository.RuletaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +42,8 @@ public class RuletaGiroServiceImpl implements IRuletaGiroService {
     private final ClienteRepository clienteRepository;
     private final RuletaRepository ruletaRepository;
     private final RuletaItemRepository itemRepository;
+    private final UsuarioSecurityService usuarioSecurityService;
+    private final IClienteService clienteService;
 
     @Override
     @Transactional(readOnly = true)
@@ -86,6 +95,50 @@ public class RuletaGiroServiceImpl implements IRuletaGiroService {
     public void eliminarGiro(Long id) {
         RuletaGiro giro = giroRepository.findById(id).orElseThrow(() -> new BusinessException("Giro no encontrado", HttpStatus.NOT_FOUND));
         giroRepository.delete(giro);
+    }
+
+    @Override
+    @Transactional
+    public RuletaGiro guardarGiro(FidelizacionTarjeta tarjeta, Cliente cliente, Ruleta ruleta, RuletaItem premio, Integer numeroGiro, BigDecimal anguloResultado, BigDecimal probFinal, BigDecimal probAplicada) {
+        if (!tarjeta.getCliente().getClienteId().equals(cliente.getClienteId())) {
+            throw new BusinessException("La tarjeta no pertenece al cliente.", HttpStatus.BAD_REQUEST);
+        }
+        RuletaGiro giro = RuletaGiro.builder().tarjeta(tarjeta).cliente(cliente).ruleta(ruleta).item(premio).numeroGiro(numeroGiro).anguloResultado(anguloResultado)
+                .probFinal(probFinal).probAplicada(probAplicada).build();
+        return giroRepository.save(giro);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<RuletaGiroResponseDTO> obtenerMisGiros() {
+        Usuario usuario = usuarioSecurityService.getUsuarioLogueado();
+        Integer clienteId = clienteService.obtenerIdClientePorUsuario(usuario.getIdUsuario());
+        return giroRepository.findByClienteClienteIdOrderByCreatedAtDesc(clienteId).stream().map(giroMapper::toResponse).toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public RuletaGiroResponseDTO obtenerMiGiro(Long id) {
+        Usuario usuario = usuarioSecurityService.getUsuarioLogueado();
+        Integer clienteId = clienteService.obtenerIdClientePorUsuario(usuario.getIdUsuario());
+        RuletaGiro giro = giroRepository.findById(id).orElseThrow(() -> new BusinessException("Giro no encontrado", HttpStatus.NOT_FOUND));
+        if (!giro.getCliente().getClienteId().equals(clienteId)) {
+            throw new BusinessException("No tiene permiso para acceder a este giro.", HttpStatus.FORBIDDEN);
+        }
+        return giroMapper.toResponse(giro);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Integer contarGiros() {
+        return Math.toIntExact(giroRepository.count());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<RuletaGiroResponseDTO> obtenerUltimosGiros(int limite) {
+        Pageable pageable = PageRequest.of(0, limite);
+        return giroMapper.toResponseList(giroRepository.findAllByOrderByCreatedAtDesc(pageable));
     }
 
     private FidelizacionTarjeta obtenerTarjeta(Long id) {

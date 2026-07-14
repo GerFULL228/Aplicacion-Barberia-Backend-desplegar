@@ -41,7 +41,6 @@ public class Venta {
     @Column(name = "tipo_comprobante")
     private TipoComprobante tipoComprobante;
 
-
     @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DetalleVenta> detalles;
 

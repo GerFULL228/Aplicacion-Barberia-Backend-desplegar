@@ -3,6 +3,7 @@ package com.sistemabarberia.fadex_backend.modules.fidelizacion.tarjeta.controlle
 import com.sistemabarberia.fadex_backend.commons.response.ApiResponse;
 import com.sistemabarberia.fadex_backend.commons.response.PageResponse;
 import com.sistemabarberia.fadex_backend.modules.fidelizacion.tarjeta.dto.FidelizacionTarjetaFiltro;
+import com.sistemabarberia.fadex_backend.modules.fidelizacion.tarjeta.dto.request.FidelizacionTarjetaPatchRequestDTO;
 import com.sistemabarberia.fadex_backend.modules.fidelizacion.tarjeta.dto.request.FidelizacionTarjetaRequestDTO;
 import com.sistemabarberia.fadex_backend.modules.fidelizacion.tarjeta.dto.response.FidelizacionTarjetaResponseDTO;
 import com.sistemabarberia.fadex_backend.modules.fidelizacion.tarjeta.service.IFidelizacionTarjetaService;
@@ -14,6 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -51,5 +54,23 @@ public class FidelizacionTarjetaController {
     public ResponseEntity<ApiResponse<Void>> eliminar(@PathVariable Long id) {
         tarjetaService.eliminarTarjeta(id);
         return ResponseEntity.ok(ApiResponse.ok("Tarjeta eliminada correctamente."));
+    }
+
+    @PatchMapping("/{id}")
+    @PreAuthorize("hasAuthority('FIDELIZACION_MANAGE')")
+    public ResponseEntity<ApiResponse<FidelizacionTarjetaResponseDTO>> actualizarParcial(@PathVariable Long id, @RequestBody @Valid FidelizacionTarjetaPatchRequestDTO dto) {
+        return ResponseEntity.ok(ApiResponse.ok("Tarjeta actualizada correctamente.", tarjetaService.actualizarParcial(id, dto)));
+    }
+
+    @GetMapping("/mis-tarjetas")
+    @PreAuthorize("hasAuthority('FIDELIZACION_READ')")
+    public ResponseEntity<ApiResponse<List<FidelizacionTarjetaResponseDTO>>> obtenerMisTarjetas() {
+        return ResponseEntity.ok(ApiResponse.ok("Mis tarjetas obtenidas correctamente.", tarjetaService.obtenerMisTarjetas()));
+    }
+
+    @GetMapping("/mis-tarjetas/{id}")
+    @PreAuthorize("hasAuthority('FIDELIZACION_READ')")
+    public ResponseEntity<ApiResponse<FidelizacionTarjetaResponseDTO>> obtenerMiTarjeta(@PathVariable Long id) {
+        return ResponseEntity.ok(ApiResponse.ok("Tarjeta obtenida correctamente.", tarjetaService.obtenerMiTarjeta(id)));
     }
 }

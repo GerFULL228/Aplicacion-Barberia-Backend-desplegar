@@ -62,6 +62,9 @@ public class RuletaItem extends AuditableEntity {
     @JoinColumn(name="id_producto")
     private Producto producto;
 
+    @Column(name="cantidad_producto")
+    private Integer cantidadProducto;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="id_servicio")
     private Servicio servicio;

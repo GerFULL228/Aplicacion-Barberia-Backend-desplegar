@@ -39,7 +39,7 @@ public class RuletaItemRequestDTO {
     private String imagenUrl;
     private Long productoId;
     private Long servicioId;
-
+    private Integer cantidadProducto;
     @NotNull
     private Boolean activo;
 

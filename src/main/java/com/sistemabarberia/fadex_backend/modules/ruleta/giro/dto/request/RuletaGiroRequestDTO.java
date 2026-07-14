@@ -9,7 +9,6 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 public class RuletaGiroRequestDTO {
-
     @NotNull
     private Long tarjetaId;
 
@@ -27,5 +26,4 @@ public class RuletaGiroRequestDTO {
 
     private BigDecimal probFinal;
     private BigDecimal probAplicada;
-
 }

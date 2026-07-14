@@ -75,7 +75,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": " {\r\n   \"username\": \"admin1\",\r\n   \"password\": \"admin123\"\r\n }\r\n\r\n",
+              "raw": " \r\n \r\n \r\n// {  \"username\": \"admin1\",   \"password\": \"admin123\" }\r\n\r\n  {\"username\": \"Pablo123_\", \"password\": \"Pablo123_\" }\r\n\r\n",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1004,7 +1004,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "\r\n{\r\n    \"clienteId\": 1,\r\n    \"servicioId\": 1,\r\n    \"barberoId\": 1,\r\n    \"fecha\": \"2026-05-16\",\r\n    \"horaInicio\": \"11:00:00\"\r\n}",
+              "raw": "\r\n{\r\n    \"clienteId\": 63,\r\n    \"servicioId\": 1,\r\n    \"barberoId\": 2,\r\n    \"fecha\": \"2026-05-16\",\r\n    \"horaInicio\": \"15:00:00\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1048,14 +1048,14 @@
               }
             },
             "url": {
-              "raw": "{{api}}/barbero/citas/1/estado",
+              "raw": "{{api}}/barbero/citas/131/estado",
               "host": [
                 "{{api}}"
               ],
               "path": [
                 "barbero",
                 "citas",
-                "1",
+                "131",
                 "estado"
               ]
             }
@@ -2316,7 +2316,7 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{api_url_v1}}/fidelizacion/movimientos",
+                  "raw": "{{api_url_v1}}/fidelizacion/movimientos?clienteId=1",
                   "host": [
                     "{{api_url_v1}}"
                   ],
@@ -2327,9 +2327,7 @@
                   "query": [
                     {
                       "key": "clienteId",
-                      "value": "1",
-                      "type": "text",
-                      "disabled": true
+                      "value": "1"
                     },
                     {
                       "key": "tarjetaId",
@@ -2501,9 +2499,785 @@
                 }
               },
               "response": []
+            },
+            {
+              "name": "MisMovimientos",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{api_url_v1}}/fidelizacion/movimientos/mis-movimientos",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "fidelizacion",
+                    "movimientos",
+                    "mis-movimientos"
+                  ],
+                  "query": [
+                    {
+                      "key": "clienteId",
+                      "value": "1",
+                      "type": "text",
+                      "disabled": true
+                    },
+                    {
+                      "key": "tarjetaId",
+                      "value": "1",
+                      "type": "text",
+                      "disabled": true
+                    },
+                    {
+                      "key": "origen",
+                      "value": "RESERVA",
+                      "type": "text",
+                      "disabled": true
+                    },
+                    {
+                      "key": "fechaInicio",
+                      "value": "2026-06-28T05:46:23.20822",
+                      "type": "text",
+                      "disabled": true
+                    },
+                    {
+                      "key": "fechaFin",
+                      "value": "2026-06-28T05:46:23.20822",
+                      "type": "text",
+                      "disabled": true
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "listarMovimientosCliente Copy",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{api_url_v1}}/fidelizacion/movimientos",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "fidelizacion",
+                    "movimientos"
+                  ],
+                  "query": [
+                    {
+                      "key": "clienteId",
+                      "value": "1",
+                      "type": "text",
+                      "disabled": true
+                    },
+                    {
+                      "key": "tarjetaId",
+                      "value": "1",
+                      "type": "text",
+                      "disabled": true
+                    },
+                    {
+                      "key": "origen",
+                      "value": "RESERVA",
+                      "type": "text",
+                      "disabled": true
+                    },
+                    {
+                      "key": "fechaInicio",
+                      "value": "2026-06-28T05:46:23.20822",
+                      "type": "text",
+                      "disabled": true
+                    },
+                    {
+                      "key": "fechaFin",
+                      "value": "2026-06-28T05:46:23.20822",
+                      "type": "text",
+                      "disabled": true
+                    }
+                  ]
+                }
+              },
+              "response": []
             }
           ]
         },
+        {
+          "name": "regla",
+          "item": [
+            {
+              "name": "listarReglas",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{api_url_v1}}/fidelizacion/reglas",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "fidelizacion",
+                    "reglas"
+                  ],
+                  "query": [
+                    {
+                      "key": "tipoAlcance",
+                      "value": "SERVICIO",
+                      "disabled": true
+                    },
+                    {
+                      "key": "categoriaId",
+                      "value": "1",
+                      "disabled": true
+                    },
+                    {
+                      "key": "activo",
+                      "value": "TRUE",
+                      "disabled": true
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "listarReglasId",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{api_url_v1}}/fidelizacion/reglas/1",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "fidelizacion",
+                    "reglas",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "crearReglas",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "\r\n{\r\n  \"categoriaId\": 3,\r\n  \"tipoAlcance\": \"CATEGORIA\", // prodcuto, servicio, categoria,combo (si es combo entonces tiene los 2)\r\n  \"servicioId\": null, // varia si es  por servicio entonces va a tener numero\r\n  \"productoId\": null, // varia si es  por producto entonces va a tener numero\r\n  \"puntos\": 1,\r\n  \"activo\": true\r\n}\r\n\r\n",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{api_url_v1}}/fidelizacion/reglas",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "fidelizacion",
+                    "reglas"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "cambiarEstado",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"campo\": \"activo\",\r\n    \"valor\": false\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{api_url_v1}}/fidelizacion/reglas/3",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "fidelizacion",
+                    "reglas",
+                    "3"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "actualizarReglas",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"categoriaId\": 1,\r\n  \"tipoAlcance\": \"SERVICIO\",\r\n  \"servicioId\": 4,\r\n  \"productoId\": null,\r\n  \"puntos\": 4,\r\n  \"activo\": false\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{api_url_v1}}/fidelizacion/reglas/13",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "fidelizacion",
+                    "reglas",
+                    "13"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "listarReglas",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{api_url_v1}}/fidelizacion/reglas/13",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "fidelizacion",
+                    "reglas",
+                    "13"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "tarjeta",
+          "item": [
+            {
+              "name": "listarTarjetas",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{api_url_v1}}/fidelizacion/tarjetas",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "fidelizacion",
+                    "tarjetas"
+                  ],
+                  "query": [
+                    {
+                      "key": "clienteId",
+                      "value": "1",
+                      "disabled": true
+                    },
+                    {
+                      "key": "categoriaId",
+                      "value": "2",
+                      "disabled": true
+                    },
+                    {
+                      "key": "cicloActivo",
+                      "value": "TRUE",
+                      "disabled": true
+                    },
+                    {
+                      "key": "activo",
+                      "value": "TRUE",
+                      "type": "text",
+                      "disabled": true
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "listarTarjetaId",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{api_url_v1}}/fidelizacion/tarjetas/1",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "fidelizacion",
+                    "tarjetas",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "crearTarjeta",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"clienteId\": 1,\r\n    \"categoriaId\": 3\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{api_url_v1}}/fidelizacion/tarjetas",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "fidelizacion",
+                    "tarjetas"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "cambiarEstado",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"campo\": \"activo\",\r\n    \"valor\": false\r\n}\r\n\r\n//  {\"campo\": \"cicloActivo\",\"valor\": true}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{api_url_v1}}/fidelizacion/tarjetas/1",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "fidelizacion",
+                    "tarjetas",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "actualizarTarjeta",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"clienteId\": 1,\r\n    \"categoriaId\": 4\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{api_url_v1}}/fidelizacion/tarjetas/1",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "fidelizacion",
+                    "tarjetas",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "eliminarTarjesta",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{api_url_v1}}/fidelizacion/tarjetas/1",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "fidelizacion",
+                    "tarjetas",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "MisTarjetas",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{api_url_v1}}/fidelizacion/tarjetas/mis-tarjetas",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "fidelizacion",
+                    "tarjetas",
+                    "mis-tarjetas"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "MiTarjetaID",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{api_url_v1}}/fidelizacion/tarjetas/mis-tarjetas/5",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "fidelizacion",
+                    "tarjetas",
+                    "mis-tarjetas",
+                    "5"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "dashobard",
+          "item": [
+            {
+              "name": "obtener dahsbaord cliente",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{api_url_v1}}/fidelizacion/dashboard/cliente",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "fidelizacion",
+                    "dashboard",
+                    "cliente"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "obtener dahsbaord cliente Copy",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{api_url_v1}}/fidelizacion/dashboard/cliente",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "fidelizacion",
+                    "dashboard",
+                    "cliente"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "obtenerGirosFechaadmin",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{api_url_v1}}/fidelizacion/dashboard/admin/giros-por-semana?fechaInicio=2026-06-01&fechaFin=2026-07-13",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "fidelizacion",
+                    "dashboard",
+                    "admin",
+                    "giros-por-semana"
+                  ],
+                  "query": [
+                    {
+                      "key": "fechaInicio",
+                      "value": "2026-06-01"
+                    },
+                    {
+                      "key": "fechaFin",
+                      "value": "2026-07-13"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "obtenerMoviminetoFechaadmin",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{api_url_v1}}/fidelizacion/dashboard/admin/movimientos-por-semana?fechaInicio=2026-06-01&fechaFin=2026-07-13",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "fidelizacion",
+                    "dashboard",
+                    "admin",
+                    "movimientos-por-semana"
+                  ],
+                  "query": [
+                    {
+                      "key": "fechaInicio",
+                      "value": "2026-06-01"
+                    },
+                    {
+                      "key": "fechaFin",
+                      "value": "2026-07-13"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Ruleta",
+      "item": [
         {
           "name": "configuracion",
           "item": [
@@ -2595,14 +3369,14 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{api_url_v1}}/fidelizacion/configuracion/1",
+                  "raw": "{{api_url_v1}}/fidelizacion/configuracion/2",
                   "host": [
                     "{{api_url_v1}}"
                   ],
                   "path": [
                     "fidelizacion",
                     "configuracion",
-                    "1"
+                    "2"
                   ]
                 }
               },
@@ -2625,7 +3399,7 @@
                 "header": [],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\r\n    \"categoriaId\": 4,\r\n    \"activa\": true,\r\n    \"meta\": 10,\r\n    \"mostrarSiempre\": true,\r\n    \"crearTarjetaAutomatica\": true,\r\n    \"ruletaId\": 1\r\n}",
+                  "raw": "{\r\n    \"categoriaId\": 20,\r\n    \"activa\": true,\r\n    \"meta\": 10,\r\n    \"mostrarSiempre\": true,\r\n    \"crearTarjetaAutomatica\": true,\r\n    \"ruletaId\": 1\r\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -2640,6 +3414,44 @@
                   "path": [
                     "fidelizacion",
                     "configuracion"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "cambiarEstado",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"valor\": \"true\",\r\n    \"campo\": \"mostrarSiempre\"\r\n}\r\n\r\n//{\r\n//    \"valor\": \"true\",\r\n//    \"campo\": \"crearTarjetaAutomatica\"\r\n//}\r\n\r\n//{\r\n//    \"valor\": \"true\",\r\n//    \"campo\": \"activa\"\r\n//}\r\n",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{api}}/fidelizacion/configuracion/2",
+                  "host": [
+                    "{{api}}"
+                  ],
+                  "path": [
+                    "fidelizacion",
+                    "configuracion",
+                    "2"
                   ]
                 }
               },
@@ -2670,14 +3482,14 @@
                   }
                 },
                 "url": {
-                  "raw": "{{api_url_v1}}/fidelizacion/configuracion/1",
+                  "raw": "{{api_url_v1}}/fidelizacion/configuracion/5",
                   "host": [
                     "{{api_url_v1}}"
                   ],
                   "path": [
                     "fidelizacion",
                     "configuracion",
-                    "1"
+                    "5"
                   ]
                 }
               },
@@ -2699,14 +3511,14 @@
                 "method": "DELETE",
                 "header": [],
                 "url": {
-                  "raw": "{{api_url_v1}}/fidelizacion/configuracion/1",
+                  "raw": "{{api_url_v1}}/fidelizacion/configuracion/6",
                   "host": [
                     "{{api_url_v1}}"
                   ],
                   "path": [
                     "fidelizacion",
                     "configuracion",
-                    "1"
+                    "6"
                   ]
                 }
               },
@@ -2714,373 +3526,37 @@
             }
           ]
         },
-        {
-          "name": "regla",
-          "item": [
-            {
-              "name": "listarReglas",
-              "request": {
-                "auth": {
-                  "type": "bearer",
-                  "bearer": [
-                    {
-                      "key": "token",
-                      "value": "{{token}}",
-                      "type": "string"
-                    }
-                  ]
-                },
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "{{api_url_v1}}/fidelizacion/reglas?tipoAlcance=SERVICIO&categoriaId=1&activo=TRUE",
-                  "host": [
-                    "{{api_url_v1}}"
-                  ],
-                  "path": [
-                    "fidelizacion",
-                    "reglas"
-                  ],
-                  "query": [
-                    {
-                      "key": "tipoAlcance",
-                      "value": "SERVICIO"
-                    },
-                    {
-                      "key": "categoriaId",
-                      "value": "1"
-                    },
-                    {
-                      "key": "activo",
-                      "value": "TRUE"
-                    }
-                  ]
-                }
-              },
-              "response": []
-            },
-            {
-              "name": "listarReglasId",
-              "request": {
-                "auth": {
-                  "type": "bearer",
-                  "bearer": [
-                    {
-                      "key": "token",
-                      "value": "{{token}}",
-                      "type": "string"
-                    }
-                  ]
-                },
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "{{api_url_v1}}/fidelizacion/reglas",
-                  "host": [
-                    "{{api_url_v1}}"
-                  ],
-                  "path": [
-                    "fidelizacion",
-                    "reglas"
-                  ]
-                }
-              },
-              "response": []
-            },
-            {
-              "name": "crearReglas",
-              "request": {
-                "auth": {
-                  "type": "bearer",
-                  "bearer": [
-                    {
-                      "key": "token",
-                      "value": "{{token}}",
-                      "type": "string"
-                    }
-                  ]
-                },
-                "method": "POST",
-                "header": [],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\r\n  \"categoriaId\": 3,\r\n  \"tipoAlcance\": \"CATEGORIA\",\r\n  \"servicioId\": null,\r\n  \"productoId\": null,\r\n  \"puntos\": 1,\r\n  \"activo\": true\r\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": {
-                  "raw": "{{api_url_v1}}/fidelizacion/reglas",
-                  "host": [
-                    "{{api_url_v1}}"
-                  ],
-                  "path": [
-                    "fidelizacion",
-                    "reglas"
-                  ]
-                }
-              },
-              "response": []
-            },
-            {
-              "name": "actualizarReglas",
-              "request": {
-                "auth": {
-                  "type": "bearer",
-                  "bearer": [
-                    {
-                      "key": "token",
-                      "value": "{{token}}",
-                      "type": "string"
-                    }
-                  ]
-                },
-                "method": "PUT",
-                "header": [],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\r\n  \"categoriaId\": 1,\r\n  \"tipoAlcance\": \"SERVICIO\",\r\n  \"servicioId\": 4,\r\n  \"productoId\": null,\r\n  \"puntos\": 4,\r\n  \"activo\": false\r\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": {
-                  "raw": "{{api_url_v1}}/fidelizacion/reglas/1",
-                  "host": [
-                    "{{api_url_v1}}"
-                  ],
-                  "path": [
-                    "fidelizacion",
-                    "reglas",
-                    "1"
-                  ]
-                }
-              },
-              "response": []
-            },
-            {
-              "name": "listarReglas",
-              "request": {
-                "auth": {
-                  "type": "bearer",
-                  "bearer": [
-                    {
-                      "key": "token",
-                      "value": "{{token}}",
-                      "type": "string"
-                    }
-                  ]
-                },
-                "method": "DELETE",
-                "header": [],
-                "url": {
-                  "raw": "{{api_url_v1}}/fidelizacion/reglas/1",
-                  "host": [
-                    "{{api_url_v1}}"
-                  ],
-                  "path": [
-                    "fidelizacion",
-                    "reglas",
-                    "1"
-                  ]
-                }
-              },
-              "response": []
-            }
-          ]
-        },
-        {
-          "name": "tarjeta",
-          "item": [
-            {
-              "name": "listarTarjetas",
-              "request": {
-                "auth": {
-                  "type": "bearer",
-                  "bearer": [
-                    {
-                      "key": "token",
-                      "value": "{{token}}",
-                      "type": "string"
-                    }
-                  ]
-                },
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "{{api_url_v1}}/fidelizacion/tarjetas?clienteId=1&categoriaId=2&cicloActivo=TRUE",
-                  "host": [
-                    "{{api_url_v1}}"
-                  ],
-                  "path": [
-                    "fidelizacion",
-                    "tarjetas"
-                  ],
-                  "query": [
-                    {
-                      "key": "clienteId",
-                      "value": "1"
-                    },
-                    {
-                      "key": "categoriaId",
-                      "value": "2"
-                    },
-                    {
-                      "key": "cicloActivo",
-                      "value": "TRUE"
-                    }
-                  ]
-                }
-              },
-              "response": []
-            },
-            {
-              "name": "listarTarjetaId",
-              "request": {
-                "auth": {
-                  "type": "bearer",
-                  "bearer": [
-                    {
-                      "key": "token",
-                      "value": "{{token}}",
-                      "type": "string"
-                    }
-                  ]
-                },
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "{{api_url_v1}}/fidelizacion/tarjetas/1",
-                  "host": [
-                    "{{api_url_v1}}"
-                  ],
-                  "path": [
-                    "fidelizacion",
-                    "tarjetas",
-                    "1"
-                  ]
-                }
-              },
-              "response": []
-            },
-            {
-              "name": "crearTarjeta",
-              "request": {
-                "auth": {
-                  "type": "bearer",
-                  "bearer": [
-                    {
-                      "key": "token",
-                      "value": "{{token}}",
-                      "type": "string"
-                    }
-                  ]
-                },
-                "method": "POST",
-                "header": [],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\r\n    \"clienteId\": 1,\r\n    \"categoriaId\": 3\r\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": {
-                  "raw": "{{api_url_v1}}/fidelizacion/tarjetas",
-                  "host": [
-                    "{{api_url_v1}}"
-                  ],
-                  "path": [
-                    "fidelizacion",
-                    "tarjetas"
-                  ]
-                }
-              },
-              "response": []
-            },
-            {
-              "name": "actualizarTarjeta",
-              "request": {
-                "auth": {
-                  "type": "bearer",
-                  "bearer": [
-                    {
-                      "key": "token",
-                      "value": "{{token}}",
-                      "type": "string"
-                    }
-                  ]
-                },
-                "method": "PUT",
-                "header": [],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\r\n    \"clienteId\": 1,\r\n    \"categoriaId\": 4\r\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": {
-                  "raw": "{{api_url_v1}}/fidelizacion/tarjetas/1",
-                  "host": [
-                    "{{api_url_v1}}"
-                  ],
-                  "path": [
-                    "fidelizacion",
-                    "tarjetas",
-                    "1"
-                  ]
-                }
-              },
-              "response": []
-            },
-            {
-              "name": "eliminarTarjesta",
-              "request": {
-                "auth": {
-                  "type": "bearer",
-                  "bearer": [
-                    {
-                      "key": "token",
-                      "value": "{{token}}",
-                      "type": "string"
-                    }
-                  ]
-                },
-                "method": "DELETE",
-                "header": [],
-                "url": {
-                  "raw": "{{api_url_v1}}/fidelizacion/tarjetas/1",
-                  "host": [
-                    "{{api_url_v1}}"
-                  ],
-                  "path": [
-                    "fidelizacion",
-                    "tarjetas",
-                    "1"
-                  ]
-                }
-              },
-              "response": []
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "Ruleta",
-      "item": [
         {
           "name": "Ruleta",
           "item": [
+            {
+              "name": "listarRuletasActivas",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{api_url_v1}}/ruleta/activas",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "ruleta",
+                    "activas"
+                  ]
+                }
+              },
+              "response": []
+            },
             {
               "name": "listarRuletas",
               "request": {
@@ -3097,28 +3573,28 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{api_url_v1}}/ruletas?nombre=Ruleta Principal&tipo=GENERAL&activa=TRUE",
+                  "raw": "{{api_url_v1}}/ruleta",
                   "host": [
                     "{{api_url_v1}}"
                   ],
                   "path": [
-                    "ruletas"
+                    "ruleta"
                   ],
                   "query": [
                     {
                       "key": "nombre",
                       "value": "Ruleta Principal",
-                      "type": "text"
+                      "disabled": true
                     },
                     {
                       "key": "tipo",
                       "value": "GENERAL",
-                      "type": "text"
+                      "disabled": true
                     },
                     {
                       "key": "activa",
                       "value": "TRUE",
-                      "type": "text"
+                      "disabled": true
                     }
                   ]
                 }
@@ -3141,12 +3617,12 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{api_url_v1}}/ruletas/1",
+                  "raw": "{{api_url_v1}}/ruleta/1",
                   "host": [
                     "{{api_url_v1}}"
                   ],
                   "path": [
-                    "ruletas",
+                    "ruleta",
                     "1"
                   ]
                 }
@@ -3170,7 +3646,7 @@
                 "header": [],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\r\n  \"nombre\": \"Ruleta VIP\",\r\n  \"descripcion\": \"Ruleta para clientes VIP\",\r\n  \"tipo\": \"GENERAL\",\r\n  \"activa\": true,\r\n  \"incrementoPorGiro\": 0.02\r\n}",
+                  "raw": "{\r\n  \"nombre\": \"Ruleta de Test\",\r\n  \"descripcion\": \"Ruleta para hcaer pruebas\",\r\n  \"tipo\": \"GENERAL\",\r\n  \"activa\": true,\r\n  \"incrementoPorGiro\": 0.02\r\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -3178,12 +3654,47 @@
                   }
                 },
                 "url": {
-                  "raw": "{{api_url_v1}}/ruletas",
+                  "raw": "{{api_url_v1}}/ruleta",
                   "host": [
                     "{{api_url_v1}}"
                   ],
                   "path": [
-                    "ruletas"
+                    "ruleta"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "cambiarEstado",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PATCH",
+                "header": [],
+                "url": {
+                  "raw": "{{api}}/ruleta/5/estado?activa=true",
+                  "host": [
+                    "{{api}}"
+                  ],
+                  "path": [
+                    "ruleta",
+                    "5",
+                    "estado"
+                  ],
+                  "query": [
+                    {
+                      "key": "activa",
+                      "value": "true"
+                    }
                   ]
                 }
               },
@@ -3206,7 +3717,7 @@
                 "header": [],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\r\n  \"nombre\": \"Ruleta Principales\",\r\n  \"descripcion\": \"Actualizada\",\r\n  \"tipo\": \"FIDELIZACION\",\r\n  \"activa\": true,\r\n  \"incrementoPorGiro\": 0.03\r\n}",
+                  "raw": "{\r\n  \"nombre\": \"Ruleta de Bienvenida\",\r\n  \"descripcion\": \"Actualizada\",\r\n  \"tipo\": \"FIDELIZACION\",\r\n  \"activa\": true,\r\n  \"incrementoPorGiro\": 0.03\r\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -3214,13 +3725,13 @@
                   }
                 },
                 "url": {
-                  "raw": "{{api_url_v1}}/ruletas/3",
+                  "raw": "{{api_url_v1}}/ruleta/6",
                   "host": [
                     "{{api_url_v1}}"
                   ],
                   "path": [
-                    "ruletas",
-                    "3"
+                    "ruleta",
+                    "6"
                   ]
                 }
               },
@@ -3242,13 +3753,41 @@
                 "method": "DELETE",
                 "header": [],
                 "url": {
-                  "raw": "{{api_url_v1}}/ruletas/1",
+                  "raw": "{{api_url_v1}}/ruleta/7",
                   "host": [
                     "{{api_url_v1}}"
                   ],
                   "path": [
-                    "ruletas",
-                    "1"
+                    "ruleta",
+                    "7"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "listarRuletasMiRuleta",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{api_url_v1}}/ruleta/mi-ruleta",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "ruleta",
+                    "mi-ruleta"
                   ]
                 }
               },
@@ -3451,7 +3990,7 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{api_url_v1}}/ruleta/giros?clienteId=1&tarjetaId=2&ruletaId=2&fechaInicio=2026-06-28T05:46:23.20822&fechaFin=2026-06-28T05:46:23.20822",
+                  "raw": "{{api_url_v1}}/ruleta/giros",
                   "host": [
                     "{{api_url_v1}}"
                   ],
@@ -3462,23 +4001,28 @@
                   "query": [
                     {
                       "key": "clienteId",
-                      "value": "1"
+                      "value": "1",
+                      "disabled": true
                     },
                     {
                       "key": "tarjetaId",
-                      "value": "2"
+                      "value": "2",
+                      "disabled": true
                     },
                     {
                       "key": "ruletaId",
-                      "value": "2"
+                      "value": "2",
+                      "disabled": true
                     },
                     {
                       "key": "fechaInicio",
-                      "value": "2026-06-28T05:46:23.20822"
+                      "value": "2026-06-28T05:46:23.20822",
+                      "disabled": true
                     },
                     {
                       "key": "fechaFin",
-                      "value": "2026-06-28T05:46:23.20822"
+                      "value": "2026-06-28T05:46:23.20822",
+                      "disabled": true
                     }
                   ]
                 }
@@ -3542,6 +4086,94 @@
                 }
               },
               "response": []
+            },
+            {
+              "name": "mislistarGiros",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{api_url_v1}}/ruleta/girar/6",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "ruleta",
+                    "girar",
+                    "6"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "mislistarGiros",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{api_url_v1}}/ruleta/giros?clienteId=1&tarjetaId=2&ruletaId=2&fechaInicio=2026-06-28T05:46:23.20822&fechaFin=2026-06-28T05:46:23.20822",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "ruleta",
+                    "giros"
+                  ],
+                  "query": [
+                    {
+                      "key": "clienteId",
+                      "value": "1"
+                    },
+                    {
+                      "key": "tarjetaId",
+                      "value": "2"
+                    },
+                    {
+                      "key": "ruletaId",
+                      "value": "2"
+                    },
+                    {
+                      "key": "fechaInicio",
+                      "value": "2026-06-28T05:46:23.20822"
+                    },
+                    {
+                      "key": "fechaFin",
+                      "value": "2026-06-28T05:46:23.20822"
+                    }
+                  ]
+                }
+              },
+              "response": []
             }
           ]
         },
@@ -3564,7 +4196,7 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{api_url_v1}}/ruleta/items?ruletaId=1&nombre=Cupón Sorpresa&tipoPremio=SERVICIO&activo=TRUE",
+                  "raw": "{{api_url_v1}}/ruleta/items",
                   "host": [
                     "{{api_url_v1}}"
                   ],
@@ -3575,19 +4207,23 @@
                   "query": [
                     {
                       "key": "ruletaId",
-                      "value": "1"
+                      "value": "1",
+                      "disabled": true
                     },
                     {
                       "key": "nombre",
-                      "value": "Cupón Sorpresa"
+                      "value": "Cupón Sorpresa",
+                      "disabled": true
                     },
                     {
                       "key": "tipoPremio",
-                      "value": "SERVICIO"
+                      "value": "SERVICIO",
+                      "disabled": true
                     },
                     {
                       "key": "activo",
-                      "value": "TRUE"
+                      "value": "TRUE",
+                      "disabled": true
                     }
                   ]
                 }
@@ -3668,6 +4304,42 @@
                   "path": [
                     "ruleta",
                     "items"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "cambiarEstado",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PATCH",
+                "header": [],
+                "url": {
+                  "raw": "{{api}}/ruleta/items/5/estado?activo=true",
+                  "host": [
+                    "{{api}}"
+                  ],
+                  "path": [
+                    "ruleta",
+                    "items",
+                    "5",
+                    "estado"
+                  ],
+                  "query": [
+                    {
+                      "key": "activo",
+                      "value": "true"
+                    }
                   ]
                 }
               },
@@ -3927,6 +4599,143 @@
                     "recompensas",
                     "obtenidas",
                     "1"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "misRecompensas",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{api_url_v1}}/recompensas/obtenidas/mis-recompensas",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "recompensas",
+                    "obtenidas",
+                    "mis-recompensas"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "miRecompensaID",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{api_url_v1}}/recompensas/obtenidas/mis-recompensas/5",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "recompensas",
+                    "obtenidas",
+                    "mis-recompensas",
+                    "5"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "girar",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{api_url_v1}}/recompensas/obtenidas/girar",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "recompensas",
+                    "obtenidas",
+                    "girar"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "canjear",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"codigoCanje\":\"REC-548123\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{api_url_v1}}/recompensas/obtenidas/recompensas/obtenidas/canjear",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "recompensas",
+                    "obtenidas",
+                    "recompensas",
+                    "obtenidas",
+                    "canjear"
                   ]
                 }
               },

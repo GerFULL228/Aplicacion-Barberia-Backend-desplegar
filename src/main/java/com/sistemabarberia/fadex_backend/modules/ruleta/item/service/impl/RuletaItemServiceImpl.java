@@ -4,6 +4,7 @@ import com.sistemabarberia.fadex_backend.commons.exception.BusinessException;
 import com.sistemabarberia.fadex_backend.commons.response.PageResponse;
 import com.sistemabarberia.fadex_backend.commons.storage.FileStorageService;
 import com.sistemabarberia.fadex_backend.modules.producto.entity.Producto;
+import com.sistemabarberia.fadex_backend.modules.ruleta.validator.RuletaItemValidator;
 import com.sistemabarberia.fadex_backend.modules.ruleta.item.entity.enums.TipoPremio;
 import com.sistemabarberia.fadex_backend.modules.ruleta.item.specs.RuletaItemSpecification;
 import com.sistemabarberia.fadex_backend.modules.servicio.entity.Servicio;
@@ -37,6 +38,7 @@ public class RuletaItemServiceImpl implements IRuletaItemService {
     private final ServicioRepository servicioRepository;
     private final FileStorageService storageService;
     private final RuletaItemMapper ruletaItemMapper;
+    private final RuletaItemValidator ruletaItemValidator;
 
     private static final List<String> TIPOS_IMAGEN = List.of("image/jpeg","image/png","image/webp");
 
@@ -55,13 +57,16 @@ public class RuletaItemServiceImpl implements IRuletaItemService {
     }
 
     @Override
+    @Transactional
     public RuletaItemResponseDTO crearItem(RuletaItemRequestDTO dto, MultipartFile imagen) {
         Ruleta ruleta = obtenerRuleta(dto.getRuletaId());
         RuletaItem item = ruletaItemMapper.toEntity(dto);
         item.setRuleta(ruleta);
         asignarPremio(item, dto, imagen);
-        validarPremioMayor(dto, null);
-        return ruletaItemMapper.toResponse(ruletaItemRepository.save(item));
+        ruletaItemValidator.validarPremioMayor(dto, null);
+        RuletaItem guardado = ruletaItemRepository.save(item);
+        ruletaItemValidator.validarProbabilidadesRuleta(item.getRuleta().getRuletaId());
+        return ruletaItemMapper.toResponse(guardado);
     }
 
     @Override
@@ -75,7 +80,17 @@ public class RuletaItemServiceImpl implements IRuletaItemService {
         ruletaItemMapper.updateFromRequest(dto, item);
         item.setRuleta(obtenerRuleta(dto.getRuletaId()));
         asignarPremio(item, dto, imagen);
-        validarPremioMayor(dto, id);
+        ruletaItemValidator.validarPremioMayor(dto, id);
+        RuletaItem guardado = ruletaItemRepository.save(item);
+        ruletaItemValidator.validarProbabilidadesRuleta(item.getRuleta().getRuletaId());
+        return ruletaItemMapper.toResponse(guardado);
+    }
+
+    @Override
+    @Transactional
+    public RuletaItemResponseDTO cambiarEstado(Long id, Boolean activo) {
+        RuletaItem item = ruletaItemRepository.findById(id).orElseThrow(() -> new BusinessException("Item de ruleta no encontrado", HttpStatus.NOT_FOUND));
+        item.setActivo(activo);
         return ruletaItemMapper.toResponse(ruletaItemRepository.save(item));
     }
 
@@ -90,9 +105,20 @@ public class RuletaItemServiceImpl implements IRuletaItemService {
         ruletaItemRepository.delete(item);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<RuletaItem> obtenerItemsActivos(Long ruletaId) {
+        return ruletaItemRepository.findByRuletaRuletaIdAndActivoTrue(ruletaId);
+    }
+
     private void asignarPremio(RuletaItem item, RuletaItemRequestDTO dto, MultipartFile imagen) {
         item.setProducto(null);
         item.setServicio(null);
+        if (dto.getCantidadProducto() == null || dto.getCantidadProducto() <= 0) {
+            item.setCantidadProducto(1);
+        } else {
+            item.setCantidadProducto(dto.getCantidadProducto());
+        }
         switch (dto.getTipoPremio()) {
             case PRODUCTO -> {
                 if (dto.getProductoId() == null) {
@@ -100,7 +126,7 @@ public class RuletaItemServiceImpl implements IRuletaItemService {
                 }
                 Producto producto = productoRepository.findById(dto.getProductoId()).orElseThrow(() -> new BusinessException("Producto no encontrado", HttpStatus.NOT_FOUND));
                 item.setProducto(producto);
-                item.setImagenUrl(obtenerImagenProducto(producto));
+                item.setImagenUrl(producto.getUrlsMultimedia() != null && !producto.getUrlsMultimedia().isEmpty() ? producto.getUrlsMultimedia().getFirst() : null);
             }
             case SERVICIO -> {
                 if (dto.getServicioId() == null) {
@@ -108,9 +134,21 @@ public class RuletaItemServiceImpl implements IRuletaItemService {
                 }
                 Servicio servicio = servicioRepository.findById(dto.getServicioId()).orElseThrow(() -> new BusinessException("Servicio no encontrado", HttpStatus.NOT_FOUND));
                 item.setServicio(servicio);
-                item.setImagenUrl(obtenerImagenServicio(servicio));
+                item.setImagenUrl(servicio.getUrlsMultimedia() != null && !servicio.getUrlsMultimedia().isEmpty() ? servicio.getUrlsMultimedia().getFirst() : null);
             }
             case DESCUENTO, CUPON -> {
+                if (imagen != null && !imagen.isEmpty()) {
+                    if (item.getImagenUrl() != null) {
+                        storageService.eliminarArchivo(item.getImagenUrl());
+                    }
+                    String url = storageService.guardarArchivo(imagen, "ruleta-items", TIPOS_IMAGEN);
+                    item.setImagenUrl(url);
+                }
+            }
+            case SIN_PREMIO -> {
+                item.setProducto(null);
+                item.setServicio(null);
+                item.setCantidadProducto(null);
                 if (imagen != null && !imagen.isEmpty()) {
                     if (item.getImagenUrl() != null) {
                         storageService.eliminarArchivo(item.getImagenUrl());
@@ -122,33 +160,21 @@ public class RuletaItemServiceImpl implements IRuletaItemService {
         }
     }
 
-    private String obtenerImagenProducto(Producto producto) {
-        if (producto.getUrlsMultimedia() == null || producto.getUrlsMultimedia().isEmpty()) {
-            throw new BusinessException("El producto seleccionado no tiene imágenes", HttpStatus.BAD_REQUEST);
-        }
-        return producto.getUrlsMultimedia().get(0);
-    }
-
-    private String obtenerImagenServicio(Servicio servicio) {
-        if (servicio.getUrlsMultimedia() == null || servicio.getUrlsMultimedia().isEmpty()) {
-            throw new BusinessException("El servicio seleccionado no tiene imágenes", HttpStatus.BAD_REQUEST);
-        }
-        return servicio.getUrlsMultimedia().get(0);
-    }
+//    private String obtenerImagenProducto(Producto producto) {
+//        if (producto.getUrlsMultimedia() == null || producto.getUrlsMultimedia().isEmpty()) {
+//            throw new BusinessException("El producto seleccionado no tiene imágenes", HttpStatus.BAD_REQUEST);
+//        }
+//        return producto.getUrlsMultimedia().getFirst();
+//    }
+//
+//    private String obtenerImagenServicio(Servicio servicio) {
+//        if (servicio.getUrlsMultimedia() == null || servicio.getUrlsMultimedia().isEmpty()) {
+//            throw new BusinessException("El servicio seleccionado no tiene imágenes", HttpStatus.BAD_REQUEST);
+//        }
+//        return servicio.getUrlsMultimedia().getFirst();
+//    }
 
     private Ruleta obtenerRuleta(Long id) {
         return ruletaRepository.findById(id).orElseThrow(() -> new BusinessException("Ruleta no encontrada", HttpStatus.NOT_FOUND));
-    }
-
-    private void validarPremioMayor(RuletaItemRequestDTO dto, Long itemId) {
-        if (!Boolean.TRUE.equals(dto.getEsPremioMayor())) {return;}
-        boolean existe = ruletaItemRepository.existsByRuletaRuletaIdAndEsPremioMayorTrue(dto.getRuletaId());
-        if (itemId != null) {
-            RuletaItem actual = ruletaItemRepository.findById(itemId).orElseThrow(() -> new BusinessException("Item no encontrado", HttpStatus.NOT_FOUND));
-            if (Boolean.TRUE.equals(actual.getEsPremioMayor())) {return;}
-        }
-        if (existe) {
-            throw new BusinessException("La ruleta ya tiene un premio mayor", HttpStatus.BAD_REQUEST);
-        }
     }
 }

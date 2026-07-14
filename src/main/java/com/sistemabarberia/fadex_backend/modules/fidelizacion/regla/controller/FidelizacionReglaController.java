@@ -3,6 +3,7 @@ package com.sistemabarberia.fadex_backend.modules.fidelizacion.regla.controller;
 import com.sistemabarberia.fadex_backend.commons.response.ApiResponse;
 import com.sistemabarberia.fadex_backend.commons.response.PageResponse;
 import com.sistemabarberia.fadex_backend.modules.fidelizacion.regla.dto.FidelizacionReglaFiltro;
+import com.sistemabarberia.fadex_backend.modules.fidelizacion.regla.dto.request.FidelizacionReglaPatchRequestDTO;
 import com.sistemabarberia.fadex_backend.modules.fidelizacion.regla.dto.request.FidelizacionReglaRequestDTO;
 import com.sistemabarberia.fadex_backend.modules.fidelizacion.regla.dto.response.FidelizacionReglaResponseDTO;
 import com.sistemabarberia.fadex_backend.modules.fidelizacion.regla.service.IFidelizacionReglaService;
@@ -51,5 +52,11 @@ public class FidelizacionReglaController {
     public ResponseEntity<ApiResponse<Void>> eliminar(@PathVariable Long id) {
         reglaService.eliminarRegla(id);
         return ResponseEntity.ok(ApiResponse.ok("Regla eliminada correctamente."));
+    }
+
+    @PatchMapping("/{id}")
+    @PreAuthorize("hasAuthority('FIDELIZACION_MANAGE')")
+    public ResponseEntity<ApiResponse<FidelizacionReglaResponseDTO>> actualizarParcial(@PathVariable Long id, @RequestBody @Valid FidelizacionReglaPatchRequestDTO dto) {
+        return ResponseEntity.ok(ApiResponse.ok("Regla actualizada correctamente.", reglaService.actualizarParcial(id, dto)));
     }
 }

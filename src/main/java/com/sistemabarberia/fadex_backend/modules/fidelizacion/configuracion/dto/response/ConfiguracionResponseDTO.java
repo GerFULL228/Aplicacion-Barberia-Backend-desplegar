@@ -14,6 +14,7 @@ public class ConfiguracionResponseDTO {
     private String categoriaNombre;
     private Boolean activa;
     private Integer meta;
+    private Integer girosPorMeta;
     private Boolean mostrarSiempre;
     private Boolean crearTarjetaAutomatica;
     private Long ruletaId;

@@ -45,6 +45,9 @@ public class RuletaGiro extends AuditableEntity {
     @Column(name = "numero_giro", nullable = false)
     private Integer numeroGiro;
 
+    @Column(name = "angulo_resultado")
+    private BigDecimal anguloResultado;
+
     @Column(name = "prob_final", precision = 6, scale = 3)
     private BigDecimal probFinal;
 

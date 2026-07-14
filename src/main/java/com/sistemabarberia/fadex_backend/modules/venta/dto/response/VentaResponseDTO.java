@@ -1,5 +1,6 @@
 package com.sistemabarberia.fadex_backend.modules.venta.dto.response;
 
+import com.sistemabarberia.fadex_backend.modules.pagos.entity.MetodoPago;
 import com.sistemabarberia.fadex_backend.modules.venta.entity.TipoComprobante;
 import lombok.*;
 
@@ -19,5 +20,6 @@ public class VentaResponseDTO {
     private String clienteNombre;
     private LocalDateTime fecha;
     private TipoComprobante tipoComprobante;
+    private MetodoPago metodoPago;
     private List<DetalleVentaResponseDTO> detalles;
 }

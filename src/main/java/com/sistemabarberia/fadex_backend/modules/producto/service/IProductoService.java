@@ -19,4 +19,5 @@ public interface IProductoService {
     ProductoResponse cambiarEstadoProducto(Long id, boolean nuevoEstado);
     ProductoResponse cambiarPublicacion(Long id, boolean nuevoEstado);
     void eliminarProducto(Long id);
+    void descontarStockPremio(Long productoId, int cantidad);
 }

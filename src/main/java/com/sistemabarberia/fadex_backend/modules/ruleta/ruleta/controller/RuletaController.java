@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/ruletas")
+@RequestMapping("/api/v1/ruleta")
 @RequiredArgsConstructor
 public class RuletaController {
 
@@ -50,6 +50,13 @@ public class RuletaController {
     public ResponseEntity<ApiResponse<RuletaResponseDTO>> actualizar(@PathVariable Long id, @Valid @RequestBody RuletaRequestDTO dto) {
         RuletaResponseDTO data = ruletaService.actualizarRuleta(id, dto);
         return ResponseEntity.ok(ApiResponse.ok("Ruleta actualizada correctamente.", data));
+    }
+
+    @PreAuthorize("hasAuthority('RULETA_MANAGE')")
+    @PatchMapping("/{id}/estado")
+    public ResponseEntity<ApiResponse<RuletaResponseDTO>> cambiarEstado(@PathVariable Long id, @RequestParam Boolean activa) {
+        RuletaResponseDTO data = ruletaService.cambiarEstado(id, activa);
+        return ResponseEntity.ok(ApiResponse.ok("Estado de la ruleta actualizado correctamente.", data));
     }
 
     @PreAuthorize("hasAuthority('RULETA_MANAGE')")

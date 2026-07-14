@@ -45,11 +45,10 @@ public class Reserva {
     private LocalDate fecha;
     private LocalTime horaInicio;
     private LocalTime horaFin;
-
     private String observacion;
-
     private BigDecimal total;
-
-
+  
+    @Column(name = "recordatorio_enviado", columnDefinition = "boolean default false")
+    private Boolean recordatorioEnviado = false;
 
 }

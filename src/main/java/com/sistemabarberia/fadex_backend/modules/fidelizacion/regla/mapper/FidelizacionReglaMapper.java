@@ -14,8 +14,11 @@ public interface FidelizacionReglaMapper {
     @BeanMapping(ignoreByDefault = false, unmappedTargetPolicy = ReportingPolicy.IGNORE)
     void updateFromRequest(FidelizacionReglaRequestDTO dto, @MappingTarget FidelizacionRegla entity);
 
-    @Mapping(source = "categoria.id", target = "categoriaId")
-    @Mapping(source = "servicio.servicioId", target = "servicioId")
-    @Mapping(source = "producto.id", target = "productoId")
+    @Mapping(target = "categoriaId", source = "categoria.id")
+    @Mapping(target = "categoriaNombre", source = "categoria.nombre")
+    @Mapping(target = "servicioId", source = "servicio.servicioId")
+    @Mapping(target = "servicioNombre", source = "servicio.nombre")
+    @Mapping(target = "productoId", source = "producto.id")
+    @Mapping(target = "productoNombre", source = "producto.nombre")
     FidelizacionReglaResponseDTO toResponse(FidelizacionRegla entity);
 }

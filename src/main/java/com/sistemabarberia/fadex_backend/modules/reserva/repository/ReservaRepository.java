@@ -296,4 +296,20 @@ AND (:metodoPago IS NULL OR p.metodo::TEXT = :metodoPago)
             @Param("hasta") String hasta,
             @Param("clienteNombre") String clienteNombre
     );
+
+    @Query("SELECT r FROM Reserva r " +
+            "JOIN FETCH r.cliente c " +
+            "JOIN FETCH c.persona p " +
+            "JOIN FETCH r.barbero b " +
+            "JOIN FETCH b.persona bp " +
+            "WHERE r.estadoReserva IN ('CONFIRMADA', 'PENDIENTE_PAGO') " + // Enviamos a confirmadas o pendientes de pago
+            "AND r.recordatorioEnviado = false " +
+            "AND r.fecha = :fechaActual " +
+            "AND r.horaInicio BETWEEN :horaInicioBusqueda AND :horaFinBusqueda")
+    List<Reserva> findReservasParaRecordatorio(
+            @Param("fechaActual") LocalDate fechaActual,
+            @Param("horaInicioBusqueda") LocalTime horaInicioBusqueda,
+            @Param("horaFinBusqueda") LocalTime horaFinBusqueda
+    );
+
 }

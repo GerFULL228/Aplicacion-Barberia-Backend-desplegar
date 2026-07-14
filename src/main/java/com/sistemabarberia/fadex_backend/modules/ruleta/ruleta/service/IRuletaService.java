@@ -14,5 +14,7 @@ public interface IRuletaService {
     RuletaResponseDTO obtenerRuletaPorId(Long id);
     RuletaResponseDTO crearRuleta(RuletaRequestDTO dto);
     RuletaResponseDTO actualizarRuleta(Long id, RuletaRequestDTO dto);
+    RuletaResponseDTO cambiarEstado(Long id, Boolean activa);
     void eliminarRuleta(Long id);
+
 }

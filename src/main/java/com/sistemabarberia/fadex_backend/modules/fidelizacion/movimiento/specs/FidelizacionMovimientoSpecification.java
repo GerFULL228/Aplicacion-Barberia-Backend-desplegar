@@ -4,35 +4,36 @@ import com.sistemabarberia.fadex_backend.modules.fidelizacion.movimiento.dto.Fid
 import com.sistemabarberia.fadex_backend.modules.fidelizacion.movimiento.entity.FidelizacionMovimiento;
 import org.springframework.data.jpa.domain.Specification;
 
+import jakarta.persistence.criteria.Predicate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FidelizacionMovimientoSpecification {
     public static Specification<FidelizacionMovimiento> conFiltros(FidelizacionMovimientoFiltro filtro) {
         return (root, query, cb) -> {
-            var predicate = cb.conjunction();
-
+            List<Predicate> predicates = new ArrayList<>();
             if (filtro.getClienteId() != null) {
-                predicate.getExpressions().add(cb.equal(root.get("cliente").get("clienteId"), filtro.getClienteId()));
+                predicates.add(cb.equal(root.get("cliente").get("clienteId"), filtro.getClienteId().intValue()));
             }
 
             if (filtro.getTarjetaId() != null) {
-                predicate.getExpressions().add(cb.equal(root.get("tarjeta").get("id"), filtro.getTarjetaId()));
+                predicates.add(cb.equal(root.get("tarjeta").get("id"), filtro.getTarjetaId()));
             }
 
             if (filtro.getOrigen() != null) {
-                predicate.getExpressions().add(cb.equal(root.get("origen"), filtro.getOrigen()));
+                predicates.add(cb.equal(root.get("origen"), filtro.getOrigen()));
             }
 
             if (filtro.getFechaInicio() != null) {
-                predicate.getExpressions().add(cb.greaterThanOrEqualTo(root.get("createdAt"), filtro.getFechaInicio().atStartOfDay()));
+                predicates.add(cb.greaterThanOrEqualTo(root.get("createdAt"), filtro.getFechaInicio().atStartOfDay()));
             }
 
             if (filtro.getFechaFin() != null) {
-                predicate.getExpressions().add(cb.lessThanOrEqualTo(root.get("createdAt"), filtro.getFechaFin().atTime(LocalTime.MAX)));
+                predicates.add(cb.lessThanOrEqualTo(root.get("createdAt"), filtro.getFechaFin().atTime(LocalTime.MAX)));
             }
 
-            return predicate;
+            return cb.and(predicates.toArray(new Predicate[0]));
         };
     }
-
 }

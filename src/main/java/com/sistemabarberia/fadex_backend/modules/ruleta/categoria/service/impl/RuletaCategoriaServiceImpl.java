@@ -1,4 +1,4 @@
-package com.sistemabarberia.fadex_backend.modules.ruleta.categoria.service.impll;
+package com.sistemabarberia.fadex_backend.modules.ruleta.categoria.service.impl;
 
 import com.sistemabarberia.fadex_backend.commons.exception.BusinessException;
 import com.sistemabarberia.fadex_backend.commons.response.PageResponse;
@@ -14,7 +14,6 @@ import com.sistemabarberia.fadex_backend.modules.ruleta.categoria.service.IRulet
 import com.sistemabarberia.fadex_backend.modules.ruleta.categoria.specs.RuletaCategoriaSpecs;
 import com.sistemabarberia.fadex_backend.modules.ruleta.ruleta.entity.Ruleta;
 import com.sistemabarberia.fadex_backend.modules.ruleta.ruleta.repository.RuletaRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,6 +32,7 @@ public class RuletaCategoriaServiceImpl implements IRuletaCategoriaService {
     private final RuletaCategoriaMapper ruletaCategoriaMapper;
 
     @Override
+    @Transactional
     public RuletaCategoriaResponseDTO crearCategoria(RuletaCategoriaRequestDTO request) {
         Ruleta ruleta = ruletaRepository.findById(request.getIdRuleta()).orElseThrow(() -> new BusinessException("Ruleta no encontrada.", HttpStatus.NOT_FOUND));
         Categoria categoria = categoriaRepository.findById(request.getIdCategoria()).orElseThrow(() -> new BusinessException("Categoría no encontrada", HttpStatus.NOT_FOUND));
@@ -43,6 +43,7 @@ public class RuletaCategoriaServiceImpl implements IRuletaCategoriaService {
     }
 
     @Override
+    @Transactional
     public RuletaCategoriaResponseDTO actualizarCategoria(Long id, RuletaCategoriaRequestDTO request) {
         RuletaCategoria entity = ruletaCategoriaRepository.findById(id).orElseThrow(() -> new BusinessException("Relación no encontrada", HttpStatus.NOT_FOUND));
         Ruleta ruleta = ruletaRepository.findById(request.getIdRuleta()).orElseThrow(() -> new BusinessException("Ruleta no encontrada.", HttpStatus.NOT_FOUND));
@@ -67,6 +68,7 @@ public class RuletaCategoriaServiceImpl implements IRuletaCategoriaService {
     }
 
     @Override
+    @Transactional
     public void eliminarCategoria(Long id) {
         RuletaCategoria entity = ruletaCategoriaRepository.findById(id).orElseThrow(() -> new BusinessException("Relación no encontrada.", HttpStatus.NOT_FOUND));
         ruletaCategoriaRepository.delete(entity);

@@ -8,5 +8,6 @@ import lombok.Setter;
 public class FidelizacionTarjetaFiltro {
     private Long clienteId;
     private Long categoriaId;
+    private Boolean activo;
     private Boolean cicloActivo;
 }

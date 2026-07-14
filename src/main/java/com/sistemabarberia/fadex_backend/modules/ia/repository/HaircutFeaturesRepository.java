@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface HaircutFeaturesRepository extends JpaRepository<HaircutFeatures, Integer> {
+    void deleteByIdCorte(Integer idCorte);
+    boolean existsByIdCorte(Integer idCorte);
 }
