@@ -9,6 +9,7 @@ import com.sistemabarberia.fadex_backend.modules.ruleta.recompensa.dto.Recompens
 import com.sistemabarberia.fadex_backend.modules.ruleta.recompensa.dto.request.RecompensaObtenidaRequestDTO;
 import com.sistemabarberia.fadex_backend.modules.ruleta.recompensa.dto.response.RecompensaObtenidaResponseDTO;
 import com.sistemabarberia.fadex_backend.modules.ruleta.recompensa.entity.RecompensaObtenida;
+import com.sistemabarberia.fadex_backend.modules.ruleta.recompensa.entity.enums.EstadoRecompensa;
 import com.sistemabarberia.fadex_backend.modules.venta.entity.Venta;
 import org.springframework.data.domain.Pageable;
 
@@ -28,4 +29,5 @@ public interface IRecompensaObtenidaService {
     Reserva aplicarRecompensas(Reserva reserva, Integer clienteId, List<Long> longs);
     Integer contarRecompensas();
     List<RecompensaObtenidaResponseDTO> obtenerUltimasRecompensas(int limite);
+    RecompensaObtenidaResponseDTO cambiarEstado(Long id, EstadoRecompensa nuevoEstado, String observacion);
 }

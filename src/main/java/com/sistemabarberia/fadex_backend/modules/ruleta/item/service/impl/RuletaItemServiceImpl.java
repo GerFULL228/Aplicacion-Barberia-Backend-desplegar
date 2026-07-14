@@ -126,7 +126,7 @@ public class RuletaItemServiceImpl implements IRuletaItemService {
                 }
                 Producto producto = productoRepository.findById(dto.getProductoId()).orElseThrow(() -> new BusinessException("Producto no encontrado", HttpStatus.NOT_FOUND));
                 item.setProducto(producto);
-                item.setImagenUrl(obtenerImagenProducto(producto));
+                item.setImagenUrl(producto.getUrlsMultimedia() != null && !producto.getUrlsMultimedia().isEmpty() ? producto.getUrlsMultimedia().getFirst() : null);
             }
             case SERVICIO -> {
                 if (dto.getServicioId() == null) {
@@ -134,7 +134,7 @@ public class RuletaItemServiceImpl implements IRuletaItemService {
                 }
                 Servicio servicio = servicioRepository.findById(dto.getServicioId()).orElseThrow(() -> new BusinessException("Servicio no encontrado", HttpStatus.NOT_FOUND));
                 item.setServicio(servicio);
-                item.setImagenUrl(obtenerImagenServicio(servicio));
+                item.setImagenUrl(servicio.getUrlsMultimedia() != null && !servicio.getUrlsMultimedia().isEmpty() ? servicio.getUrlsMultimedia().getFirst() : null);
             }
             case DESCUENTO, CUPON -> {
                 if (imagen != null && !imagen.isEmpty()) {
@@ -160,19 +160,19 @@ public class RuletaItemServiceImpl implements IRuletaItemService {
         }
     }
 
-    private String obtenerImagenProducto(Producto producto) {
-        if (producto.getUrlsMultimedia() == null || producto.getUrlsMultimedia().isEmpty()) {
-            throw new BusinessException("El producto seleccionado no tiene imágenes", HttpStatus.BAD_REQUEST);
-        }
-        return producto.getUrlsMultimedia().getFirst();
-    }
-
-    private String obtenerImagenServicio(Servicio servicio) {
-        if (servicio.getUrlsMultimedia() == null || servicio.getUrlsMultimedia().isEmpty()) {
-            throw new BusinessException("El servicio seleccionado no tiene imágenes", HttpStatus.BAD_REQUEST);
-        }
-        return servicio.getUrlsMultimedia().getFirst();
-    }
+//    private String obtenerImagenProducto(Producto producto) {
+//        if (producto.getUrlsMultimedia() == null || producto.getUrlsMultimedia().isEmpty()) {
+//            throw new BusinessException("El producto seleccionado no tiene imágenes", HttpStatus.BAD_REQUEST);
+//        }
+//        return producto.getUrlsMultimedia().getFirst();
+//    }
+//
+//    private String obtenerImagenServicio(Servicio servicio) {
+//        if (servicio.getUrlsMultimedia() == null || servicio.getUrlsMultimedia().isEmpty()) {
+//            throw new BusinessException("El servicio seleccionado no tiene imágenes", HttpStatus.BAD_REQUEST);
+//        }
+//        return servicio.getUrlsMultimedia().getFirst();
+//    }
 
     private Ruleta obtenerRuleta(Long id) {
         return ruletaRepository.findById(id).orElseThrow(() -> new BusinessException("Ruleta no encontrada", HttpStatus.NOT_FOUND));

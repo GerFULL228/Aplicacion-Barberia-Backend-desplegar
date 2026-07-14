@@ -268,6 +268,45 @@ public class RecompensaObtenidaServiceImpl implements IRecompensaObtenidaService
     }
 
     @Override
+    @Transactional
+    public RecompensaObtenidaResponseDTO cambiarEstado(Long id, EstadoRecompensa nuevoEstado, String observacion) {
+        RecompensaObtenida recompensa = recompensaObtenidaRepository.findById(id).orElseThrow(() -> new BusinessException("Recompensa no encontrada", HttpStatus.NOT_FOUND));
+        validarTransicion(recompensa.getEstado(), nuevoEstado);
+        recompensa.setEstado(nuevoEstado);
+        if (observacion != null && !observacion.isBlank()) {
+            recompensa.setObservacion(observacion);
+        }
+        switch (nuevoEstado) {
+            case CANJEADO -> {
+                Usuario usuario = usuarioSecurityService.getUsuarioLogueado();
+                recompensa.setFechaCanje(LocalDateTime.now());
+                recompensa.setUsuarioCanje(usuario);
+            }
+            case PENDIENTE -> {
+                recompensa.setFechaCanje(null);
+                recompensa.setUsuarioCanje(null);
+            }
+            default -> {}
+        }
+        RecompensaObtenida guardada = recompensaObtenidaRepository.save(recompensa);
+        return recompensaObtenidaMapper.toResponse(guardada);
+    }
+
+    private void validarTransicion(EstadoRecompensa actual, EstadoRecompensa nuevo) {
+        if (actual == nuevo) {
+            throw new BusinessException("La recompensa ya se encuentra en estado " + nuevo, HttpStatus.BAD_REQUEST);
+        }
+        boolean permitido = switch (actual) {
+            case PENDIENTE -> nuevo == EstadoRecompensa.CANJEADO || nuevo == EstadoRecompensa.VENCIDO || nuevo == EstadoRecompensa.ANULADO;
+            case VENCIDO -> nuevo == EstadoRecompensa.PENDIENTE || nuevo == EstadoRecompensa.ANULADO;
+            case CANJEADO, ANULADO -> false;
+        };
+        if (!permitido) {
+            throw new BusinessException("No se puede cambiar de " + actual + " a " + nuevo, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public List<RecompensaObtenidaResponseDTO> obtenerUltimasRecompensas(int limite) {
         Pageable pageable = PageRequest.of(0, limite);

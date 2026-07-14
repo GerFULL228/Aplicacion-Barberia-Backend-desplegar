@@ -319,11 +319,18 @@ public class FidelizacionTarjetaServiceImpl implements IFidelizacionTarjetaServi
     @Transactional
     public FidelizacionTarjetaResponseDTO actualizarParcial(Long id, FidelizacionTarjetaPatchRequestDTO dto) {
         FidelizacionTarjeta tarjeta = tarjetaRepository.findById(id).orElseThrow(() -> new BusinessException("Tarjeta no encontrada", HttpStatus.NOT_FOUND));
+        System.out.println("ANTES: " + tarjeta.getActivo());
         switch (dto.getCampo()) {
             case "activo" -> tarjeta.setActivo((Boolean) dto.getValor());
             case "cicloActivo" -> tarjeta.setCicloActivo((Boolean) dto.getValor());
             default -> throw new BusinessException("Campo no permitido para actualización.", HttpStatus.BAD_REQUEST);
         }
-        return tarjetaMapper.toResponse(tarjetaRepository.save(tarjeta));
+        System.out.println(dto.getCampo());
+        System.out.println(dto.getValor());
+        System.out.println(dto.getValor().getClass());
+        System.out.println("DESPUES: " + tarjeta.getActivo());
+        tarjeta = tarjetaRepository.save(tarjeta);
+        System.out.println("GUARDADO: " + tarjeta.getActivo());
+        return tarjetaMapper.toResponse(tarjeta);
     }
 }

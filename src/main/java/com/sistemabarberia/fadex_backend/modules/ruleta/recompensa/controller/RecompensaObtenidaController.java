@@ -6,6 +6,7 @@ import com.sistemabarberia.fadex_backend.modules.fidelizacion.tarjeta.service.IF
 import com.sistemabarberia.fadex_backend.modules.ruleta.engine.service.IRuletaEngineService;
 import com.sistemabarberia.fadex_backend.modules.ruleta.item.dto.RuletaItemFiltro;
 import com.sistemabarberia.fadex_backend.modules.ruleta.recompensa.dto.RecompensaObtenidaFiltro;
+import com.sistemabarberia.fadex_backend.modules.ruleta.recompensa.dto.request.CambiarEstadoRecompensaRequestDTO;
 import com.sistemabarberia.fadex_backend.modules.ruleta.recompensa.dto.request.CanjearRecompensaRequestDTO;
 import com.sistemabarberia.fadex_backend.modules.ruleta.recompensa.dto.request.RecompensaObtenidaRequestDTO;
 import com.sistemabarberia.fadex_backend.modules.ruleta.recompensa.dto.response.RecompensaObtenidaResponseDTO;
@@ -88,5 +89,11 @@ public class RecompensaObtenidaController {
         FidelizacionTarjeta tarjeta = tarjetaService.obtenerTarjetaConGiroDisponible();
         RecompensaObtenida recompensa = ruletaEngineService.ejecutarGiro(tarjeta);
         return ResponseEntity.ok(ApiResponse.ok("Giro realizado correctamente.", recompensaObtenidaMapper.toResponse(recompensa)));
+    }
+
+    @PatchMapping("/{id}/estado")
+    @PreAuthorize("hasAuthority('RECOMPENSA_CANJEAR')")
+    public ResponseEntity<ApiResponse<RecompensaObtenidaResponseDTO>> cambiarEstado(@PathVariable Long id, @Valid @RequestBody CambiarEstadoRecompensaRequestDTO request) {
+        return ResponseEntity.ok(ApiResponse.ok("Estado actualizado correctamente.", recompensaObtenidaService.cambiarEstado(id, request.getEstado(), request.getObservacion())));
     }
 }

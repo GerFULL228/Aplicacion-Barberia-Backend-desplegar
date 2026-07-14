@@ -8,7 +8,7 @@ import lombok.Setter;
 public class FidelizacionTarjetaResponseDTO {
     private Long id;
     private Long clienteId;
-    private String clienteNombre;
+    private String clienteNombreCompleto;
     private Long categoriaId;
     private String categoriaNombre;
     private Integer progreso;

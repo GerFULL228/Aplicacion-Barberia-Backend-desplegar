@@ -18,15 +18,15 @@ public class RuletaGiroSpecification {
             }
 
             if (filtro.getRuletaId() != null) {
-                predicate.getExpressions().add(cb.equal(root.get("ruleta").get("id"), filtro.getRuletaId()));
+                predicate.getExpressions().add(cb.equal(root.get("ruleta").get("ruletaId"), filtro.getRuletaId()));
             }
 
             if (filtro.getFechaInicio() != null) {
-                predicate.getExpressions().add(cb.greaterThanOrEqualTo(root.get("fecha"), filtro.getFechaInicio().atStartOfDay()));
+                predicate.getExpressions().add(cb.greaterThanOrEqualTo(root.get("createdAt"), filtro.getFechaInicio().atStartOfDay()));
             }
 
             if (filtro.getFechaFin() != null) {
-                predicate.getExpressions().add(cb.lessThanOrEqualTo(root.get("fecha"), filtro.getFechaFin().atTime(23,59,59)));
+                predicate.getExpressions().add(cb.lessThanOrEqualTo(root.get("createdAt"), filtro.getFechaFin().atTime(23,59,59)));
             }
 
             return predicate;

@@ -27,5 +27,4 @@ public class FidelizacionMovimientoRequestDTO {
     private Integer puntos;
 
     private String descripcion;
-
 }
