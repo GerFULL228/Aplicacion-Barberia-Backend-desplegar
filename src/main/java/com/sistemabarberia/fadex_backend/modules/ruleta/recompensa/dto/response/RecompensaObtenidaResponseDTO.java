@@ -15,6 +15,9 @@ public class RecompensaObtenidaResponseDTO {
     private String clienteNombre;
     private Long itemId;
     private String itemNombre;
+    private String itemImagen;
+    private String colorHex;
+    private Boolean premioMayor;
     private EstadoRecompensa estado;
     private String observacion;
     private Long usuarioCanjeId;

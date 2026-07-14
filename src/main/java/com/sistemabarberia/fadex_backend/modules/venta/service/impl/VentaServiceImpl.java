@@ -5,8 +5,10 @@ import com.sistemabarberia.fadex_backend.modules.barbero.entity.Barbero;
 import com.sistemabarberia.fadex_backend.modules.barbero.repository.BarberoRepository;
 import com.sistemabarberia.fadex_backend.modules.cliente.entity.Cliente;
 import com.sistemabarberia.fadex_backend.modules.cliente.repository.ClienteRepository;
+import com.sistemabarberia.fadex_backend.modules.fidelizacion.engine.service.IFidelizacionEngine;
 import com.sistemabarberia.fadex_backend.modules.producto.entity.Producto;
 import com.sistemabarberia.fadex_backend.modules.producto.repository.ProductoRepository;
+import com.sistemabarberia.fadex_backend.modules.ruleta.recompensa.service.IRecompensaObtenidaService;
 import com.sistemabarberia.fadex_backend.modules.pagos.entity.Pago;
 import com.sistemabarberia.fadex_backend.modules.pagos.entity.TipoPago;
 import com.sistemabarberia.fadex_backend.modules.pagos.repository.PagoRepository;
@@ -25,6 +27,7 @@ import com.sistemabarberia.fadex_backend.modules.reserva.entity.Reserva;
 import com.sistemabarberia.fadex_backend.modules.reserva.entity.EstadoReserva;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,6 +55,8 @@ public class VentaServiceImpl implements IVentaService {
     private final VentaMapper ventaMapper;
     private final DetalleVentaMapper detalleVentaMapper;
     private final HistorialVentaMapper historialVentaMapper;
+    private final IFidelizacionEngine fidelizacionEngine;
+    private final IRecompensaObtenidaService recompensaObtenidaService;
 
     @Override
     @Transactional
@@ -62,7 +67,7 @@ public class VentaServiceImpl implements IVentaService {
         Reserva reservaVinculada = null;
         List<DetalleVenta> detalles = new ArrayList<>();
 
-        if(dto.getBarberoId() != null){
+        if (dto.getBarberoId() != null) {
             barbero = barberoRepository.findById(dto.getBarberoId())
                     .orElseThrow(() -> new ResourceNotFoundException("Barbero no encontrado"));
         }
@@ -89,7 +94,7 @@ public class VentaServiceImpl implements IVentaService {
             reservaRepository.save(reservaVinculada);
 
         } else {
-            if(dto.getClienteId() == null) {
+            if (dto.getClienteId() == null) {
                 throw new IllegalArgumentException("El cliente es obligatorio para ventas libres.");
             }
             cliente = clienteRepository.findById(dto.getClienteId())
@@ -122,6 +127,13 @@ public class VentaServiceImpl implements IVentaService {
         venta.setDetalles(detalles);
         Venta ventaGuardada = ventaRepository.save(venta);
         ventaGuardada = ventaRepository.findByIdWithDetalles(ventaGuardada.getVentaId());
+
+        // Recompensas (módulo migrado a tablas nuevas): se aplican antes de calcular el
+        // monto total por si el servicio ajusta precios/descuentos sobre los detalles.
+        if (dto.getRecompensasAplicadas() != null && !dto.getRecompensasAplicadas().isEmpty()) {
+            recompensaObtenidaService.aplicarRecompensas(dto.getRecompensasAplicadas(), ventaGuardada);
+        }
+
         BigDecimal montoTotal = ventaGuardada.getDetalles().stream()
                 .map(detalle -> detalle.getPrecioUnitario().multiply(BigDecimal.valueOf(detalle.getCantidad())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -146,6 +158,8 @@ public class VentaServiceImpl implements IVentaService {
         historial.setFecha(LocalDateTime.now());
         historialVentaRepository.save(historial);
 
+        fidelizacionEngine.procesarVenta(ventaGuardada); //agregar a fidelizacion enginep para acumular puntos por venta
+
         VentaResponseDTO response = ventaMapper.toResponse(ventaGuardada);
         response.setMetodoPago(dto.getMetodoPago());
 
@@ -158,14 +172,12 @@ public class VentaServiceImpl implements IVentaService {
         LocalDateTime fechaInicio = null;
         LocalDateTime fechaFin = null;
         TipoComprobante comprobanteEnum = null;
-
         if (fechaInicioStr != null && !fechaInicioStr.isEmpty()) {
             fechaInicio = LocalDate.parse(fechaInicioStr.substring(0, 10)).atStartOfDay();
         }
         if (fechaFinStr != null && !fechaFinStr.isEmpty()) {
             fechaFin = LocalDate.parse(fechaFinStr.substring(0, 10)).atTime(23, 59, 59);
         }
-
         if (tipoComprobanteStr != null && !tipoComprobanteStr.isEmpty()) {
             try {
                 comprobanteEnum = TipoComprobante.valueOf(tipoComprobanteStr.toUpperCase());
@@ -173,25 +185,18 @@ public class VentaServiceImpl implements IVentaService {
                 comprobanteEnum = null;
             }
         }
-
         String clienteFiltro = (cliente != null && !cliente.trim().isEmpty()) ? cliente.trim() : null;
         String correlativoFiltro = (numeroCorrelativo != null && !numeroCorrelativo.trim().isEmpty()) ? numeroCorrelativo.trim() : null;
-
         boolean hasCliente = clienteFiltro != null;
         String valCliente = hasCliente ? clienteFiltro : "";
-
         boolean hasCorrelativo = correlativoFiltro != null;
         String valCorrelativo = hasCorrelativo ? correlativoFiltro : "";
-
         boolean hasComprobante = comprobanteEnum != null;
         TipoComprobante valComprobante = hasComprobante ? comprobanteEnum : TipoComprobante.BOLETA;
-
         boolean hasFechaInicio = fechaInicio != null;
         LocalDateTime valFechaInicio = hasFechaInicio ? fechaInicio : LocalDateTime.now();
-
         boolean hasFechaFin = fechaFin != null;
         LocalDateTime valFechaFin = hasFechaFin ? fechaFin : LocalDateTime.now();
-
         List<Venta> ventas = ventaRepository.buscarConFiltrosAvanzados(
                 hasCliente, valCliente,
                 hasCorrelativo, valCorrelativo,
@@ -247,7 +252,6 @@ public class VentaServiceImpl implements IVentaService {
         venta.setCliente(cliente);
         venta.setFecha(dto.getFecha());
         venta.setTipoComprobante(dto.getTipoComprobante());
-
         detalleVentaRepository.deleteAll(venta.getDetalles());
         venta.getDetalles().clear();
         for (DetalleVentaRequestDTO detDto : dto.getDetalles()) {
@@ -255,10 +259,8 @@ public class VentaServiceImpl implements IVentaService {
             detalle.setVenta(venta);
             venta.getDetalles().add(detalle);
         }
-
         Venta ventaActualizada = ventaRepository.save(venta);
         ventaActualizada = ventaRepository.findByIdWithDetalles(ventaActualizada.getVentaId());
-
         HistorialVenta historial = new HistorialVenta();
         historial.setVenta(ventaActualizada);
         historial.setFecha(LocalDateTime.now());
@@ -293,8 +295,7 @@ public class VentaServiceImpl implements IVentaService {
 
     @Override
     public List<HistorialVentaResponseDTO> listarHistorial(Integer ventaId) {
-        return historialVentaMapper.toResponseList(
-                historialVentaRepository.findByVenta_VentaId(ventaId)
+        return historialVentaMapper.toResponseList(historialVentaRepository.findByVenta_VentaId(ventaId)
         );
     }
 

@@ -31,7 +31,7 @@ public interface RuletaGiroMapper {
 
     @Mapping(target = "tarjetaId", source = "tarjeta.id")
     @Mapping(target = "clienteId", source = "cliente.clienteId")
-    @Mapping(target = "clienteNombre", source = "cliente.persona.nombre")
+    @Mapping(target = "clienteNombre", expression = "java(entity.getCliente().getPersona().getNombre() + \" \" + entity.getCliente().getPersona().getApellido())")
     @Mapping(target = "ruletaId", source = "ruleta.ruletaId")
     @Mapping(target = "ruletaNombre", source = "ruleta.nombre")
     @Mapping(target = "fecha", source = "createdAt")

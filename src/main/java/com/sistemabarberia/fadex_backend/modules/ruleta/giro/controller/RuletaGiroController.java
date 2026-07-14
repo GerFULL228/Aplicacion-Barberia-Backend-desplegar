@@ -15,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/ruleta/giros")
@@ -51,5 +53,17 @@ public class RuletaGiroController {
     public ResponseEntity<ApiResponse<Void>> eliminar(@PathVariable Long id) {
         giroService.eliminarGiro(id);
         return ResponseEntity.ok(ApiResponse.ok("Giro eliminado correctamente."));
+    }
+
+    @GetMapping("/mis-giros")
+    @PreAuthorize("hasAuthority('FIDELIZACION_READ')")
+    public ResponseEntity<ApiResponse<List<RuletaGiroResponseDTO>>> obtenerMisGiros() {
+        return ResponseEntity.ok(ApiResponse.ok("Giros obtenidos correctamente.", giroService.obtenerMisGiros()));
+    }
+
+    @GetMapping("/mis-giros/{id}")
+    @PreAuthorize("hasAuthority('FIDELIZACION_READ')")
+    public ResponseEntity<ApiResponse<RuletaGiroResponseDTO>> obtenerMiGiro(@PathVariable Long id) {
+        return ResponseEntity.ok(ApiResponse.ok("Giro obtenido correctamente.", giroService.obtenerMiGiro(id)));
     }
 }

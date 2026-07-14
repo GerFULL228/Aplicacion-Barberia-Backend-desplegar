@@ -65,6 +65,7 @@ public class CategoriaServiceImpl implements ICategoriaService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public CategoriaResponseDTO obtenerPorId(Long id) {
         Categoria categoria = categoriaRepository.findById(id).orElseThrow(() -> new BusinessException("Categoría no encontrada", HttpStatus.NOT_FOUND));
         Map<Long, CategoriaResponseDTO> mapa = construirArbol(true);
@@ -75,6 +76,7 @@ public class CategoriaServiceImpl implements ICategoriaService {
     }
 
     @Override
+    @Transactional
     public CategoriaResponseDTO crear(CategoriaRequestDTO dto) {
         if (dto.getPadreId() == null) {
             if (categoriaRepository.existsByNombreIgnoreCaseAndPadreIsNullAndEstadoTrue(dto.getNombre().trim())) {
@@ -105,6 +107,7 @@ public class CategoriaServiceImpl implements ICategoriaService {
     }
 
     @Override
+    @Transactional
     public CategoriaResponseDTO actualizar(Long id, CategoriaRequestDTO dto) {
         Categoria categoria = categoriaRepository.findById(id).orElseThrow(() -> new BusinessException("Categoría no encontrada", HttpStatus.NOT_FOUND));
         boolean cambioNombre = !categoria.getNombre().equalsIgnoreCase(dto.getNombre().trim());
@@ -161,6 +164,7 @@ public class CategoriaServiceImpl implements ICategoriaService {
     }
 
     @Override
+    @Transactional
     public CategoriaResponseDTO cambiarEstado(Long id, Boolean estado) {
         Categoria categoria = categoriaRepository.findById(id).orElseThrow(() -> new BusinessException("Categoría no encontrada", HttpStatus.NOT_FOUND));
         if (Boolean.TRUE.equals(estado) && categoria.getPadre() != null) {
@@ -191,6 +195,7 @@ public class CategoriaServiceImpl implements ICategoriaService {
     }
 
     @Override
+    @Transactional
     public void eliminar(Long id) {
         Categoria categoria = categoriaRepository.findById(id).orElseThrow(() -> new BusinessException("Categoría no encontrada", HttpStatus.NOT_FOUND));
         boolean tieneSubcategorias = categoriaRepository.existsByPadreId(id);
@@ -255,6 +260,7 @@ public class CategoriaServiceImpl implements ICategoriaService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Long> obtenerIdsCategoriaYRamas(Long categoriaId) {
         Set<Long> ids = new HashSet<>();
         recolectarCategoriasHijas(categoriaId, ids);

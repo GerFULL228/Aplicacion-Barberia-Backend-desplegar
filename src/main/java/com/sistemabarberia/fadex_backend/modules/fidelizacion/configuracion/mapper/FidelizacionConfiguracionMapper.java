@@ -9,6 +9,7 @@ import org.mapstruct.Mapping;
 public interface FidelizacionConfiguracionMapper {
     @Mapping(target = "configuracionId", source = "configuracionId")
     @Mapping(target = "categoriaId", source = "categoria.id")
+    @Mapping(target = "girosPorMeta", source = "girosPorMeta")
     @Mapping(target = "categoriaNombre", source = "categoria.nombre")
     @Mapping(target = "ruletaId", source = "ruleta.ruletaId")
     @Mapping(target = "ruletaNombre", source = "ruleta.nombre")

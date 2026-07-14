@@ -15,7 +15,7 @@ public class FidelizacionReglaSpecification {
             List<Predicate> predicates = new ArrayList<>();
 
             if(filtro.getCategoriaId()!=null){predicates.add(
-                    cb.equal(root.get("categoria").get("categoriaId"), filtro.getCategoriaId()));
+                    cb.equal(root.get("categoria").get("id"), filtro.getCategoriaId()));
             }
 
             if(filtro.getTipoAlcance()!=null){
@@ -25,10 +25,7 @@ public class FidelizacionReglaSpecification {
             if(filtro.getActivo()!=null){
                 predicates.add(cb.equal(root.get("activo"), filtro.getActivo()));
             }
-
             return cb.and(predicates.toArray(new Predicate[0]));
         };
-
     }
-
 }

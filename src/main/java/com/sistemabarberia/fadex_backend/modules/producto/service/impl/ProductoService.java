@@ -19,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
@@ -36,6 +37,7 @@ public class ProductoService implements IProductoService {
     private static final List<String> TIPOS_IMAGEN = List.of("image/jpeg", "image/png", "image/webp");
 
     @Override
+    @Transactional(readOnly = true)
     public ProductoResponse obtenerProductoPublicadoPorId(Long id) {
         Producto producto = productoRepository.findById(id).orElseThrow(() -> new BusinessException("Producto no encontrado", HttpStatus.NOT_FOUND));
         if (!producto.isEstado() || !producto.isPublicado()) {
@@ -45,6 +47,7 @@ public class ProductoService implements IProductoService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PageResponse<ProductoResponse> listarProductosPublicos(ProductoFiltro filtro, Pageable pageable) {
         filtro.setEstado(true);
         filtro.setPublicado(true);
@@ -57,6 +60,7 @@ public class ProductoService implements IProductoService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PageResponse<ProductoResponse> listarProductoFiltros(ProductoFiltro filtro, Pageable pageable) {
         List<Long> categoriasIds = null;
         if (filtro != null && filtro.getIdCategoria() != null) {
@@ -67,12 +71,14 @@ public class ProductoService implements IProductoService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ProductoResponse obtenerProductoPorId(Long id) {
         Producto producto = productoRepository.findById(id).orElseThrow(() -> new BusinessException("Producto no encontrado", HttpStatus.NOT_FOUND));
         return productoMapper.toResponse(producto);
     }
 
     @Override
+    @Transactional
     public ProductoResponse crearProducto(ProductoRequest request, List<MultipartFile> archivos)  {
         Categoria categoria = obtenerCategoriaProducto(request.getIdCategoria());
         String nombre = validarNombreProducto(request.getNombre());
@@ -99,6 +105,7 @@ public class ProductoService implements IProductoService {
     }
 
     @Override
+    @Transactional
     public ProductoResponse actualizarProducto(Long id, ProductoRequest request, List<MultipartFile> archivos) {
         Producto producto = productoRepository.findById(id).orElseThrow(() ->new BusinessException("Producto no encontrado",HttpStatus.NOT_FOUND));
         Categoria categoria = obtenerCategoriaProducto(request.getIdCategoria());
@@ -130,6 +137,7 @@ public class ProductoService implements IProductoService {
     }
 
     @Override
+    @Transactional
     public ProductoResponse  cambiarEstadoProducto(Long id, boolean nuevoEstado) {
         Producto producto = productoRepository.findById(id).orElseThrow(() -> new BusinessException("Producto no encontrado", HttpStatus.NOT_FOUND));
         producto.setEstado(nuevoEstado);
@@ -138,6 +146,7 @@ public class ProductoService implements IProductoService {
     }
 
     @Override
+    @Transactional
     public ProductoResponse cambiarPublicacion(Long id, boolean publicado) {
         Producto producto = productoRepository.findById(id).orElseThrow(() -> new BusinessException("Producto no encontrado", HttpStatus.NOT_FOUND));
         producto.setPublicado(publicado);
@@ -146,6 +155,7 @@ public class ProductoService implements IProductoService {
     }
 
     @Override
+    @Transactional
     public void eliminarProducto(Long id) {
         Producto producto = productoRepository.findById(id).orElseThrow(() -> new BusinessException("Producto no encontrado", HttpStatus.NOT_FOUND));
         if (producto.getUrlsMultimedia() != null) {
@@ -154,6 +164,20 @@ public class ProductoService implements IProductoService {
             }
         }
         productoRepository.delete(producto);
+    }
+
+    @Override
+    @Transactional
+    public void descontarStockPremio(Long productoId, int cantidad) {
+        Producto producto = productoRepository.findById(productoId).orElseThrow(() -> new BusinessException("Producto no encontrado", HttpStatus.NOT_FOUND));
+        if (cantidad <= 0) {
+            throw new BusinessException("La cantidad debe ser mayor a cero.", HttpStatus.BAD_REQUEST);
+        }
+        if (producto.getStock() < cantidad) {
+            throw new BusinessException("Stock insuficiente para entregar el premio.", HttpStatus.BAD_REQUEST);
+        }
+        producto.setStock(producto.getStock() - cantidad);
+        productoRepository.save(producto);
     }
 
     private void validarArchivoImagen(MultipartFile file) {

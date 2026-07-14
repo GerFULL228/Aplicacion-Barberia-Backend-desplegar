@@ -8,11 +8,14 @@ import lombok.Setter;
 public class FidelizacionTarjetaResponseDTO {
     private Long id;
     private Long clienteId;
-    private String clienteNombre;
+    private String clienteNombreCompleto;
     private Long categoriaId;
     private String categoriaNombre;
     private Integer progreso;
+    private Integer meta;
+    private Integer girosPorMeta;
     private Integer girosDisponibles;
     private Integer totalGiros;
+    private Boolean activo;
     private Boolean cicloActivo;
 }

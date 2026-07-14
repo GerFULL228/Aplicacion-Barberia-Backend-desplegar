@@ -8,6 +8,7 @@ import com.sistemabarberia.fadex_backend.modules.categoria.entity.Categoria;
 import com.sistemabarberia.fadex_backend.modules.categoria.entity.CategoriaEnum;
 import com.sistemabarberia.fadex_backend.modules.categoria.repository.CategoriaRepository;
 import com.sistemabarberia.fadex_backend.modules.categoria.service.ICategoriaService;
+import com.sistemabarberia.fadex_backend.modules.ia.repository.HaircutFeaturesRepository;
 import com.sistemabarberia.fadex_backend.modules.servicio.dto.ServicioFiltro;
 import com.sistemabarberia.fadex_backend.modules.servicio.dto.request.ServicioRequestDTO;
 import com.sistemabarberia.fadex_backend.modules.servicio.dto.response.ServicioResponseDTO;
@@ -16,6 +17,7 @@ import com.sistemabarberia.fadex_backend.modules.servicio.mapper.ServicioMapper;
 import com.sistemabarberia.fadex_backend.modules.servicio.repository.ServicioRepository;
 import com.sistemabarberia.fadex_backend.modules.servicio.service.IServicioService;
 import com.sistemabarberia.fadex_backend.modules.servicio.specs.ServicioSpecification;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -37,10 +39,12 @@ public class ServicioServiceImpl implements IServicioService {
     private final ServicioMapper servicioMapper;
     private final FileStorageService fileStorageService;
     private final ICategoriaService categoriaService;
+    private final HaircutFeaturesRepository haircutFeaturesRepository;
 
-    private static final List<String> TIPOS_IMAGEN =  List.of("image/jpeg", "image/png", "image/webp");
+    private static final List<String> TIPOS_IMAGEN = List.of("image/jpeg", "image/png", "image/webp");
 
     @Override
+    @Transactional(readOnly = true)
     public ServicioResponseDTO obtenerServicioPublicadoPorId(Long id) {
         Servicio servicio = servicioRepository.findById(id).orElseThrow(() -> new BusinessException("Servicio no encontrado", HttpStatus.NOT_FOUND));
         if (!servicio.isEstado() || !servicio.isPublicado()) {
@@ -50,6 +54,7 @@ public class ServicioServiceImpl implements IServicioService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PageResponse<ServicioResponseDTO> listarServiciosPublicos(ServicioFiltro filtro, Pageable pageable) {
         filtro.setEstado(true);
         filtro.setPublicado(true);
@@ -62,6 +67,7 @@ public class ServicioServiceImpl implements IServicioService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PageResponse<ServicioResponseDTO> listarServicioFiltros(ServicioFiltro filtro, Pageable pageable) {
         List<Long> categoriasIds = null;
         if (filtro != null && filtro.getCategoriaId() != null) {
@@ -72,12 +78,14 @@ public class ServicioServiceImpl implements IServicioService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ServicioResponseDTO obtenerPorId(Long id) {
         Servicio servicio = servicioRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Servicio no encontrado"));
         return servicioMapper.toResponse(servicio);
     }
 
     @Override
+    @Transactional
     public ServicioResponseDTO crear(ServicioRequestDTO dto, List<MultipartFile> archivos) {
         Categoria categoria = obtenerCategoriaServicio(dto.getCategoriaId());
         String nombre = validarNombreServicio(dto.getNombre());
@@ -102,6 +110,7 @@ public class ServicioServiceImpl implements IServicioService {
     }
 
     @Override
+    @Transactional
     public ServicioResponseDTO actualizar(Long id, ServicioRequestDTO dto, List<MultipartFile> archivos) {
         Servicio servicio = servicioRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Servicio no encontrado"));
         Categoria categoria = obtenerCategoriaServicio(dto.getCategoriaId());
@@ -133,6 +142,7 @@ public class ServicioServiceImpl implements IServicioService {
     }
 
     @Override
+    @Transactional
     public ServicioResponseDTO cambiarEstadoServicio(Long id, boolean estado) {
         Servicio servicio = servicioRepository.findById(id).orElseThrow(() -> new BusinessException("Servicio no encontrado", HttpStatus.NOT_FOUND));
         servicio.setEstado(estado);
@@ -141,6 +151,7 @@ public class ServicioServiceImpl implements IServicioService {
     }
 
     @Override
+    @Transactional
     public ServicioResponseDTO cambiarPublicacion(Long id, boolean publicado) {
         Servicio servicio = servicioRepository.findById(id).orElseThrow(() -> new BusinessException("Servicio no encontrado", HttpStatus.NOT_FOUND));
         servicio.setPublicado(publicado);
@@ -149,12 +160,16 @@ public class ServicioServiceImpl implements IServicioService {
     }
 
     @Override
+    @Transactional
     public void eliminar(Long id) {
         Servicio servicio = servicioRepository.findById(id).orElseThrow(() -> new BusinessException("Servicio no encontrado", HttpStatus.NOT_FOUND));
         if (servicio.getUrlsMultimedia() != null) {
             for (String url : servicio.getUrlsMultimedia()) {
                 fileStorageService.eliminarArchivo(url);
             }
+        }
+        if (haircutFeaturesRepository.existsByIdCorte(id.intValue())) {
+            haircutFeaturesRepository.deleteByIdCorte(id.intValue());
         }
         servicioRepository.delete(servicio);
     }
@@ -200,13 +215,6 @@ public class ServicioServiceImpl implements IServicioService {
         return nombre;
     }
     public List<Map<String, Object>> getLista() {
-        return servicioRepository.findAll().stream()
-                .map(s -> {
-                    Map<String, Object> m = new HashMap<>();
-                    m.put("id", s.getServicioId());
-                    m.put("nombre", s.getNombre());
-                    return m;
-                })
-                .toList();
+        return servicioRepository.findAll().stream().map(s -> {Map<String, Object> m = new HashMap<>();m.put("id", s.getServicioId());m.put("nombre", s.getNombre());return m;}).toList();
     }
 }

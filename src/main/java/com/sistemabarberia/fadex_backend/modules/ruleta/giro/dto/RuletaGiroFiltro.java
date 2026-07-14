@@ -13,5 +13,4 @@ public class RuletaGiroFiltro {
     private Long ruletaId;
     private LocalDate fechaInicio;
     private LocalDate fechaFin;
-
 }

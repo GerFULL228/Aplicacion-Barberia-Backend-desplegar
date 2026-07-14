@@ -15,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/fidelizacion/movimientos")
@@ -51,5 +53,17 @@ public class FidelizacionMovimientoController {
     public ResponseEntity<ApiResponse<Void>> eliminar(@PathVariable Long id) {
         movimientoService.eliminarMovimiento(id);
         return ResponseEntity.ok(ApiResponse.ok("Movimiento eliminado correctamente."));
+    }
+
+    @GetMapping("/cliente/{clienteId}")
+    @PreAuthorize("hasAuthority('FIDELIZACION_READ')")
+    public ResponseEntity<ApiResponse<List<FidelizacionMovimientoResponseDTO>>> listarPorCliente(@PathVariable Integer clienteId) {
+        return ResponseEntity.ok(ApiResponse.ok("Movimientos obtenidos correctamente.", movimientoService.listarPorCliente(clienteId)));
+    }
+
+    @GetMapping("/mis-movimientos")
+    @PreAuthorize("hasAuthority('FIDELIZACION_READ')")
+    public ResponseEntity<ApiResponse<List<FidelizacionMovimientoResponseDTO>>> obtenerMisMovimientos(){
+        return ResponseEntity.ok(ApiResponse.ok("Mis movimientos obtenidos correctamente.", movimientoService.obtenerMisMovimientos()));
     }
 }

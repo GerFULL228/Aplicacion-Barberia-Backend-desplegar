@@ -26,5 +26,8 @@ public class VentaRequestDTO {
     private MetodoPago metodoPago;
 
     private List<DetalleVentaRequestDTO> detalles;
+
+    private List<Long> recompensasAplicadas;
+
     private Long reservaId;
 }

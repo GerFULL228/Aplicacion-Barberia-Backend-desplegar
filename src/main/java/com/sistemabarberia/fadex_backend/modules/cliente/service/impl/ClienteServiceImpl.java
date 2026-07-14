@@ -12,6 +12,7 @@ import com.sistemabarberia.fadex_backend.modules.cliente.entity.Cliente;
 import com.sistemabarberia.fadex_backend.modules.cliente.mapper.ClienteMapper;
 import com.sistemabarberia.fadex_backend.modules.cliente.repository.ClienteRepository;
 import com.sistemabarberia.fadex_backend.modules.cliente.service.IClienteService;
+import com.sistemabarberia.fadex_backend.modules.fidelizacion.engine.service.IFidelizacionEngine;
 import com.sistemabarberia.fadex_backend.modules.persona.entity.Persona;
 import com.sistemabarberia.fadex_backend.modules.persona.repository.PersonaRepository;
 import com.sistemabarberia.fadex_backend.modules.recompensa.entity.Recompensa;
@@ -54,61 +55,44 @@ public class ClienteServiceImpl implements IClienteService {
     @Autowired
     private ClienteMapper mapper;
 
+    @Autowired
+    private IFidelizacionEngine fidelizacionEngine;
     //CRUD básico
 
     @Override
     public Page<ClienteResponseDTO> listarClientes(Pageable pageable) {
-        return clienteRepository.findByActivoTrue(pageable)
-                .map(mapper::toResponseDTO);
+        return clienteRepository.findByActivoTrue(pageable).map(mapper::toResponseDTO);
     }
 
     @Override
     public Page<ClienteResponseDTO> listarClientesInhabilitados(Pageable pageable) {
-        return clienteRepository.findByActivoFalse(pageable)
-                .map(mapper::toResponseDTO);
+        return clienteRepository.findByActivoFalse(pageable).map(mapper::toResponseDTO);
     }
 
 
     @Transactional
     @Override
     public ClienteResponseDTO crearCliente(ClienteRequestDTO dto) {
-
-        Persona persona = personaRepository.findById(dto.getPersonaId())
-                .orElseThrow(() -> new BusinessException(
-                        "Persona no encontrada con id: " + dto.getPersonaId(),
-                        HttpStatus.NOT_FOUND));
-
+        Persona persona = personaRepository.findById(dto.getPersonaId()).orElseThrow(() -> new BusinessException("Persona no encontrada con id: " + dto.getPersonaId(), HttpStatus.NOT_FOUND));
         if (clienteRepository.existsByPersona_PersonaId(dto.getPersonaId())) {
-            throw new BusinessException(
-                    "Esta persona ya está registrada como Cliente",
-                    HttpStatus.CONFLICT);
+            throw new BusinessException("Esta persona ya está registrada como Cliente", HttpStatus.CONFLICT);
         }
-
         if (barberoRepository.existsByPersona_PersonaId(dto.getPersonaId())) {
-            throw new BusinessException(
-                    "Esta persona ya está registrada como Barbero",
-                    HttpStatus.CONFLICT);
+            throw new BusinessException("Esta persona ya está registrada como Barbero", HttpStatus.CONFLICT);
         }
-
         Cliente cliente = mapper.toEntity(dto, persona);
         Cliente guardado = clienteRepository.save(cliente);
-
         // Se crea la tarjeta de recompensas automáticamente
-        Recompensa recompensa = Recompensa.builder()
-                .cliente(guardado)
-                .cortesAcumulados(0)
-                .cortesGratis(0)
-                .fechaActualizacion(LocalDateTime.now())
-                .build();
-        recompensaRepository.save(recompensa);
-
+//        Recompensa recompensa = Recompensa.builder().cliente(guardado).cortesAcumulados(0).cortesGratis(0).fechaActualizacion(LocalDateTime.now()).build();
+//        recompensaRepository.save(recompensa);
+        fidelizacionEngine.registrarCliente(guardado);
+        System.out.println("Creando tarjetas para cliente " + guardado.getClienteId());
         return mapper.toResponseDTO(guardado);
     }
 
     @Override
     public ClienteResponseDTO eliminar(Integer id) {
-        Cliente cliente = clienteRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
+        Cliente cliente = clienteRepository.findById(id).orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
         ClienteResponseDTO dto = mapper.toResponseDTO(cliente);
 
         Integer idPersona = cliente.getPersona().getPersonaId();
@@ -119,10 +103,7 @@ public class ClienteServiceImpl implements IClienteService {
 
     @Override
     public ClienteResponseDTO buscarCliente(Integer id) {
-        Cliente cliente = clienteRepository.findById(id)
-                .orElseThrow(() -> new BusinessException(
-                        "Cliente no encontrado con id: " + id,
-                        HttpStatus.NOT_FOUND));
+        Cliente cliente = clienteRepository.findById(id).orElseThrow(() -> new BusinessException("Cliente no encontrado con id: " + id, HttpStatus.NOT_FOUND));
         return mapper.toResponseDTO(cliente);
     }
 

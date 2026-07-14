@@ -37,6 +37,15 @@ public class RuletaItemController {
         return ResponseEntity.ok(ApiResponse.ok("Item obtenido correctamente.", ruletaItemService.obtenerItemPorId(id)));
     }
 
+    @GetMapping("activo/{id}")
+    @PreAuthorize("hasAuthority('RULETA_READ')")
+    public ResponseEntity<ApiResponse<PageResponse<RuletaItemResponseDTO>>> listarActivos(@PathVariable Long id, @PageableDefault(size = 10, page = 0) Pageable pageable) {
+        RuletaItemFiltro filtro = new RuletaItemFiltro();
+        filtro.setRuletaId(id);
+        filtro.setActivo(true);
+        return ResponseEntity.ok(ApiResponse.ok("Listado de items activos obtenido correctamente.", ruletaItemService.listarItemConFiltros(filtro, pageable)));
+    }
+
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAuthority('RULETA_MANAGE')")
     public ResponseEntity<ApiResponse<RuletaItemResponseDTO>> crear(@RequestPart("data") @Valid RuletaItemRequestDTO dto, @RequestPart(value = "imagen", required = false) MultipartFile imagen) {
@@ -47,6 +56,13 @@ public class RuletaItemController {
     @PreAuthorize("hasAuthority('RULETA_MANAGE')")
     public ResponseEntity<ApiResponse<RuletaItemResponseDTO>> actualizar(@PathVariable Long id, @RequestPart("data") @Valid RuletaItemRequestDTO dto, @RequestPart(value = "imagen", required = false) MultipartFile imagen) {
         return ResponseEntity.ok(ApiResponse.ok("Item actualizado correctamente.", ruletaItemService.actualizarItem(id, dto, imagen)));
+    }
+
+    @PatchMapping("/{id}/estado")
+    @PreAuthorize("hasAuthority('RULETA_MANAGE')")
+    public ResponseEntity<ApiResponse<RuletaItemResponseDTO>> cambiarEstado(@PathVariable Long id, @RequestParam Boolean activo) {
+        RuletaItemResponseDTO data = ruletaItemService.cambiarEstado(id, activo);
+        return ResponseEntity.ok(ApiResponse.ok("Estado del item actualizado correctamente.", data));
     }
 
     @DeleteMapping("/{id}")

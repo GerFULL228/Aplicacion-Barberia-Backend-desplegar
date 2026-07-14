@@ -72,6 +72,13 @@ public class RuletaServiceImpl implements IRuletaService {
     }
 
     @Override
+    public RuletaResponseDTO cambiarEstado(Long id, Boolean activa) {
+        Ruleta ruleta = ruletaRepository.findById(id).orElseThrow(() -> new BusinessException("Ruleta no encontrada.", HttpStatus.NOT_FOUND));
+        ruleta.setActiva(activa);
+        return ruletaMapper.toResponse(ruletaRepository.save(ruleta));
+    }
+
+    @Override
     public void eliminarRuleta(Long id) {
         Ruleta ruleta = ruletaRepository.findById(id).orElseThrow(() -> new BusinessException("Ruleta no encontrada.", HttpStatus.NOT_FOUND));
         ruletaRepository.delete(ruleta);

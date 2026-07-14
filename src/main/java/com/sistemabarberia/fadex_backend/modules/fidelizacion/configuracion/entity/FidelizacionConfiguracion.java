@@ -31,6 +31,10 @@ public class FidelizacionConfiguracion extends AuditableEntity {
     @Column(nullable = false)
     private Integer meta;
 
+    @Column(name="giros_por_meta")
+    @Builder.Default
+    private Integer girosPorMeta = 1;
+
     @Column(name = "mostrar_siempre", nullable = false)
     @Builder.Default
     private Boolean mostrarSiempre = false;

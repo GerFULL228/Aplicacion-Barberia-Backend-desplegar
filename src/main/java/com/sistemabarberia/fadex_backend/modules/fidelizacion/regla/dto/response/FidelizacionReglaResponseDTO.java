@@ -10,11 +10,14 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FidelizacionReglaResponseDTO {
+    private TipoAlcanceFidelizacion tipoAlcance;
     private Long reglaId;
     private Long categoriaId;
-    private TipoAlcanceFidelizacion tipoAlcance;
+    private String categoriaNombre;
     private Long servicioId;
+    private String servicioNombre;
     private Long productoId;
+    private String productoNombre;
     private Integer puntos;
     private Boolean activo;
     private LocalDateTime createdAt;

@@ -8,5 +8,4 @@ public enum EstadoReserva {
     CANCELADA,
     CANCELADA_AUTOMATICA,
     NO_ASISTIO
-
 }

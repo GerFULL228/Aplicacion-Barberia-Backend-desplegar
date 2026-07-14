@@ -21,6 +21,10 @@ public class ConfiguracionRequestDTO {
     private Integer meta;
 
     @NotNull
+    @Min(1)
+    private Integer girosPorMeta;
+
+    @NotNull
     private Boolean mostrarSiempre;
 
     @NotNull

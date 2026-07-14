@@ -39,7 +39,7 @@ public interface FidelizacionTarjetaMapper {
     void updateFromRequest(FidelizacionTarjetaRequestDTO dto, @MappingTarget FidelizacionTarjeta entity);
 
     @Mapping(target = "clienteId", source = "cliente.clienteId")
-    @Mapping(target = "clienteNombre", source = "cliente.persona.nombre")
+    @Mapping(target = "clienteNombreCompleto", expression = "java((entity.getCliente().getPersona().getNombre() == null ? \"\" : entity.getCliente().getPersona().getNombre()) + \" \" + (entity.getCliente().getPersona().getApellido() == null ? \"\" : entity.getCliente().getPersona().getApellido()))")
     @Mapping(target = "categoriaId", source = "categoria.id")
     @Mapping(target = "categoriaNombre", source = "categoria.nombre")
     FidelizacionTarjetaResponseDTO toResponse(FidelizacionTarjeta entity);

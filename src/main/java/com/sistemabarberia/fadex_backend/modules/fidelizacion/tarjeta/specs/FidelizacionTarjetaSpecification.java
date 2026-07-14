@@ -20,6 +20,9 @@ public class FidelizacionTarjetaSpecification {
                 predicate.getExpressions().add(cb.equal(root.get("cicloActivo"), filtro.getCicloActivo()));
             }
 
+            if (filtro.getActivo() != null) {
+                predicate.getExpressions().add(cb.equal(root.get("activo"), filtro.getActivo()));
+            }
             return predicate;
         };
     }

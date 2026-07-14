@@ -10,7 +10,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FidelizacionReglaRequestDTO {
-
     @NotNull
     private Long categoriaId;
 
@@ -26,5 +25,4 @@ public class FidelizacionReglaRequestDTO {
 
     @NotNull
     private Boolean activo;
-
 }

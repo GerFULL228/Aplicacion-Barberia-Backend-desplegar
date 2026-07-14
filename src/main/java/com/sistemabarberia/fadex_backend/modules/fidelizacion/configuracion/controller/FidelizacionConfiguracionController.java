@@ -3,6 +3,7 @@ package com.sistemabarberia.fadex_backend.modules.fidelizacion.configuracion.con
 import com.sistemabarberia.fadex_backend.commons.response.PageResponse;
 import com.sistemabarberia.fadex_backend.commons.response.ApiResponse;
 import com.sistemabarberia.fadex_backend.modules.fidelizacion.configuracion.dto.ConfiguracionFiltro;
+import com.sistemabarberia.fadex_backend.modules.fidelizacion.configuracion.dto.request.ConfiguracionPatchRequestDTO;
 import com.sistemabarberia.fadex_backend.modules.fidelizacion.configuracion.dto.request.ConfiguracionRequestDTO;
 import com.sistemabarberia.fadex_backend.modules.fidelizacion.configuracion.dto.response.ConfiguracionResponseDTO;
 import com.sistemabarberia.fadex_backend.modules.fidelizacion.configuracion.service.IFidelizacionConfiguracionService;
@@ -55,5 +56,12 @@ public class FidelizacionConfiguracionController {
     public ResponseEntity<ApiResponse<Void>> eliminar(@PathVariable Long id) {
         configuracionService.eliminarConfiguracion(id);
         return ResponseEntity.ok(ApiResponse.ok("Configuración eliminada correctamente"));
+    }
+
+    @PreAuthorize("hasAuthority('FIDELIZACION_MANAGE')")
+    @PatchMapping("/{id}")
+    public ResponseEntity<ApiResponse<ConfiguracionResponseDTO>> actualizarParcial(@PathVariable Long id, @Valid @RequestBody ConfiguracionPatchRequestDTO dto) {
+        ConfiguracionResponseDTO data = configuracionService.actualizarParcial(id, dto);
+        return ResponseEntity.ok(ApiResponse.ok("Configuración actualizada correctamente.", data));
     }
 }

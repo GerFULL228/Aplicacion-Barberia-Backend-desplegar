@@ -1,5 +1,7 @@
 package com.sistemabarberia.fadex_backend.modules.fidelizacion.movimiento.service.impl;
 
+import com.sistemabarberia.fadex_backend.auth.usuario.Entity.Usuario;
+import com.sistemabarberia.fadex_backend.auth.usuario.service.UsuarioSecurityService;
 import com.sistemabarberia.fadex_backend.commons.exception.BusinessException;
 import com.sistemabarberia.fadex_backend.commons.response.PageResponse;
 import com.sistemabarberia.fadex_backend.modules.cliente.entity.Cliente;
@@ -8,6 +10,7 @@ import com.sistemabarberia.fadex_backend.modules.fidelizacion.movimiento.dto.Fid
 import com.sistemabarberia.fadex_backend.modules.fidelizacion.movimiento.dto.request.FidelizacionMovimientoRequestDTO;
 import com.sistemabarberia.fadex_backend.modules.fidelizacion.movimiento.dto.response.FidelizacionMovimientoResponseDTO;
 import com.sistemabarberia.fadex_backend.modules.fidelizacion.movimiento.entity.FidelizacionMovimiento;
+import com.sistemabarberia.fadex_backend.modules.fidelizacion.movimiento.entity.enums.OrigenFidelizacion;
 import com.sistemabarberia.fadex_backend.modules.fidelizacion.movimiento.mapper.FidelizacionMovimientoMapper;
 import com.sistemabarberia.fadex_backend.modules.fidelizacion.movimiento.repository.FidelizacionMovimientoRepository;
 import com.sistemabarberia.fadex_backend.modules.fidelizacion.movimiento.service.IFidelizacionMovimientoService;
@@ -16,10 +19,13 @@ import com.sistemabarberia.fadex_backend.modules.fidelizacion.tarjeta.entity.Fid
 import com.sistemabarberia.fadex_backend.modules.fidelizacion.tarjeta.repository.FidelizacionTarjetaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +35,7 @@ public class FidelizacionMovimientoServiceImpl implements IFidelizacionMovimient
     private final FidelizacionMovimientoMapper movimientoMapper;
     private final FidelizacionTarjetaRepository tarjetaRepository;
     private final ClienteRepository clienteRepository;
+    private final UsuarioSecurityService usuarioSecurityService;
 
     @Override
     @Transactional(readOnly = true)
@@ -76,6 +83,33 @@ public class FidelizacionMovimientoServiceImpl implements IFidelizacionMovimient
     public void eliminarMovimiento(Long id) {
         FidelizacionMovimiento movimiento = movimientoRepository.findById(id).orElseThrow(() -> new BusinessException("Movimiento no encontrado", HttpStatus.NOT_FOUND));
         movimientoRepository.delete(movimiento);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<FidelizacionMovimientoResponseDTO> listarPorCliente(Integer clienteId) {
+        return movimientoMapper.toResponseList(movimientoRepository.findByClienteClienteIdOrderByCreatedAtDesc(clienteId));
+    }
+
+    @Override
+    @Transactional
+    public void registrarMovimiento(FidelizacionTarjeta tarjeta, OrigenFidelizacion origen, Long idOrigen, int puntos, String descripcion) {
+        FidelizacionMovimiento movimiento = FidelizacionMovimiento.builder().tarjeta(tarjeta).cliente(tarjeta.getCliente()).origen(origen).idOrigen(idOrigen).puntos(puntos).descripcion(descripcion).build();
+        movimientoRepository.save(movimiento);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<FidelizacionMovimientoResponseDTO> obtenerMisMovimientos() {
+        Usuario usuario = usuarioSecurityService.getUsuarioLogueado();
+        Cliente cliente = clienteRepository.findByUsuarioId(usuario.getIdUsuario()).orElseThrow(() -> new BusinessException("Cliente no encontrado.", HttpStatus.NOT_FOUND));
+        return movimientoMapper.toResponseList(movimientoRepository.findByClienteClienteIdOrderByCreatedAtDesc(cliente.getClienteId()));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<FidelizacionMovimientoResponseDTO> obtenerUltimosMovimientos(int limite) {
+        return movimientoRepository.findAllByOrderByCreatedAtDesc(PageRequest.of(0, limite)).stream().map(movimientoMapper::toResponse).toList();
     }
 
     private FidelizacionTarjeta obtenerTarjeta(Long id) {

@@ -5,9 +5,11 @@ import com.sistemabarberia.fadex_backend.commons.response.PageResponse;
 import com.sistemabarberia.fadex_backend.modules.categoria.entity.Categoria;
 import com.sistemabarberia.fadex_backend.modules.categoria.repository.CategoriaRepository;
 import com.sistemabarberia.fadex_backend.modules.fidelizacion.regla.dto.FidelizacionReglaFiltro;
+import com.sistemabarberia.fadex_backend.modules.fidelizacion.regla.dto.request.FidelizacionReglaPatchRequestDTO;
 import com.sistemabarberia.fadex_backend.modules.fidelizacion.regla.dto.request.FidelizacionReglaRequestDTO;
 import com.sistemabarberia.fadex_backend.modules.fidelizacion.regla.dto.response.FidelizacionReglaResponseDTO;
 import com.sistemabarberia.fadex_backend.modules.fidelizacion.regla.entity.FidelizacionRegla;
+import com.sistemabarberia.fadex_backend.modules.fidelizacion.regla.entity.enums.TipoAlcanceFidelizacion;
 import com.sistemabarberia.fadex_backend.modules.fidelizacion.regla.mapper.FidelizacionReglaMapper;
 import com.sistemabarberia.fadex_backend.modules.fidelizacion.regla.repository.FidelizacionReglaRepository;
 import com.sistemabarberia.fadex_backend.modules.fidelizacion.regla.service.IFidelizacionReglaService;
@@ -72,6 +74,25 @@ public class FidelizacionReglaServiceImpl implements IFidelizacionReglaService {
         FidelizacionRegla regla = reglaRepository.findById(id).orElseThrow(() -> new BusinessException("Regla no encontrada", HttpStatus.NOT_FOUND));
         reglaRepository.delete(regla);
 
+    }
+
+    @Override
+    @Transactional
+    public void crearReglaPorDefecto(Categoria categoria) {
+        if (reglaRepository.existsByCategoriaIdAndTipoAlcanceAndActivoTrue(categoria.getId(), TipoAlcanceFidelizacion.CATEGORIA)) {return;}
+        FidelizacionRegla regla = FidelizacionRegla.builder().categoria(categoria).tipoAlcance(TipoAlcanceFidelizacion.CATEGORIA).puntos(1).activo(true).build();
+        reglaRepository.save(regla);
+    }
+
+    @Override
+    @Transactional
+    public FidelizacionReglaResponseDTO actualizarParcial(Long id, FidelizacionReglaPatchRequestDTO dto) {
+        FidelizacionRegla regla = reglaRepository.findById(id).orElseThrow(() -> new BusinessException("Regla no encontrada", HttpStatus.NOT_FOUND));
+        switch (dto.getCampo()) {
+            case "activo" -> regla.setActivo((Boolean) dto.getValor());
+            default -> throw new BusinessException("Campo no permitido para actualización.", HttpStatus.BAD_REQUEST);
+        }
+        return reglaMapper.toResponse(reglaRepository.save(regla));
     }
 
     private Categoria obtenerCategoria(Long id){
