@@ -68,8 +68,7 @@ public class VentaServiceImpl implements IVentaService {
         List<DetalleVenta> detalles = new ArrayList<>();
 
         if (dto.getBarberoId() != null) {
-            barbero = barberoRepository.findById(dto.getBarberoId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Barbero no encontrado"));
+            barbero = barberoRepository.findById(dto.getBarberoId()).orElseThrow(() -> new ResourceNotFoundException("Barbero no encontrado"));
         }
 
         Venta venta = new Venta();
@@ -79,9 +78,7 @@ public class VentaServiceImpl implements IVentaService {
         venta.setNumeroCorrelativo(generarCorrelativo(venta.getFecha()));
 
         if (dto.getReservaId() != null) {
-            reservaVinculada = reservaRepository.findById(dto.getReservaId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Reserva no encontrada"));
-
+            reservaVinculada = reservaRepository.findById(dto.getReservaId()).orElseThrow(() -> new ResourceNotFoundException("Reserva no encontrada"));
             cliente = reservaVinculada.getCliente();
 
             DetalleVenta detalleServicio = new DetalleVenta();
@@ -150,19 +147,15 @@ public class VentaServiceImpl implements IVentaService {
         if (reservaVinculada != null) {
             pago.setReserva(reservaVinculada);
         }
-
         pagoRepository.save(pago);
-
         HistorialVenta historial = new HistorialVenta();
         historial.setVenta(ventaGuardada);
         historial.setFecha(LocalDateTime.now());
         historialVentaRepository.save(historial);
-
-        fidelizacionEngine.procesarVenta(ventaGuardada); //agregar a fidelizacion enginep para acumular puntos por venta
-
+        Long reservaIdParaFidelizacion = reservaVinculada != null ? reservaVinculada.getId() : null;
+        fidelizacionEngine.procesarVenta(ventaGuardada, reservaIdParaFidelizacion);
         VentaResponseDTO response = ventaMapper.toResponse(ventaGuardada);
         response.setMetodoPago(dto.getMetodoPago());
-
         return response;
     }
 
@@ -229,25 +222,17 @@ public class VentaServiceImpl implements IVentaService {
     @Override
     @Transactional(readOnly = true)
     public VentaResponseDTO obtenerPorId(Integer id) {
-        Venta venta = Optional.ofNullable(
-                ventaRepository.findByIdWithDetalles(id)
-        ).orElseThrow(() -> new ResourceNotFoundException("Venta no encontrada"));
-
+        Venta venta = Optional.ofNullable(ventaRepository.findByIdWithDetalles(id)).orElseThrow(() -> new ResourceNotFoundException("Venta no encontrada"));
         VentaResponseDTO dto = ventaMapper.toResponse(venta);
-
-        pagoRepository.findFirstByVenta_VentaId(dto.getVentaId())
-                .ifPresent(pago -> dto.setMetodoPago(pago.getMetodo()));
-
+        pagoRepository.findFirstByVenta_VentaId(dto.getVentaId()).ifPresent(pago -> dto.setMetodoPago(pago.getMetodo()));
         return dto;
     }
 
     @Override
     @Transactional
     public VentaResponseDTO actualizar(Integer id, VentaRequestDTO dto) {
-        Venta venta = ventaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Venta no encontrada"));
-        Cliente cliente = clienteRepository.findById(dto.getClienteId())
-                .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado"));
+        Venta venta = ventaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Venta no encontrada"));
+        Cliente cliente = clienteRepository.findById(dto.getClienteId()).orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado"));
 
         venta.setCliente(cliente);
         venta.setFecha(dto.getFecha());
@@ -288,15 +273,12 @@ public class VentaServiceImpl implements IVentaService {
 
     @Override
     public List<DetalleVentaResponseDTO> listarDetalles(Integer ventaId) {
-        return detalleVentaMapper.toResponseList(
-                detalleVentaRepository.findByVenta_VentaId(ventaId)
-        );
+        return detalleVentaMapper.toResponseList(detalleVentaRepository.findByVenta_VentaId(ventaId));
     }
 
     @Override
     public List<HistorialVentaResponseDTO> listarHistorial(Integer ventaId) {
-        return historialVentaMapper.toResponseList(historialVentaRepository.findByVenta_VentaId(ventaId)
-        );
+        return historialVentaMapper.toResponseList(historialVentaRepository.findByVenta_VentaId(ventaId));
     }
 
     private String generarCorrelativo(LocalDateTime fecha) {

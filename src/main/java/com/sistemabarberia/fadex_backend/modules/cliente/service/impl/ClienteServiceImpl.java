@@ -22,7 +22,9 @@ import com.sistemabarberia.fadex_backend.modules.venta.repository.VentaRepositor
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -61,12 +63,14 @@ public class ClienteServiceImpl implements IClienteService {
 
     @Override
     public Page<ClienteResponseDTO> listarClientes(Pageable pageable) {
-        return clienteRepository.findByActivoTrue(pageable).map(mapper::toResponseDTO);
+        Pageable pageableOrdenado = aplicarOrdenDesc(pageable, "clienteId");
+        return clienteRepository.findByActivoTrue(pageableOrdenado).map(mapper::toResponseDTO);
     }
 
     @Override
     public Page<ClienteResponseDTO> listarClientesInhabilitados(Pageable pageable) {
-        return clienteRepository.findByActivoFalse(pageable).map(mapper::toResponseDTO);
+        Pageable pageableOrdenado = aplicarOrdenDesc(pageable, "clienteId");
+        return clienteRepository.findByActivoFalse(pageableOrdenado).map(mapper::toResponseDTO);
     }
 
 
@@ -111,8 +115,7 @@ public class ClienteServiceImpl implements IClienteService {
 
     @Override
     public Page<ClienteResponseDTO> buscarPorNombre(String nombre, Pageable pageable) {
-        return clienteRepository.buscarPorNombre(nombre, pageable)
-                .map(mapper::toResponseDTO);
+        return clienteRepository.buscarPorNombre(nombre, pageable).map(mapper::toResponseDTO);
     }
 
     // Filtros por fecha
@@ -125,20 +128,17 @@ public class ClienteServiceImpl implements IClienteService {
 
     @Override
     public Page<ClienteResponseDTO> filtrarPorMesActual(Pageable pageable) {
-        return clienteRepository.filtrarPorMesActual(pageable)
-                .map(mapper::toResponseDTO);
+        return clienteRepository.filtrarPorMesActual(pageable).map(mapper::toResponseDTO);
     }
 
     @Override
     public Page<ClienteResponseDTO> filtrarPorAnioActual(Pageable pageable) {
-        return clienteRepository.filtrarPorAnioActual(pageable)
-                .map(mapper::toResponseDTO);
+        return clienteRepository.filtrarPorAnioActual(pageable).map(mapper::toResponseDTO);
     }
 
     @Override
     public Page<ClienteResponseDTO> filtrarRecientes(Pageable pageable) {
-        return clienteRepository.filtrarRecientes(pageable)
-                .map(mapper::toResponseDTO);
+        return clienteRepository.filtrarRecientes(pageable).map(mapper::toResponseDTO);
     }
 
     @Override
@@ -148,13 +148,9 @@ public class ClienteServiceImpl implements IClienteService {
             Pageable pageable) {
 
         if (fechaInicio.isAfter(fechaFin)) {
-            throw new BusinessException(
-                    "La fecha de inicio no puede ser posterior a la fecha fin",
-                    HttpStatus.BAD_REQUEST);
+            throw new BusinessException("La fecha de inicio no puede ser posterior a la fecha fin", HttpStatus.BAD_REQUEST);
         }
-
-        return clienteRepository.filtrarPorRangoFechas(fechaInicio, fechaFin, pageable)
-                .map(mapper::toResponseDTO);
+        return clienteRepository.filtrarPorRangoFechas(fechaInicio, fechaFin, pageable).map(mapper::toResponseDTO);
     }
 
     //  Resúmenes y actividad
@@ -280,5 +276,9 @@ public class ClienteServiceImpl implements IClienteService {
         return clienteRepository.findByUsuarioId(idUsuario)
                 .map(Cliente::getClienteId)
                 .orElseThrow(() -> new RuntimeException("Cliente no encontrado para el usuario: " + idUsuario));
+    }
+
+    private Pageable aplicarOrdenDesc(Pageable pageable, String campo) {
+        return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.DESC, campo));
     }
 }

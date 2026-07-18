@@ -90,6 +90,7 @@ public class FidelizacionReglaServiceImpl implements IFidelizacionReglaService {
         FidelizacionRegla regla = reglaRepository.findById(id).orElseThrow(() -> new BusinessException("Regla no encontrada", HttpStatus.NOT_FOUND));
         switch (dto.getCampo()) {
             case "activo" -> regla.setActivo((Boolean) dto.getValor());
+            case "puntos" -> regla.setPuntos(((Number) dto.getValor()).intValue());
             default -> throw new BusinessException("Campo no permitido para actualización.", HttpStatus.BAD_REQUEST);
         }
         return reglaMapper.toResponse(reglaRepository.save(regla));

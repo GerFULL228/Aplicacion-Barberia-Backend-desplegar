@@ -8,8 +8,6 @@ import com.sistemabarberia.fadex_backend.auth.usuario.dto.response.UsuarioTablaR
 import com.sistemabarberia.fadex_backend.auth.usuario.service.IUsuarioService;
 import com.sistemabarberia.fadex_backend.commons.response.ApiResponse;
 import com.sistemabarberia.fadex_backend.commons.response.PageResponse;
-import com.sistemabarberia.fadex_backend.modules.persona.dto.request.PersonaUpdateRequestDTO;
-import com.sistemabarberia.fadex_backend.modules.persona.service.IPersonaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -29,9 +27,6 @@ import java.util.List;
 public class UsuarioController {
 
     private final IUsuarioService usuarioService;
-    private final IPersonaService personaService;
-
-
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<UsuarioResponse>>> listar() {
@@ -39,8 +34,7 @@ public class UsuarioController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<UsuarioResponse>> buscarPorId(
-            @PathVariable Integer id) {
+    public ResponseEntity<ApiResponse<UsuarioResponse>> buscarPorId(@PathVariable Integer id) {
         return ResponseEntity.ok( ApiResponse.ok("Usuario encontrado", usuarioService.getById(id)));
     }
 
@@ -51,255 +45,114 @@ public class UsuarioController {
 
     @PostMapping("/admin")
     @PreAuthorize("hasRole('admin')")
-    public ResponseEntity<ApiResponse<UsuarioResponse>> crearAdmin(
-            @Valid @RequestBody CreateUsuarioRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.ok("Admin creado correctamente", usuarioService.crearAdmin(request)));
+    public ResponseEntity<ApiResponse<UsuarioResponse>> crearAdmin(@Valid @RequestBody CreateUsuarioRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok("Admin creado correctamente", usuarioService.crearAdmin(request)));
     }
 
     @PostMapping("/barbero")
     @PreAuthorize("hasRole('admin')")
-    public ResponseEntity<ApiResponse<UsuarioResponse>> crearBarbero(
-            @Valid @RequestBody CreateBarberoRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.ok("Barbero creado correctamente", usuarioService.crearBarbero(request)));
+    public ResponseEntity<ApiResponse<UsuarioResponse>> crearBarbero(@Valid @RequestBody CreateBarberoRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok("Barbero creado correctamente", usuarioService.crearBarbero(request)));
     }
 
     @PostMapping("/cliente")
-    public ResponseEntity<ApiResponse<UsuarioResponse>> crearCliente(
-            @Valid @RequestBody CreateClienteRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.ok("Cliente creado correctamente", usuarioService.crearCliente(request)));
+    public ResponseEntity<ApiResponse<UsuarioResponse>> crearCliente(@Valid @RequestBody CreateClienteRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok("Cliente creado correctamente", usuarioService.crearCliente(request)));
     }
 
 
 
     @PutMapping("/{id}/reset-password")
     @PreAuthorize("hasAnyRole('admin','barbero','cliente')")
-    public ResponseEntity<ApiResponse<Void>> resetPassword(
-            @PathVariable Integer id,
-            @Valid @RequestBody ResetPasswordRequest request
-    ) {
-
+    public ResponseEntity<ApiResponse<Void>> resetPassword(@PathVariable Integer id, @Valid @RequestBody ResetPasswordRequest request) {
         usuarioService.resetPassword(id, request);
-
-        return ResponseEntity.ok(
-                ApiResponse.ok("Contraseña reseteada correctamente")
-        );
+        return ResponseEntity.ok(ApiResponse.ok("Contraseña reseteada correctamente"));
     }
 
 
     @PatchMapping("/{id}/username-update")
     @PreAuthorize("hasAnyRole('admin','barbero','cliente')")
-    public ResponseEntity<ApiResponse<Void>> updateUsername(
-            @PathVariable Integer id,
-            @Valid @RequestBody UpdateUsernameRequest request
-    ) {
-
+    public ResponseEntity<ApiResponse<Void>> updateUsername(@PathVariable Integer id, @Valid @RequestBody UpdateUsernameRequest request) {
         usuarioService.updateUsername(id, request);
-
-        return ResponseEntity.ok(
-                ApiResponse.ok("Usuario actualizado correctamente")
-        );
+        return ResponseEntity.ok(ApiResponse.ok("Usuario actualizado correctamente"));
     }
 
     @GetMapping("/tabla")
-    public ResponseEntity<ApiResponse<PageResponse<UsuarioTablaResponse>>> listarUsuariosTabla(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
-
+    public ResponseEntity<ApiResponse<PageResponse<UsuarioTablaResponse>>> listarUsuariosTabla(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
-
-        Page<UsuarioTablaResponse> result =
-                usuarioService.listarUsuariosTabla(pageable);
-
-        return ResponseEntity.ok(
-                ApiResponse.ok(
-                        "Usuarios obtenidos correctamente",
-                        result
-                )
-        );
+        Page<UsuarioTablaResponse> result = usuarioService.listarUsuariosTabla(pageable);
+        return ResponseEntity.ok(ApiResponse.ok("Usuarios obtenidos correctamente", result));
     }
 
     @GetMapping("/filtrar")
-    public ResponseEntity<ApiResponse<PageResponse<UsuarioTablaResponse>>> filtrarUsuarios(
-
-            @RequestParam(required = false) String rol,
-
-            @RequestParam(required = false) Boolean tieneQr,
-
-            @RequestParam(required = false) Boolean multiplesRoles,
-
-            @RequestParam(defaultValue = "0") int page,
-
-            @RequestParam(defaultValue = "10") int size
-    ) {
-
+    public ResponseEntity<ApiResponse<PageResponse<UsuarioTablaResponse>>> filtrarUsuarios(@RequestParam(required = false) String rol, @RequestParam(required = false) Boolean tieneQr, @RequestParam(required = false) Boolean multiplesRoles, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
-
-        Page<UsuarioTablaResponse> result =
-                usuarioService.filtrarUsuarios(
-                        rol,
-                        tieneQr,
-                        multiplesRoles,
-                        pageable
-                );
-
-        return ResponseEntity.ok(
-                ApiResponse.ok(
-                        "Usuarios filtrados correctamente",
-                        result
-                )
-        );
+        Page<UsuarioTablaResponse> result = usuarioService.filtrarUsuarios(rol, tieneQr, multiplesRoles, pageable);
+        return ResponseEntity.ok(ApiResponse.ok("Usuarios filtrados correctamente", result));
     }
 
     @GetMapping("/buscar")
-    public ResponseEntity<ApiResponse<PageResponse<UsuarioTablaResponse>>> buscarUsuarios(
-
-            @RequestParam String texto,
-
-            @RequestParam(defaultValue = "0") int page,
-
-            @RequestParam(defaultValue = "10") int size
-    ) {
-
+    public ResponseEntity<ApiResponse<PageResponse<UsuarioTablaResponse>>> buscarUsuarios(@RequestParam String texto, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
-
-        Page<UsuarioTablaResponse> result =
-                usuarioService.buscarUsuarios(
-                        texto,
-                        pageable
-                );
-
-        return ResponseEntity.ok(
-                ApiResponse.ok(
-                        "Usuarios encontrados correctamente",
-                        result
-                )
-        );
+        Page<UsuarioTablaResponse> result = usuarioService.buscarUsuarios(texto, pageable);
+        return ResponseEntity.ok(ApiResponse.ok("Usuarios encontrados correctamente", result));
     }
 
     @GetMapping(value = "/{id}/qr", produces = MediaType.IMAGE_PNG_VALUE)
-    public ResponseEntity<byte[]> generarQr(
-            @PathVariable Integer id
-    ) {
-
+    public ResponseEntity<byte[]> generarQr(@PathVariable Integer id) {
         byte[] qr = usuarioService.generarQr(id);
-
         return ResponseEntity.ok(qr);
     }
 
     @PatchMapping("/{id}/pin")
     @PreAuthorize("hasRole('admin')")
-    public ResponseEntity<ApiResponse<Void>> asignarPin(
-            @PathVariable Integer id,
-            @Valid @RequestBody AsignarPinRequest request
-    ) {
+    public ResponseEntity<ApiResponse<Void>> asignarPin(@PathVariable Integer id, @Valid @RequestBody AsignarPinRequest request) {
         usuarioService.asignarPin(id, request);
         return ResponseEntity.ok(ApiResponse.ok("PIN asignado correctamente"));
     }
 
     @PostMapping("/{id}/qr/regenerar")
     @PreAuthorize("hasRole('admin')")
-    public ResponseEntity<byte[]> regenerarQr(
-            @PathVariable Integer id
-    ) {
-
+    public ResponseEntity<byte[]> regenerarQr(@PathVariable Integer id) {
         byte[] qr = usuarioService.regenerarQr(id);
-
         return ResponseEntity.ok(qr);
     }
 
-
-
-
     @PatchMapping("/{id}/roles")
     @PreAuthorize("hasRole('admin')")
-    public ResponseEntity<ApiResponse<Void>> asignarRoles(
-
-            @PathVariable Integer id,
-
-            @Valid
-            @RequestBody AssignRolesRequest request
-    ) {
-
+    public ResponseEntity<ApiResponse<Void>> asignarRoles(@PathVariable Integer id, @Valid @RequestBody AssignRolesRequest request) {
         usuarioService.asignarRoles(id, request);
-
-        return ResponseEntity.ok(
-                ApiResponse.ok(
-                        "Roles asignados correctamente"
-                )
-        );
+        return ResponseEntity.ok(ApiResponse.ok("Roles asignados correctamente"));
     }
 
     @GetMapping("/roles")
     public ResponseEntity<ApiResponse<List<RolResponse>>> listarRoles() {
-
-        return ResponseEntity.ok(
-                ApiResponse.ok(
-                        "Roles obtenidos correctamente",
-                        usuarioService.listarRoles()
-                )
-        );
+        return ResponseEntity.ok(ApiResponse.ok("Roles obtenidos correctamente", usuarioService.listarRoles()));
     }
 
     @GetMapping("/{id}/roles")
-    public ResponseEntity<ApiResponse<List<RolResponse>>> obtenerRolesUsuario(
-            @PathVariable Integer id
-    ) {
-
-        return ResponseEntity.ok(
-                ApiResponse.ok(
-                        "Roles del usuario obtenidos correctamente",
-                        usuarioService.obtenerRolesUsuario(id)
-                )
-        );
+    public ResponseEntity<ApiResponse<List<RolResponse>>> obtenerRolesUsuario(@PathVariable Integer id) {
+        return ResponseEntity.ok(ApiResponse.ok("Roles del usuario obtenidos correctamente", usuarioService.obtenerRolesUsuario(id)));
     }
 
     @GetMapping("/{id}/permisos")
-    public ResponseEntity<ApiResponse<PageResponse<PermisoResponse>>> obtenerPermisosUsuario(
-            @PathVariable Integer id,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
+    public ResponseEntity<ApiResponse<PageResponse<PermisoResponse>>> obtenerPermisosUsuario(@PathVariable Integer id, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
-
-        return ResponseEntity.ok(
-                ApiResponse.ok(
-                        "Permisos obtenidos correctamente",
-                        usuarioService.obtenerPermisosUsuario(id, pageable)
-                )
-        );
+        return ResponseEntity.ok(ApiResponse.ok("Permisos obtenidos correctamente", usuarioService.obtenerPermisosUsuario(id, pageable)));
     }
 
     @DeleteMapping("/{id}/roles/{idRol}")
     @PreAuthorize("hasRole('admin')")
-    public ResponseEntity<ApiResponse<Void>> quitarRol(
-            @PathVariable Integer id,
-            @PathVariable Integer idRol
-    ) {
+    public ResponseEntity<ApiResponse<Void>> quitarRol(@PathVariable Integer id, @PathVariable Integer idRol) {
         usuarioService.quitarRol(id, idRol);
         return ResponseEntity.ok(ApiResponse.ok("Rol eliminado correctamente"));
     }
 
     @PatchMapping("/me/change-password")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiResponse<Void>> changeMyPassword(
-            Authentication authentication,
-            @Valid @RequestBody ChangePasswordRequest request
-    ) {
-
-        usuarioService.changeMyPassword(
-                authentication.getName(),
-                request
-        );
-
-        return ResponseEntity.ok(
-                ApiResponse.ok(
-                        "Contraseña actualizada correctamente"
-                )
-        );
+    public ResponseEntity<ApiResponse<Void>> changeMyPassword(Authentication authentication, @Valid @RequestBody ChangePasswordRequest request) {
+        usuarioService.changeMyPassword(authentication.getName(), request);
+        return ResponseEntity.ok(ApiResponse.ok("Contraseña actualizada correctamente"));
     }
 
 
