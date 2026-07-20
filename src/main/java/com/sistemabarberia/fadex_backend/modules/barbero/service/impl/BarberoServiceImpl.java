@@ -50,16 +50,14 @@ public class BarberoServiceImpl implements IBarberoService {
 
     @Override
     public Page<BarberoResponseDTO> listarBarberos(Pageable pageable) {
-        return barberoRepository.findByActivoTrue(pageable)
-                .map(mapper::toResponseDTO);
+        Pageable pageableOrdenado = aplicarOrdenDesc(pageable, "barberoId");
+        return barberoRepository.findByActivoTrue(pageableOrdenado).map(mapper::toResponseDTO);
     }
 
     @Override
     public Page<BarberoResponseDTO> listarBarberosInhabilitados(Pageable pageable) {
-
-        return barberoRepository.findByActivoFalse(pageable)
-                .map(mapper::toResponseDTO);
-
+        Pageable pageableOrdenado = aplicarOrdenDesc(pageable, "barberoId");
+        return barberoRepository.findByActivoFalse(pageableOrdenado).map(mapper::toResponseDTO);
     }
 
     @Override
@@ -343,5 +341,8 @@ public class BarberoServiceImpl implements IBarberoService {
                                 "Barbero no encontrado para el usuario: " + idUsuario
                         )
                 );
+    }
+    private Pageable aplicarOrdenDesc(Pageable pageable, String campo) {
+        return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.DESC, campo));
     }
 }

@@ -4,6 +4,7 @@ import com.sistemabarberia.fadex_backend.auth.usuario.Entity.Usuario;
 import com.sistemabarberia.fadex_backend.auth.usuario.service.UsuarioSecurityService;
 import com.sistemabarberia.fadex_backend.commons.exception.BusinessException;
 import com.sistemabarberia.fadex_backend.commons.exception.ResourceNotFoundException;
+import com.sistemabarberia.fadex_backend.commons.response.PageResponse;
 import com.sistemabarberia.fadex_backend.modules.barbero.entity.Barbero;
 
 import com.sistemabarberia.fadex_backend.modules.barbero.repository.BarberoRepository;
@@ -11,6 +12,7 @@ import com.sistemabarberia.fadex_backend.modules.cliente.entity.Cliente;
 import com.sistemabarberia.fadex_backend.modules.cliente.repository.ClienteRepository;
 import com.sistemabarberia.fadex_backend.modules.fidelizacion.engine.service.IFidelizacionEngine;
 import com.sistemabarberia.fadex_backend.modules.reserva.dto.Request.ReservaRequest;
+import com.sistemabarberia.fadex_backend.modules.reserva.dto.ReservaFiltro;
 import com.sistemabarberia.fadex_backend.modules.reserva.dto.Response.*;
 import com.sistemabarberia.fadex_backend.modules.reserva.entity.EstadoReserva;
 import com.sistemabarberia.fadex_backend.modules.reserva.entity.Reserva;
@@ -19,13 +21,16 @@ import com.sistemabarberia.fadex_backend.modules.reserva.mapper.ReservaMapper;
 import com.sistemabarberia.fadex_backend.modules.reserva.repository.ReservaRepository;
 import com.sistemabarberia.fadex_backend.modules.reserva.dto.Request.ActualizarEstadoReservaDTO;
 import com.sistemabarberia.fadex_backend.modules.persona.entity.Persona;
+import com.sistemabarberia.fadex_backend.modules.reserva.specs.ReservaSpecification;
 import com.sistemabarberia.fadex_backend.modules.ruleta.recompensa.service.IRecompensaObtenidaService;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import com.sistemabarberia.fadex_backend.modules.servicio.entity.Servicio;
 
 import com.sistemabarberia.fadex_backend.modules.servicio.repository.ServicioRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -120,8 +125,9 @@ public class ReservaService {
         return reservasPage.map(reservaMapper::toDto);
     }
 
-    public Page<ReservaDTO> listarReservasAdmin(Pageable pageable) {
-        return reservaRepository.findAll(pageable).map(reservaMapper::toDto);
+    public PageResponse<ReservaDTO> listarReservasAdmin(ReservaFiltro filtro, Pageable pageable) {
+        Page<Reserva> page = reservaRepository.findAll(ReservaSpecification.conFiltros(filtro), pageable);
+        return PageResponse.of(page.map(reservaMapper::toDto));
     }
 
     public List<ReservaDTO> ListarReservasBarbero(Usuario usuario) {
@@ -199,6 +205,7 @@ public class ReservaService {
         reserva.setEstadoReserva(EstadoReserva.CANCELADA);
         return reservaMapper.toDto(reservaRepository.save(reserva));
     }
+
     @Transactional
     public ReservaDTO PagarReserva(Long reservaId) {
         Reserva reserva = buscarOFallar(reservaId);

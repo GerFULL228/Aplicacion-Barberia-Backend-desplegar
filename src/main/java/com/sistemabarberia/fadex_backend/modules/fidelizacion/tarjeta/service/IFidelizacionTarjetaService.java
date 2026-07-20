@@ -23,7 +23,7 @@ public interface IFidelizacionTarjetaService {
     void eliminarTarjeta(Long id);
     void crearTarjetasIniciales(Cliente cliente);
     void acumularPorServicio(Reserva reserva);
-    void acumularPorVenta(Venta venta);
+    void acumularPorVenta(Venta venta, Long reservaId);
     void consumirGiro(FidelizacionTarjeta tarjeta);
     List<FidelizacionTarjeta> obtenerTarjetasPorCliente(Integer clienteId);
     void evaluarMeta(FidelizacionTarjeta tarjeta);
