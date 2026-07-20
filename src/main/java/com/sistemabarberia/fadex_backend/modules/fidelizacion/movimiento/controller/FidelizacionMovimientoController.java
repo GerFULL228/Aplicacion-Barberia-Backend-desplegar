@@ -66,4 +66,9 @@ public class FidelizacionMovimientoController {
     public ResponseEntity<ApiResponse<List<FidelizacionMovimientoResponseDTO>>> obtenerMisMovimientos(){
         return ResponseEntity.ok(ApiResponse.ok("Mis movimientos obtenidos correctamente.", movimientoService.obtenerMisMovimientos()));
     }
+
+    @GetMapping("/ultimos")
+    public ResponseEntity<ApiResponse<List<FidelizacionMovimientoResponseDTO>>> obtenerUltimosMovimientos(@RequestParam(defaultValue = "5") int limite) {
+        return ResponseEntity.ok(ApiResponse.success(movimientoService.obtenerUltimosMovimientos(limite)));
+    }
 }

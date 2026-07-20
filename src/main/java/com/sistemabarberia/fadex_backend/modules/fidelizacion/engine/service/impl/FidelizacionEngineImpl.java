@@ -33,8 +33,8 @@ public class FidelizacionEngineImpl implements IFidelizacionEngine {
     }
 
     @Override
-    public void procesarVenta(Venta venta) {
-        tarjetaService.acumularPorVenta(venta);
+    public void procesarVenta(Venta venta, Long reservaId) {
+        tarjetaService.acumularPorVenta(venta, reservaId);
         if(venta.getCliente()==null){return;}
         List<FidelizacionTarjeta> tarjetas = tarjetaService.obtenerTarjetasPorCliente(venta.getCliente().getClienteId());
         tarjetas.forEach(tarjetaService::evaluarMeta);

@@ -109,7 +109,7 @@ public class PagoServiceImpl implements IPagoService {
             fidelizacionEngine.procesarServicio(reserva);
         }
         if (venta != null) {
-            fidelizacionEngine.procesarVenta(venta);
+            fidelizacionEngine.procesarVenta(venta, reserva != null ? reserva.getId() : null);
         }
         return pagoMapper.toResponse(pagoGuardado);
     }

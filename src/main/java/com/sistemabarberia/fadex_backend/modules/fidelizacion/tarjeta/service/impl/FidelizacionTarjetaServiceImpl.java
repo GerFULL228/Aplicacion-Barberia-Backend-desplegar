@@ -162,12 +162,15 @@ public class FidelizacionTarjetaServiceImpl implements IFidelizacionTarjetaServi
 
     @Override
     @Transactional
-    public void acumularPorVenta(Venta venta) {
+    public void acumularPorVenta(Venta venta, Long reservaId) {
         if (venta.getCliente() == null) {return;}
         if (venta.getDetalles() == null || venta.getDetalles().isEmpty()) {return;}
-        if (movimientoRepository.existsByOrigenAndIdOrigen(OrigenFidelizacion.VENTA, venta.getVentaId().longValue())) {return;}
+
+        boolean yaProcesadaComoVenta = movimientoRepository.existsByOrigenAndIdOrigen(OrigenFidelizacion.VENTA, venta.getVentaId().longValue());
+
         for (DetalleVenta detalle : venta.getDetalles()) {
             if (detalle.getProducto() != null) {
+                if (yaProcesadaComoVenta) {continue;}
                 Producto producto = detalle.getProducto();
                 Categoria categoriaFidelizacion = categoriaResolver.resolver(producto.getCategoria());
                 if (categoriaFidelizacion == null) {continue;}
@@ -183,10 +186,16 @@ public class FidelizacionTarjetaServiceImpl implements IFidelizacionTarjetaServi
                 tarjetaRepository.save(tarjeta);
                 evaluarMeta(tarjeta);
                 movimientoService.registrarMovimiento(tarjeta, OrigenFidelizacion.VENTA, venta.getVentaId().longValue(), puntos, "Producto: " + producto.getNombre());
-
             }
+
             if (detalle.getServicio() != null) {
                 Servicio servicio = detalle.getServicio();
+
+                OrigenFidelizacion origen = reservaId != null ? OrigenFidelizacion.RESERVA : OrigenFidelizacion.VENTA;
+                Long idOrigen = reservaId != null ? reservaId : venta.getVentaId().longValue();
+
+                if (movimientoRepository.existsByOrigenAndIdOrigen(origen, idOrigen)) {continue;}
+
                 Categoria categoriaFidelizacion = categoriaResolver.resolver(servicio.getCategoria());
                 if (categoriaFidelizacion == null) {continue;}
                 Long categoriaId = categoriaFidelizacion.getId();
@@ -194,13 +203,14 @@ public class FidelizacionTarjetaServiceImpl implements IFidelizacionTarjetaServi
                 FidelizacionTarjeta tarjeta = tarjetaRepository.findByClienteClienteIdAndCategoriaId(venta.getCliente().getClienteId(), categoriaId).orElse(null);
                 if (tarjeta == null || !Boolean.TRUE.equals(tarjeta.getActivo())) {continue;}
                 FidelizacionRegla regla = reglaRepository.findByCategoriaIdAndServicioServicioIdAndActivoTrue(categoriaId, servicio.getServicioId()).orElseGet(() -> {
-                    FidelizacionRegla nueva = FidelizacionRegla.builder().categoria(categoriaFidelizacion).tipoAlcance(TipoAlcanceFidelizacion.SERVICIO).servicio(servicio).puntos(1).activo(true).build();return reglaRepository.save(nueva);
+                    FidelizacionRegla nueva = FidelizacionRegla.builder().categoria(categoriaFidelizacion).tipoAlcance(TipoAlcanceFidelizacion.SERVICIO).servicio(servicio).puntos(1).activo(true).build();
+                    return reglaRepository.save(nueva);
                 });
                 int puntos = regla.getPuntos() * detalle.getCantidad();
                 tarjeta.setProgreso(tarjeta.getProgreso() + puntos);
                 tarjetaRepository.save(tarjeta);
                 evaluarMeta(tarjeta);
-                movimientoService.registrarMovimiento(tarjeta, OrigenFidelizacion.VENTA, venta.getVentaId().longValue(), puntos, "Servicio: " + servicio.getNombre());
+                movimientoService.registrarMovimiento(tarjeta, origen, idOrigen, puntos, "Servicio: " + servicio.getNombre());
             }
         }
     }

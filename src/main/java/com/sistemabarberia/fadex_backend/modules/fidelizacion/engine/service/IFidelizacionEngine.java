@@ -7,5 +7,5 @@ import com.sistemabarberia.fadex_backend.modules.venta.entity.Venta;
 public interface IFidelizacionEngine {
     void registrarCliente(Cliente cliente);
     void procesarServicio(Reserva reserva);
-    void procesarVenta(Venta venta);
+    void procesarVenta(Venta venta, Long reservaId);
 }

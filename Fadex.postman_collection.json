@@ -75,7 +75,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": " \r\n \r\n \r\n// {  \"username\": \"admin1\",   \"password\": \"admin123\" }\r\n\r\n  {\"username\": \"Pablo123_\", \"password\": \"Pablo123_\" }\r\n\r\n",
+              "raw": " \r\n \r\n \r\n //{  \"username\": \"admin1\",   \"password\": \"admin123\" }\r\n\r\n// {\"username\": \"Pablo123_\", \"password\": \"Pablo123_\" }\r\n\r\n  {  \"username\": \"raul_123\",   \"password\": \"raul_123\" }\r\n\r\n\r\n",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2316,7 +2316,7 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{api_url_v1}}/fidelizacion/movimientos?clienteId=1",
+                  "raw": "{{api_url_v1}}/fidelizacion/movimientos",
                   "host": [
                     "{{api_url_v1}}"
                   ],
@@ -2327,7 +2327,8 @@
                   "query": [
                     {
                       "key": "clienteId",
-                      "value": "1"
+                      "value": "1",
+                      "disabled": true
                     },
                     {
                       "key": "tarjetaId",
@@ -2524,6 +2525,67 @@
                     "fidelizacion",
                     "movimientos",
                     "mis-movimientos"
+                  ],
+                  "query": [
+                    {
+                      "key": "clienteId",
+                      "value": "1",
+                      "type": "text",
+                      "disabled": true
+                    },
+                    {
+                      "key": "tarjetaId",
+                      "value": "1",
+                      "type": "text",
+                      "disabled": true
+                    },
+                    {
+                      "key": "origen",
+                      "value": "RESERVA",
+                      "type": "text",
+                      "disabled": true
+                    },
+                    {
+                      "key": "fechaInicio",
+                      "value": "2026-06-28T05:46:23.20822",
+                      "type": "text",
+                      "disabled": true
+                    },
+                    {
+                      "key": "fechaFin",
+                      "value": "2026-06-28T05:46:23.20822",
+                      "type": "text",
+                      "disabled": true
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "MisUltimosMovimientos",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{api_url_v1}}/fidelizacion/movimientoa/ultimos",
+                  "host": [
+                    "{{api_url_v1}}"
+                  ],
+                  "path": [
+                    "fidelizacion",
+                    "movimientoa",
+                    "ultimos"
                   ],
                   "query": [
                     {
@@ -3163,7 +3225,7 @@
               "response": []
             },
             {
-              "name": "obtener dahsbaord cliente Copy",
+              "name": "obtener dahsbaord",
               "request": {
                 "auth": {
                   "type": "bearer",
@@ -3178,14 +3240,14 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{api_url_v1}}/fidelizacion/dashboard/cliente",
+                  "raw": "{{api_url_v1}}/fidelizacion/dashboard/admin",
                   "host": [
                     "{{api_url_v1}}"
                   ],
                   "path": [
                     "fidelizacion",
                     "dashboard",
-                    "cliente"
+                    "admin"
                   ]
                 }
               },
@@ -4141,7 +4203,7 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{api_url_v1}}/ruleta/giros?clienteId=1&tarjetaId=2&ruletaId=2&fechaInicio=2026-06-28T05:46:23.20822&fechaFin=2026-06-28T05:46:23.20822",
+                  "raw": "{{api_url_v1}}/ruleta/giros",
                   "host": [
                     "{{api_url_v1}}"
                   ],
@@ -4152,23 +4214,28 @@
                   "query": [
                     {
                       "key": "clienteId",
-                      "value": "1"
+                      "value": "1",
+                      "disabled": true
                     },
                     {
                       "key": "tarjetaId",
-                      "value": "2"
+                      "value": "2",
+                      "disabled": true
                     },
                     {
                       "key": "ruletaId",
-                      "value": "2"
+                      "value": "2",
+                      "disabled": true
                     },
                     {
                       "key": "fechaInicio",
-                      "value": "2026-06-28T05:46:23.20822"
+                      "value": "2026-06-28T05:46:23.20822",
+                      "disabled": true
                     },
                     {
                       "key": "fechaFin",
-                      "value": "2026-06-28T05:46:23.20822"
+                      "value": "2026-06-28T05:46:23.20822",
+                      "disabled": true
                     }
                   ]
                 }

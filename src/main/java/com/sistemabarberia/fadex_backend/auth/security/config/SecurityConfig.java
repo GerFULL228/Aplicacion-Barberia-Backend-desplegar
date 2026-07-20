@@ -164,13 +164,9 @@ public class SecurityConfig {
                         // ─────────────────────────────────────────────
                         // RECOMPENSAS
                         // ─────────────────────────────────────────────
-                        .requestMatchers(HttpMethod.GET,
-                                "/api/v1/recompensas/mi-tarjeta"
-                        ).hasRole("cliente")
-
-                        .requestMatchers(HttpMethod.GET,
-                                "/api/v1/recompensas/**"
-                        ).hasAnyRole("admin", "barbero")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/recompensas/mi-tarjeta").hasRole("cliente")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/recompensas/obtenidas/mis-recompensas", "/api/v1/recompensas/obtenidas/mis-recompensas/**").hasAnyRole("admin", "barbero", "cliente")
+                                .requestMatchers(HttpMethod.GET, "/api/v1/recompensas/**").hasAnyRole("admin", "barbero")
                         // ─────────────────────────────────────────────
                         // PAGOS
                         // ─────────────────────────────────────────────
